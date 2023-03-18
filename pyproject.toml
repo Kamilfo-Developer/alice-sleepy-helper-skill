@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "alice-hackathon-2023"
+version = "0.1.0"
+description = "A skill for Yandex Alice Hackathon 2023"
+authors = ["Kamil Biktimirov <Biktimirov.kamil@yandex.ru>"]
+readme = "README.md"
+packages = [{include = "alice_hackathon_2023"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.1.0"
+mypy = "^1.1.1"
+flake8 = "^6.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
