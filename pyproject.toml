@@ -8,6 +8,8 @@ packages = [{include = "alice_hackathon_2023"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
+python-dotenv = "^1.0.0"
+aioalice = "^1.5.1"
 
 
 [tool.poetry.group.dev.dependencies]
