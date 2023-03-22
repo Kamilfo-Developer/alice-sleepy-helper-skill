@@ -1,7 +1,7 @@
 import abc
 
 
-class Messages(abc.ABC):
+class BaseMessages(abc.ABC):
     def __init__(self):
         pass
 

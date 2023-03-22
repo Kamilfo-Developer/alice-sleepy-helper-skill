@@ -1,7 +1,7 @@
-from skill.messages.abc_messages import Messages
+from skill.messages.base_messages import BaseMessages
 
 
-class RUMessages(Messages):
+class RUMessages(BaseMessages):
     def __init__(self):
         pass
 
