@@ -21,5 +21,8 @@ COPY --from=requirements-stage /tmp/requirements.txt /app/requirements.txt
 
 RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
 
+# Making migrations using alembic
+RUN cd /app/bot/db/migrations && alembic upgrade head && cd /app 
+
 # Running the app
 CMD ["python3", "-m", "skill"]
