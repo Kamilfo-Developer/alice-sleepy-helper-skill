@@ -1,4 +1,5 @@
 import abc
+from .context_flags import Daytime
 
 
 class BaseMessages(abc.ABC):
@@ -6,5 +7,11 @@ class BaseMessages(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_start_message(self, time):
+    def get_start_message_intro(self, time: Daytime):
         pass
+
+    @abc.abstractmethod
+    def get_start_message_comeback(self, time: Daytime):
+        pass
+
+
