@@ -3,7 +3,7 @@ import datetime
 import random
 from skill.utils import TextWithTTS, Daytime, gentle_capitalize
 from skill.utils import construct_random_message
-from skill.messages.unicode_literals import DASH
+from skill.messages.unicode_literals import DASH, LAQUO, RAQUO
 from skill.messages.base_messages import BaseMessages
 
 
@@ -13,44 +13,96 @@ class RUMessages(BaseMessages):
 
     def get_start_message_intro(self, time: datetime.datetime) -> TextWithTTS:
         daytime = Daytime.from_time(time)
-        greeting_text = ""
+        greeting = TextWithTTS("Здравствуйте!")
         match daytime:
             case Daytime.DAY:
-                greeting_text = "Добрый день!"
+                greeting = TextWithTTS("Добрый день!")
             case Daytime.MORNING:
-                greeting_text = "Доброе утро!"
+                greeting = TextWithTTS("Доброе утро!")
             case Daytime.EVENING:
-                greeting_text = "Добрый вечер!"
+                greeting = TextWithTTS("Добрый вечер!")
             case Daytime.NIGHT:
-                greeting_text = "Доброй ночи!"
+                greeting = TextWithTTS("Доброй ночи!")
 
-        twtts = TextWithTTS(
-            text=f"{greeting_text} Я {DASH} Сонный Помощник, я помогаю вам"
-            " организовать свой сон."
+        intro = TextWithTTS(
+                f"Я {DASH} Сонный Помощник. Я помогаю вам организовать"
+                " ваш сон."
+            )
+
+        man = TextWithTTS(
+                "Вы можете попросить меня рассчитать оптимальное для "
+                "вас время сна, за которое вы можете выспаться. "
+                f"Для этого скажите {LAQUO}Я хочу спать{RAQUO}. "
+                "А ещё вы можете попросить меня дать вам пару "
+                "советов по тому, как лучше высыпаться."
+            )
+
+        replicas_tail = [
+            TextWithTTS("Чем я могу помочь?"),
+            TextWithTTS("Чем могу помочь?"),
+            TextWithTTS("Чем могу быть полезен?"),
+            # TODO:                         ^^ Assure gender consistency
+            TextWithTTS("Я к вашим услугам.")
+        ]
+
+        twtts = TextWithTTS(' ').join(
+            (
+                greeting,
+                intro,
+                man,
+                random.choice(replicas_tail)
+            )
         )
+
         return twtts
 
     def get_start_message_comeback(
         self, time: datetime.datetime, streak: int, scoreboard: int
     ) -> TextWithTTS:
         daytime = Daytime.from_time(time)
-        greeting_text = ""
+        greeting = TextWithTTS("Здравствуйте!")
         match daytime:
             case Daytime.DAY:
-                greeting_text = "Добрый день!"
+                greeting = TextWithTTS("Добрый день!")
             case Daytime.MORNING:
-                greeting_text = "Доброе утро!"
+                greeting = TextWithTTS("Доброе утро!")
             case Daytime.EVENING:
-                greeting_text = "Добрый вечер!"
+                greeting = TextWithTTS("Добрый вечер!")
             case Daytime.NIGHT:
-                greeting_text = "Доброй ночи!"
+                greeting = TextWithTTS("Доброй ночи!")
 
-        twtts = TextWithTTS(
-            text=f"{greeting_text} "
-            f"Сегодня вы пользуетесь Сонным Помощником {streak} день "
-            f"подряд. Так держать! Вы спите лучше, чем {scoreboard}%"
-            " пользователей!"
-        )
+        twtts = greeting
+
+        if streak > 1:
+            praise = TextWithTTS(
+                f" Сегодня вы пользуетесь Сонным Помощником {streak}"
+                " день подряд. "
+            )
+            replicas_insert = [
+                TextWithTTS("Так держать!"),
+                TextWithTTS("Замечательно!"),
+                TextWithTTS("Здорово!"),
+                TextWithTTS("Ура!"),
+                TextWithTTS("Прекрасно!"),
+                TextWithTTS("Продолжайте в том же духе!")
+            ]
+            praise += random.choice(replicas_insert)
+            praise += TextWithTTS(
+                f" Вы спите лучше, чем {scoreboard}% пользователей! "
+            )
+
+            twtts += praise
+
+        replicas_tail = [
+            TextWithTTS("Чем я могу помочь?"),
+            TextWithTTS("Чем могу помочь?"),
+            TextWithTTS("Чем могу быть полезен?"),
+            # TODO:                         ^^ Assure gender consistency
+            TextWithTTS("Я к вашим услугам.")
+        ]
+
+        twtts += random.choice(replicas_tail)
+
         return twtts
 
     def get_menu_welcome_message(self) -> TextWithTTS:
@@ -91,11 +143,11 @@ class RUMessages(BaseMessages):
             ),
             TextWithTTS(
                 f"Я {DASH} Сонный Помощник. Моя цель {DASH} помочь вам"
-                " обеспечить себе хороший и комфортный сон."
+                " обеспечить себе хороший комфортный сон."
             ),
             TextWithTTS(
-                f"Я {DASH} Сонный Помощник, я могу помочь вам спать"
-                " лучше и комфортнее."
+                f"Я {DASH} Сонный Помощник, я могу помочь вам лучше спать."
+
             ),
             TextWithTTS(
                 f"Я {DASH} Сонный Помощник, я могу помочь вам"
@@ -106,46 +158,60 @@ class RUMessages(BaseMessages):
         replicas_b = [
             TextWithTTS(
                 "Вы можете попросить меня рассчитать оптимальное для "
-                "вас время сна, за которое вы можете выспаться"
+                "вас время сна, за которое вы можете выспаться."
             ),
             TextWithTTS(
                 "Я могу рассчитать для вас оптимальное "
-                "время сна, за которое вы можете выспаться"
+                "время сна, за которое вы можете выспаться."
             ),
             TextWithTTS(
                 "С помощью меня, вы можете узнать, во сколько "
-                "вам стоит сегодня лечь, чтобы выспаться"
+                "вам стоит сегодня лечь, чтобы выспаться."
             ),
             TextWithTTS(
                 "Я могу помочь вам подобрать подходящее для вас "
-                "время сна, чтобы вы смогли выспаться"
+                "время сна, чтобы вы смогли выспаться."
             ),
         ]
 
         replicas_c = [
             TextWithTTS(
-                ". А ещё вы можете попросить у меня совет по тому, "
-                "как лучше спать."
+                f"Для этого скажите {LAQUO}Я хочу спать{RAQUO}."
             ),
             TextWithTTS(
-                ", или вы можете попросить у меня совет по тому, "
-                "как лучше спать."
-            ),
-            TextWithTTS(
-                ". А ещё я могу поделиться советом по здоровому сну."
-            ),
-            TextWithTTS(
-                ", а ещё я могу дать вам небольшой совет по "
-                "интересующему вас виду сна."
-            ),
-            TextWithTTS(
-                ". Ещё я могу дать вам пару советов по улучшению "
-                "качества вашего сна."
+                "Чтобы вызвать эту функцию, скажитe "
+                f"{LAQUO}Я хочу спать{RAQUO}."
             ),
         ]
 
-        twtts = construct_random_message(replicas_a, replicas_b, replicas_c,
-                                         insert_spaces=False)
+        replicas_d = [
+            TextWithTTS(
+                "А ещё вы можете попросить у меня совет по тому, "
+                "как лучше спать."
+            ),
+            TextWithTTS(
+                "Или вы можете попросить у меня совет по тому, "
+                "как лучше спать."
+            ),
+            TextWithTTS(
+                "А ещё я могу поделиться советом по здоровому сну."
+            ),
+            TextWithTTS(
+                "А ещё я могу дать вам небольшой совет по "
+                "интересующему вас виду сна."
+            ),
+            TextWithTTS(
+                "Ещё я могу дать вам пару советов по улучшению "
+                "качества вашего сна."
+            ),
+            TextWithTTS(
+                "А ещё я могу дать вам пару советов по тому, "
+                "как высыпаться."
+            ),
+        ]
+
+        twtts = construct_random_message(replicas_a, replicas_b,
+                                         replicas_c, replicas_d)
 
         return twtts
 
