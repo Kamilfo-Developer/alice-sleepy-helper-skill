@@ -18,5 +18,5 @@ def auto(locale):
     """
 
     if locale not in POSIX_alliases:
-        return RUMessages()
-    return POSIX_alliases[locale]()
+        return RUMessages
+    return POSIX_alliases[locale]
