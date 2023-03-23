@@ -2,7 +2,7 @@ from __future__ import annotations
 import enum
 import datetime
 import random
-from typing import Union, Any, Iterable, List
+from typing import Union, Any, Iterable, List, Callable
 
 
 class Daytime(enum.Enum):
@@ -75,6 +75,21 @@ class TextWithTTS:
 
     def __iadd__(self, __o: Union[str, TextWithTTS]) -> TextWithTTS:
         return self + __o
+
+    def transform(self, func: Callable[[str], str]) -> TextWithTTS:
+        """Apply a function to both text and speech parts
+        of TextWithTTS.
+
+        Args:
+            func (Callable[[str], str]): the function to transform
+            TextWithTTS strings
+
+        Returns:
+            TextWithTTS: new TextWithTTS with transformed strings
+        """
+
+        return TextWithTTS(func(self.text),
+                           func(self.tts))
 
     def join(self, __iterable: Iterable[TextWithTTS], /):
         """Likewise str.join, concatenate any number of TextWithTTS.

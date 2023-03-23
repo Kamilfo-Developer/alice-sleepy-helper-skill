@@ -1,10 +1,13 @@
-from typing import List, Any
+from typing import List, TYPE_CHECKING
 import datetime
 import random
 from skill.utils import TextWithTTS, Daytime, gentle_capitalize
 from skill.utils import construct_random_message
 from skill.messages.unicode_literals import DASH, LAQUO, RAQUO
 from skill.messages.base_messages import BaseMessages
+
+if TYPE_CHECKING:
+    from skill.entities import Tip, Activity
 
 
 class RUMessages(BaseMessages):
@@ -240,9 +243,8 @@ class RUMessages(BaseMessages):
         #       are planned to be added in the future.
         return random.choice(replicas)
 
-    def get_tip_message(self, tip: Any) -> TextWithTTS:
-        return TextWithTTS(gentle_capitalize(tip.text),
-                           gentle_capitalize(tip.tts))
+    def get_tip_message(self, tip: Tip) -> TextWithTTS:
+        return tip.tip_content.transform(gentle_capitalize)
 
     def get_propose_yesterday_wake_up_time_message(
         self, last_time: datetime.time
@@ -272,7 +274,7 @@ class RUMessages(BaseMessages):
         return random.choice(replicas)
 
     def get_sleep_calc_time_message(
-        self, bed_time: datetime.time, activities: List[Any]
+        self, bed_time: datetime.time, activities: List[Activity]
     ) -> TextWithTTS:
 
         twtts = TextWithTTS("Хорошо, рекомендую вам лечь в "

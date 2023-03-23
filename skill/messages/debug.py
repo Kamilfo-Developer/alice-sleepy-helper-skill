@@ -1,16 +1,21 @@
 import datetime
+from skill.utils import TextWithTTS
 
 
 def messages_showcase(messages_class):
     msg = messages_class()
 
     class QuaziTip:
-        text = "ложитесь спать в полдень, это помогает пищеварению"
-        tts = "лажитесь спать в п+олдень - это помогает пищеварению"
+        tip_content = TextWithTTS(
+            "ложитесь спать в полдень, это помогает пищеварению",
+            "лажитесь спать в п+олдень - это помогает пищеварению"
+            )
 
     class QuaziAct:
-        description = "выкинуть мусор"
-        tts = "в+ыкинуть м+усор"
+        description = TextWithTTS(
+            "выкинуть мусор",
+            "в+ыкинуть м+усор"
+            )
 
     def prtwtts(twtts):
         print(f"Text: {twtts.text}")
