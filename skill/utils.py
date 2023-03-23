@@ -1,6 +1,6 @@
 import enum
 import datetime
-from typing import Union
+from typing import Union, Optional
 
 
 class Daytime(enum.Enum):
@@ -11,8 +11,13 @@ class Daytime(enum.Enum):
 
     @classmethod
     def from_time(cls, time: Union[datetime.datetime, datetime.time]):
-        '''
-        Identify Daytime from time
+        '''Identify Daytime from time
+
+        Args:
+            time (datetime.datetime | datetime.time): time to recieve daytime.
+
+        Returns:
+            Daytime: one of daytime options according to the given time
         '''
         if isinstance(time, datetime.datetime):
             time = time.time()
@@ -36,6 +41,14 @@ class TextWithTTS:
     text: str
     tts: str
 
-    def __init__(self, text: str, tts: str):
+    def __init__(self, text: str, tts: Optional[str] = None):
         self.text = text
+        if tts is None:
+            tts = text
         self.tts = tts
+
+
+def gentle_capitalize(text: str):
+    if not text:
+        return text
+    return text[0].upper() + text[1:]
