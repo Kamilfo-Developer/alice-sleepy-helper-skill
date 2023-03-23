@@ -2,6 +2,7 @@ from __future__ import annotations
 import enum
 import datetime
 import random
+import itertools
 from typing import Union, Any, Iterable, List, Callable
 
 
@@ -105,9 +106,9 @@ class TextWithTTS:
         Returns:
             TextWithTTS: the concatenation result
         """
-
-        return TextWithTTS(self.text.join(map(lambda x: x.text, __iterable)),
-                           self.tts.join(map(lambda x: x.tts, __iterable)))
+        i1, i2 = itertools.tee(__iterable, 2)
+        return TextWithTTS(self.text.join(map(lambda x: x.text, i1)),
+                           self.tts.join(map(lambda x: x.tts, i2)))
 
 
 class IdComparable:

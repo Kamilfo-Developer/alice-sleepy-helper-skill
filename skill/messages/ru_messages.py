@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import List, TYPE_CHECKING
 import datetime
 import random
@@ -113,7 +114,7 @@ class RUMessages(BaseMessages):
             TextWithTTS("Вы находитесь в главном меню."),
             TextWithTTS("Это главное меню Сонного Помощника."),
             TextWithTTS("Вы в главном меню."),
-            TextWithTTS("Вы находитесь в главном меню Сонного Помощника"),
+            TextWithTTS("Вы находитесь в главном меню Сонного Помощника."),
         ]
 
         replicas_b = [
