@@ -1,6 +1,7 @@
+
 import enum
 import datetime
-from typing import Union, Optional
+from typing import Union, Optional, Any
 
 
 class Daytime(enum.Enum):
@@ -37,18 +38,39 @@ class Daytime(enum.Enum):
         return cls.NIGHT
 
 
+
 class TextWithTTS:
     text: str
     tts: str
 
-    def __init__(self, text: str, tts: Optional[str] = None):
+    def __init__(self, text: str, tts: str | None = None):
         self.text = text
         if tts is None:
             tts = text
+            return
+            
         self.tts = tts
 
 
-def gentle_capitalize(text: str):
-    if not text:
-        return text
-    return text[0].upper() + text[1:]
+  def gentle_capitalize(text: str):
+      if not text:
+          return text
+      return text[0].upper() + text[1:]
+
+    def __eq__(self, __o: object) -> bool:
+        return (
+            isinstance(__o, TextWithTTS)
+            and self.text == __o.text
+            and self.tts == __o.tts
+        )
+
+    def __str__(self) -> str:
+        return "Text:\n" f"{self.text}" "\n" "TTS:\n" f"{self.tts}"
+
+
+class IdComparable:
+    _id: Any
+
+    def __eq__(self, __o: object) -> bool:
+        return isinstance(__o, self.__class__) and self._id == __o._id
+
