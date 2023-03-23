@@ -144,7 +144,8 @@ class RUMessages(BaseMessages):
             ),
         ]
 
-        twtts = construct_random_message(replicas_a, replicas_b, replicas_c)
+        twtts = construct_random_message(replicas_a, replicas_b, replicas_c,
+                                         insert_spaces=False)
 
         return twtts
 
@@ -194,28 +195,31 @@ class RUMessages(BaseMessages):
     def get_sleep_calc_time_message(
         self, bed_time: datetime.time, activities: List[Any]
     ) -> TextWithTTS:
-        text = "Хорошо, рекомендую вам лечь в "
-        text += f"{bed_time.isoformat(timespec='minutes')}. "
-        tts = text
+
+        twtts = TextWithTTS("Хорошо, рекомендую вам лечь в "
+                            f"{bed_time.isoformat(timespec='minutes')}. ")
         if activities:
-            text += "За этот вечер вы можете успеть, например, "
-            tts = text
-            activities_text = [act.description for act in activities]
-            activities_tts = [act.tts for act in activities]
+            twtts += TextWithTTS("За этот вечер вы можете успеть, например, ")
+
+            activities_twtts = [act.description for act in activities]
             if len(activities) > 1:
-                activities_text[-1] = " или ".join(
-                    (activities_text[-2], activities_text[-1])
+                activities_twtts[-1] = TextWithTTS(" или ").join(
+                    (activities_twtts[-2], activities_twtts[-1])
                 )
-                activities_tts[-1] = " или ".join(
-                    (activities_tts[-2], activities_tts[-1])
-                )
-            text += ", ".join(activities_text) + ". "
-            tts += ", ".join(activities_tts) + ". "
+            twtts += TextWithTTS(", ").join(activities_twtts) + ". "
 
-        text += "Не желаете-ли получить совет по сну?"
-        tts += "Не желаете-ли получить совет по сну?"
+        replica_tail = [
+            TextWithTTS("Не желаете-ли получить совет по сну?"),
+            TextWithTTS("Не хотите-ли получить совет по сну?"),
+            TextWithTTS("Хотите получить совет по сну?"),
+            TextWithTTS("Как насчёт совета по сну?"),
+            TextWithTTS("Как насчёт небольшого совета по сну?"),
+            TextWithTTS("Вас интересует совет по сну?"),
+            TextWithTTS("Хотите совет по сну?"),
+        ]
+        twtts += random.choice(replica_tail)
 
-        return TextWithTTS(text=text, tts=tts)
+        return twtts
 
     def get_good_night_message(self) -> TextWithTTS:
         replicas = [

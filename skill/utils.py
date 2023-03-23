@@ -73,6 +73,9 @@ class TextWithTTS:
         return TextWithTTS(__o + self.text,
                            __o + self.text)
 
+    def __iadd__(self, __o: Union[str, TextWithTTS]) -> TextWithTTS:
+        return self + __o
+
     def join(self, __iterable: Iterable[TextWithTTS], /):
         """Likewise str.join, concatenate any number of TextWithTTS.
 
