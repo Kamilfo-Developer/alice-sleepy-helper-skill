@@ -1,7 +1,8 @@
 from __future__ import annotations
 import enum
 import datetime
-from typing import Union, Any, Iterable
+import random
+from typing import Union, Any, Iterable, List
 
 
 class Daytime(enum.Enum):
@@ -99,6 +100,38 @@ class IdComparable:
 
 
 def gentle_capitalize(text: str):
+    """Make the first character of a string have upper case
+    leaving the rest of the string as is, unlike built-in
+    str.capitalize method, which makes all other characters
+    have lower case.
+
+    Args:
+        text (str): the string to convert
+
+    Returns:
+        str: gently capitalized string
+    """
+
     if not text:
         return text
     return text[0].upper() + text[1:]
+
+
+def construct_random_message(*parts: List[TextWithTTS], insert_spaces=True):
+    """Construct randomly generated message from a sequence
+    of message parts options.
+
+    Args:
+        *parts (List[TextWithTTS]): message parts options
+        in the sequential order.
+
+        insert_spaces (bool, optional): whether to insert
+        spaces inbetween the parts of a message or not.
+        Degaults to True.
+
+    Returns:
+        TextWithTTS: constructed message
+    """
+    return TextWithTTS(" " if insert_spaces else "").join(
+        map(lambda x: random.choice(x),
+            parts))
