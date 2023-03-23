@@ -23,14 +23,17 @@ def messages_showcase(messages_class):
     prtwtts(msg.get_info_message())
     prtwtts(msg.get_ask_tip_topic_message())
     prtwtts(
-        msg.get_propose_yesterday_wake_up_time_message(datetime.datetime.now().time())
+        msg.get_propose_yesterday_wake_up_time_message(
+            datetime.datetime.now().time()
+            )
     )
     prtwtts(msg.get_ask_wake_up_time_message())
     prtwtts(msg.get_ask_sleep_mode_message())
     prtwtts(msg.get_tip_message(QuaziTip()))
     prtwtts(
         msg.get_sleep_calc_time_message(
-            datetime.datetime.now().time(), [QuaziAct()] * 4
+            datetime.datetime.now().time(),
+            [QuaziAct()] * 4
         )
     )
     prtwtts(msg.get_good_night_message())

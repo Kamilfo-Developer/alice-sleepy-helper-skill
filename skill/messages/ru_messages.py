@@ -1,8 +1,9 @@
-from skill.messages.base_messages import BaseMessages
+from typing import List, Any
 import datetime
+import random
 from skill.utils import TextWithTTS, Daytime, gentle_capitalize
 from skill.messages.unicode_literals import DASH
-from typing import List, Any
+from skill.messages.base_messages import BaseMessages
 
 
 class RUMessages(BaseMessages):
@@ -52,10 +53,27 @@ class RUMessages(BaseMessages):
         return twtts
 
     def get_menu_welcome_message(self) -> TextWithTTS:
-        return TextWithTTS(
-            text="Вы находитесь в главном меню. "
-            "Здесь вам доступны все функции Сонного Помощника."
-        )
+        replicas_a = [
+            TextWithTTS("Вы находитесь в главном меню."),
+            TextWithTTS("Это главное меню Сонного Помощника."),
+            TextWithTTS("Вы в главном меню."),
+            TextWithTTS("Вы находитесь в главном меню Сонного Помощника"),
+            ]
+
+        replicas_b = [
+            TextWithTTS("Здесь вам доступны все функции навыка."),
+            TextWithTTS("Чем я могу помочь?"),
+            TextWithTTS("Чем могу быть полезен?"),
+            # TODO:                         ^^ Assure gender consistency
+            TextWithTTS("Я к вашим услугам."),
+            TextWithTTS("Что угодно, лишь бы вы спали хорошо."),
+            # NOTE:     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Informal
+            ]
+
+        twtts = TextWithTTS(' ').join((random.choice(replicas_a),
+                                      random.choice(replicas_b)))
+
+        return twtts
 
     def get_info_message(self) -> TextWithTTS:
         return TextWithTTS(

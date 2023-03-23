@@ -1,7 +1,7 @@
-
+from __future__ import annotations
 import enum
 import datetime
-from typing import Union, Optional, Any
+from typing import Union, Any, Iterable
 
 
 class Daytime(enum.Enum):
@@ -38,7 +38,6 @@ class Daytime(enum.Enum):
         return cls.NIGHT
 
 
-
 class TextWithTTS:
     text: str
     tts: str
@@ -47,15 +46,7 @@ class TextWithTTS:
         self.text = text
         if tts is None:
             tts = text
-            return
-            
         self.tts = tts
-
-
-  def gentle_capitalize(text: str):
-      if not text:
-          return text
-      return text[0].upper() + text[1:]
 
     def __eq__(self, __o: object) -> bool:
         return (
@@ -67,6 +58,38 @@ class TextWithTTS:
     def __str__(self) -> str:
         return "Text:\n" f"{self.text}" "\n" "TTS:\n" f"{self.tts}"
 
+    def __add__(self, __o: Union[str, TextWithTTS]) -> TextWithTTS:
+        if isinstance(__o, TextWithTTS):
+            return TextWithTTS(self.text + __o.text,
+                               self.tts + __o.tts)
+        return TextWithTTS(self.text + __o,
+                           self.tts + __o)
+
+    def __radd__(self, __o: Union[str, TextWithTTS]) -> TextWithTTS:
+        if isinstance(__o, TextWithTTS):
+            return TextWithTTS(__o.text + self.text,
+                               __o.tts + self.tts)
+        return TextWithTTS(__o + self.text,
+                           __o + self.text)
+
+    def join(self, __iterable: Iterable[TextWithTTS], /):
+        """Likewise str.join, concatenate any number of TextWithTTS.
+
+        Calls str.join for text parts and tts parts of TextWithTTS objects
+        seperately and returns a new instance with concatenated text and tts.
+        TextWithTTS whose method is being called inserts its text and tts
+        between the concatenated objects.
+
+        Args:
+            Iterable[TextWithTTS]: sequence of TextWithTTS to concatenate
+
+        Returns:
+            TextWithTTS: the concatenation result
+        """
+
+        return TextWithTTS(self.text.join(map(lambda x: x.text, __iterable)),
+                           self.tts.join(map(lambda x: x.tts, __iterable)))
+
 
 class IdComparable:
     _id: Any
@@ -74,3 +97,8 @@ class IdComparable:
     def __eq__(self, __o: object) -> bool:
         return isinstance(__o, self.__class__) and self._id == __o._id
 
+
+def gentle_capitalize(text: str):
+    if not text:
+        return text
+    return text[0].upper() + text[1:]
