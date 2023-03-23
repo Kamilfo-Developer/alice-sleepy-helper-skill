@@ -149,7 +149,29 @@ class RUMessages(BaseMessages):
         return twtts
 
     def get_ask_tip_topic_message(self) -> TextWithTTS:
-        return TextWithTTS(text="Вас интересует совет по дневному или ночному сну?")
+        replicas = [
+            TextWithTTS(
+                "Вас интересует совет по дневному или ночному сну?"
+            ),
+            TextWithTTS(
+                "По какому сну вы хотите получить совет, дневному, "
+                "или ночному? "
+            ),
+            TextWithTTS(
+                "Я могу дать вам совет по дневному или ночному сну. "
+                "Какой сон вас интересует?"
+            ),
+            TextWithTTS(
+                "С каким сном вам нужна помощь? С дневным или ночным?"
+            ),
+            TextWithTTS(
+                "Вам нужна помощь по дневному или ночному сну?"
+            ),
+        ]
+        # NOTE: Tip topic options are currently hardcoded.
+        #       This may cause issues if new tip topics
+        #       are planned to be added in the future.
+        return random.choice(replicas)
 
     def get_tip_message(self, tip: Any) -> TextWithTTS:
         return TextWithTTS(gentle_capitalize(tip.text),
