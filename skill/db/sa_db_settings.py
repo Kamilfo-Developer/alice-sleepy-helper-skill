@@ -17,7 +17,7 @@ POSTGRES_DRIVER_NAME = os.getenv("POSTGRES_DRIVER_NAME") or "asyncpg"
 
 POSTGRES_DB_NAME = os.getenv("POSTGRES_DB_NAME") or "postgres"
 
-POSTGRES_USERNAME = os.getenv("POSTGRES_USERNAME") or "postgres"
+POSTGRES_USER = os.getenv("POSTGRES_USER") or "postgres"
 
 POSTGRES_HOST = os.getenv("POSTGRES_HOST") or "localhost"
 
@@ -32,7 +32,7 @@ if not POSTGRES_PASSWORD:
 
 DB_URL = (
     f"postgresql+{POSTGRES_DRIVER_NAME}://"
-    + f"{POSTGRES_USERNAME}:{POSTGRES_PASSWORD}"
+    + f"{POSTGRES_USER}:{POSTGRES_PASSWORD}"
     + f"@{POSTGRES_HOST}:{POSTGRES_DB_PORT}"
     + f"/{POSTGRES_DB_NAME}"
 )
