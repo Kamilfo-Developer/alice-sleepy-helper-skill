@@ -1,8 +1,6 @@
 from ru_messages import RUMessages
 
-POSIX_alliases = {
-    'ru-RU': RUMessages
-}
+POSIX_alliases = {"ru-RU": RUMessages}
 
 
 def auto(locale):

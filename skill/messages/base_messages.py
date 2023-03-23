@@ -13,11 +13,9 @@ class BaseMessages(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_start_message_comeback(self,
-                                   time: datetime.datetime,
-                                   streak: int,
-                                   scoreboard: int
-                                   ) -> TextWithTTS:
+    def get_start_message_comeback(
+        self, time: datetime.datetime, streak: int, scoreboard: int
+    ) -> TextWithTTS:
         pass
 
     @abc.abstractmethod
@@ -33,9 +31,9 @@ class BaseMessages(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_propose_yesterday_wake_up_time_message(self,
-                                                   last_time: datetime.time
-                                                   ) -> TextWithTTS:
+    def get_propose_yesterday_wake_up_time_message(
+        self, last_time: datetime.time
+    ) -> TextWithTTS:
         pass
 
     @abc.abstractmethod
@@ -51,9 +49,9 @@ class BaseMessages(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_sleep_calc_time_message(self,
-                                    bed_time: datetime.time,
-                                    activities: List[Any]) -> TextWithTTS:
+    def get_sleep_calc_time_message(
+        self, bed_time: datetime.time, activities: List[Any]
+    ) -> TextWithTTS:
         pass
 
     @abc.abstractmethod

@@ -11,14 +11,14 @@ class Daytime(enum.Enum):
 
     @classmethod
     def from_time(cls, time: Union[datetime.datetime, datetime.time]):
-        '''Identify Daytime from time
+        """Identify Daytime from time
 
         Args:
             time (datetime.datetime | datetime.time): time to recieve daytime.
 
         Returns:
             Daytime: one of daytime options according to the given time
-        '''
+        """
         if isinstance(time, datetime.datetime):
             time = time.time()
         morning = datetime.time(5, 0, 0)
