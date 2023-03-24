@@ -1,6 +1,10 @@
+from __future__ import annotations
 import enum
 import datetime
-from typing import Union, Any
+import random
+import itertools
+from typing import Union, Any, Iterable, List, Callable
+
 
 
 class Daytime(enum.Enum):
@@ -19,6 +23,7 @@ class Daytime(enum.Enum):
         Returns:
             Daytime: one of daytime options according to the given time
         """
+
         if isinstance(time, datetime.datetime):
             time = time.time()
         morning = datetime.time(5, 0, 0)
@@ -44,15 +49,11 @@ class TextWithTTS:
     def __init__(self, text: str, tts: str | None = None):
         self.text = text
         if tts is None:
-            tts = text
+            self.tts = text
             return
 
         self.tts = tts
 
-    def gentle_capitalize(self, text: str):
-        if not text:
-            return text
-        return text[0].upper() + text[1:]
 
     def __eq__(self, __o: object) -> bool:
         return (
@@ -64,9 +65,100 @@ class TextWithTTS:
     def __str__(self) -> str:
         return "Text:\n" f"{self.text}" "\n" "TTS:\n" f"{self.tts}"
 
+    def __add__(self, __o: Union[str, TextWithTTS]) -> TextWithTTS:
+        if isinstance(__o, TextWithTTS):
+            return TextWithTTS(self.text + __o.text, self.tts + __o.tts)
+        return TextWithTTS(self.text + __o, self.tts + __o)
+
+    def __radd__(self, __o: Union[str, TextWithTTS]) -> TextWithTTS:
+        if isinstance(__o, TextWithTTS):
+            return TextWithTTS(__o.text + self.text, __o.tts + self.tts)
+        return TextWithTTS(__o + self.text, __o + self.text)
+
+    def __iadd__(self, __o: Union[str, TextWithTTS]) -> TextWithTTS:
+        return self + __o
+
+    def transform(self, func: Callable[[str], str]) -> TextWithTTS:
+        """Apply a function to both text and speech parts
+        of TextWithTTS.
+
+        Args:
+            func (Callable[[str], str]): the function to transform
+            TextWithTTS strings
+
+        Returns:
+            TextWithTTS: new TextWithTTS with transformed strings
+        """
+
+        return TextWithTTS(func(self.text), func(self.tts))
+
+    def join(self, __iterable: Iterable[TextWithTTS], /):
+        """Likewise str.join, concatenate any number of TextWithTTS.
+
+        Calls str.join for text parts and tts parts of TextWithTTS objects
+        seperately and returns a new instance with concatenated text and tts.
+        TextWithTTS whose method is being called inserts its text and tts
+        between the concatenated objects.
+
+        Args:
+            Iterable[TextWithTTS]: sequence of TextWithTTS to concatenate
+
+        Returns:
+            TextWithTTS: the concatenation result
+        """
+
+        i1, i2 = itertools.tee(__iterable, 2)
+        return TextWithTTS(
+            self.text.join(map(lambda x: x.text, i1)),
+            self.tts.join(map(lambda x: x.tts, i2)),
+        )
+
 
 class IdComparable:
     _id: Any
 
     def __eq__(self, __o: object) -> bool:
         return isinstance(__o, self.__class__) and self._id == __o._id
+
+
+def gentle_capitalize(text: str):
+    """Make the first character of a string have upper case
+    leaving the rest of the string as is, unlike built-in
+    str.capitalize method, which makes all other characters
+    have lower case.
+
+    Args:
+        text (str): the string to convert
+
+    Returns:
+        str: gently capitalized string
+    """
+
+    if not text:
+        return text
+    return text[0].upper() + text[1:]
+
+
+def construct_random_message(*parts: List[TextWithTTS], insert_spaces=True):
+    """Construct randomly generated message from a sequence
+    of message parts options.
+
+    Args:
+        *parts (List[TextWithTTS]): message parts options
+        in the sequential order.
+
+        insert_spaces (bool, optional): whether to insert
+        spaces inbetween the parts of a message or not.
+        Degaults to True.
+
+    Returns:
+        TextWithTTS: constructed message
+    """
+
+    if insert_spaces:
+        delimiter = TextWithTTS(" ")
+    else:
+        delimiter = TextWithTTS("")
+
+    return delimiter.join(map(lambda x: random.choice(x), parts))
+

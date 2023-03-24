@@ -1,1 +1,3 @@
 DASH = "—"
+LAQUO = "«"
+RAQUO = "»"

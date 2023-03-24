@@ -1,4 +1,4 @@
-from ru_messages import RUMessages
+from skill.messages.ru_messages import RUMessages
 
 POSIX_alliases = {"ru-RU": RUMessages}
 
