@@ -6,6 +6,7 @@ from skill.entities import User, Tip
 from skill.db.repos.base_repo import BaseRepo
 from skill.messages.base_messages import BaseMessages
 from skill.utils import TextWithTTS
+from skill.sleep_calculator import SleepCalculator, SleepMode
 
 
 class UserManager:
@@ -171,3 +172,59 @@ class UserManager:
         if not reply:
             return tip
         return self.messages.get_tip_message(tip)
+
+    async def ask_sleep_time(
+        self,
+        now: datetime.datetime,
+        wake_up_time: datetime.time,
+        mode: SleepMode,
+        reply: bool = True,
+    ) -> TextWithTTS | datetime.datetime:
+        """Calculate user's sleep time. If reply argument is set to True,
+        this method constructs a response message, in which it proposes the
+        user a number of activities for the evening, and returns the message.
+
+        Args:
+            now (datetime.datetime): the timestamp at which the user asks to
+            calculate their sleep time.
+
+            wake_up_time (datetime.time): the time at which the user
+            wants to wake up
+
+            mode (SleepMode.LONG | SleepMode.SHORT): user's selected
+            sleep mode
+
+            reply (bool, optional): whether to return a response message or not
+            Defaults to True.
+
+        Returns:
+            TextWithTTS | datetime.datetime: if reply is set to True, a
+            response message in a form of TextWithTTS. Otherwise the proposed
+            timestamp for a user to go to bed.
+        """
+
+        now_time = now.time()
+        if wake_up_time < now_time:
+            wake_up_datetime = datetime.datetime.combine(
+                date=(
+                    now + datetime.timedelta(days=1)
+                ).date(),  # Tommorrow date
+                time=wake_up_time,
+            )
+        else:
+            wake_up_datetime = datetime.datetime.combine(
+                date=now.date(),  # Today date
+                time=wake_up_time,
+            )
+
+        bed_time = SleepCalculator.calc(now, wake_up_datetime, mode)
+        if not reply:
+            return bed_time
+
+        all_activities = await self.repo.get_activities()
+        activities = SleepCalculator.activities_compilation(
+            now, bed_time, all_activities
+        )
+        return self.messages.get_sleep_calc_time_message(
+            bed_time.time(), activities
+        )

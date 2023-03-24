@@ -1,6 +1,8 @@
 import enum
 import datetime
 from skill.sh_exceptions import SHInvalidInput
+from typing import List, Iterable
+from skill.entities import Activity
 
 
 class SleepMode(enum.Enum):
@@ -9,6 +11,44 @@ class SleepMode(enum.Enum):
 
 
 class SleepCalculator:
+    @staticmethod
+    def activities_compilation(
+        time_a: datetime.datetime,
+        time_b: datetime.datetime,
+        all_activities: Iterable[Activity],
+        limit: int = 2,
+    ) -> List[Activity]:
+        """Returns a number of activities that can be done between time_a and
+        time_b.
+
+        Args:
+            time_a (datetime.datetime): opening time boundary
+
+            time_b (datetime.datetime): closing time boundary
+
+            all_activities (Iterable[Activity]): the pool of all activities
+
+            limit (int, optional): the number of best fitting activities to
+            return.
+            Defaults to 2
+
+        Returns:
+            List[Activity]: the list of best fitting activities compilation
+        """
+
+        if time_b <= time_a:
+            raise SHInvalidInput(
+                "Closing boundary cannot be less than the opening boundary"
+            )
+        delta = time_b - time_a
+        matching_activities = filter(
+            lambda x: x.occupation_time < delta, all_activities
+        )
+        sorted_activities = sorted(
+            matching_activities, reverse=True, key=lambda x: x.occupation_time
+        )
+        return sorted_activities[:limit]
+
     @staticmethod
     def calc(
         now: datetime.datetime,
