@@ -28,7 +28,9 @@ async def insert_values(repo: BaseRepo, init_db):
 
     user = User(generate_random_string_id(), 0, now, [], now, repo)
 
-    await repo.insert_user(user)
+    new_user = User(generate_random_string_id(), 100, now, [], now, repo)
+
+    await repo.insert_users([user, new_user])
 
     topic = TipsTopic(
         uuid4(),
@@ -91,7 +93,9 @@ async def test_users(repo: BaseRepo, init_db):
 
     await repo.insert_user(user)
 
-    await repo.delete_user(user)
+    deleted_user = await repo.delete_user(user)
+
+    assert deleted_user == user and await repo.delete_user(user) is None
 
     assert await repo.get_user_by_id(user._id) is None
 
@@ -123,7 +127,12 @@ async def test_activities(repo: BaseRepo, init_db):
 
     await repo.insert_activity(activity)
 
-    await repo.delete_activity(activity)
+    deleted_activity = await repo.delete_activity(activity)
+
+    assert (
+        deleted_activity == activity
+        and await repo.delete_activity(activity) is None
+    )
 
     assert await repo.get_activity_by_id(activity._id) is None
 
@@ -166,7 +175,12 @@ async def test_tips_topics(repo: BaseRepo, init_db):
 
     await repo.insert_tips_topic(topic)
 
-    await repo.delete_tips_topic(topic)
+    deleted_tips_topic = await repo.delete_tips_topic(topic)
+
+    assert (
+        deleted_tips_topic == topic
+        and await repo.delete_tips_topic(topic) is None
+    )
 
     assert await repo.get_tips_topic_by_id(topic._id) is None
 
@@ -214,7 +228,9 @@ async def test_tips(repo: BaseRepo, insert_values):
 
     await repo.insert_tip(tip)
 
-    await repo.delete_tip(tip)
+    deleted_tip = await repo.delete_tip(tip)
+
+    assert deleted_tip == tip and await repo.delete_tip(tip) is None
 
     assert await repo.get_tip_by_id(tip._id) is None
 
@@ -361,3 +377,40 @@ async def test_getting(repo: BaseRepo, insert_values):
     tips_with_topic = await repo.get_topic_tips(tips_topics[0]._id)
 
     assert tips_with_topic != []
+
+
+@pytest.mark.parametrize("repo", repos_to_test)
+@pytest.mark.asyncio
+async def test_users_stats(repo: BaseRepo, insert_values):
+    BIG_STREAK = 10000
+
+    all_users = await repo.get_users()
+
+    all_user_counter = await repo.count_all_users()
+
+    assert len(all_users) == all_user_counter
+
+    assert await repo.count_users_with_streak(BIG_STREAK, condition=">") == 0
+    assert await repo.count_users_with_streak(BIG_STREAK, condition=">=") == 0
+
+    assert (
+        await repo.count_users_with_streak(BIG_STREAK, condition="<")
+        == all_user_counter
+    )
+
+    assert (
+        await repo.count_users_with_streak(BIG_STREAK, condition="<=")
+        == all_user_counter
+    )
+
+    assert await repo.count_users_with_streak(100, condition="<") == 1
+
+    assert await repo.count_users_with_streak(100, condition="<=") == 2
+
+    assert await repo.count_users_with_streak(100, condition=">=") == 1
+
+    assert await repo.count_users_with_streak(100, condition="==") == 1
+
+    assert await repo.count_users_with_streak(100, condition=">") == 0
+
+    assert await repo.count_users_with_streak(100, condition="==") == 1

@@ -1,6 +1,6 @@
 from aiohttp import web
-from handlers import dp
-from config import WEBHOOK_URL_PATH, WEBAPP_HOST, WEBAPP_PORT
+from skill.handlers import dp
+from skill.config import WEBHOOK_URL_PATH, WEBAPP_HOST, WEBAPP_PORT
 from aioalice import get_new_configured_app
 
 

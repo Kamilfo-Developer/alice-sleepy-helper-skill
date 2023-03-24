@@ -1,7 +1,5 @@
-from typing import Callable, Iterable
-
-from sqlalchemy.orm import selectinload
-from sqlalchemy import select
+from typing import Callable, Iterable, Literal
+from sqlalchemy import select, func
 from skill.db.models.sa_models import (
     ActivityModel,
     TipModel,
@@ -13,6 +11,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from skill.entities import Activity, Tip, TipsTopic, User
 from uuid import UUID
 import asyncio
+
+from skill.exceptions import IncorrectConditionError
 
 
 class SARepoConfig(RepoConfig):
@@ -132,7 +132,7 @@ class SARepo(BaseRepo):
                 )
             ]  # type: ignore
 
-    async def delete_user(self, user: User) -> None:
+    async def delete_user(self, user: User) -> User | None:
         async with self.__config.connection_provider() as session:
             model = await session.get(UserModel, user._id)
 
@@ -141,7 +141,11 @@ class SARepo(BaseRepo):
 
                 await session.commit()
 
-    async def delete_activity(self, activity: Activity) -> None:
+                return model.as_entity(self)
+
+            return None
+
+    async def delete_activity(self, activity: Activity) -> Activity | None:
         async with self.__config.connection_provider() as session:
             model = await session.get(ActivityModel, activity._id)
 
@@ -150,7 +154,13 @@ class SARepo(BaseRepo):
 
                 await session.commit()
 
-    async def delete_tips_topic(self, tips_topic: TipsTopic) -> None:
+                return model.as_entity(self)
+
+            return None
+
+    async def delete_tips_topic(
+        self, tips_topic: TipsTopic
+    ) -> TipsTopic | None:
         async with self.__config.connection_provider() as session:
             model = await session.get(TipsTopicModel, tips_topic._id)
 
@@ -159,7 +169,11 @@ class SARepo(BaseRepo):
 
                 await session.commit()
 
-    async def delete_tip(self, tip: Tip) -> None:
+                return model.as_entity(self)
+
+            return None
+
+    async def delete_tip(self, tip: Tip) -> Tip | None:
         async with self.__config.connection_provider() as session:
             model = await session.get(TipModel, tip._id)
 
@@ -167,6 +181,10 @@ class SARepo(BaseRepo):
                 await session.delete(model)
 
                 await session.commit()
+
+                return model.as_entity(self)
+
+            return None
 
     async def update_user(self, user: User) -> User:
         async with self.__config.connection_provider() as session:
@@ -355,3 +373,34 @@ class SARepo(BaseRepo):
             res = (await session.execute(q)).scalars().all()
 
             return [model.as_entity(self) for model in res]
+
+    async def count_all_users(self) -> int:
+        async with self.__config.connection_provider() as session:
+            q = select(func.count(UserModel.id))
+
+            return (await session.execute(q)).scalar()  # type: ignore
+
+    async def count_users_with_streak(
+        self,
+        streak: int,
+        condition: Literal["<"]
+        | Literal[">"]
+        | Literal["<="]
+        | Literal[">="]
+        | Literal["=="],
+    ) -> int:
+        async with self.__config.connection_provider() as session:
+            Q_CONDITIONS = {
+                ">": UserModel.streak > streak,
+                "<": UserModel.streak < streak,
+                ">=": UserModel.streak >= streak,
+                "<=": UserModel.streak <= streak,
+                "==": UserModel.streak == streak,
+            }
+
+            if condition not in Q_CONDITIONS:
+                raise IncorrectConditionError()
+
+            q = select(func.count(UserModel.id)).where(Q_CONDITIONS[condition])
+
+            return (await session.execute(q)).scalar()  # type: ignore
