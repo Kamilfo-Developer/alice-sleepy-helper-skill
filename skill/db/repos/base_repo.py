@@ -1,7 +1,14 @@
 from __future__ import annotations
 import abc
 from uuid import UUID
-from typing import Any, AsyncContextManager, Callable, TYPE_CHECKING, Iterable
+from typing import (
+    Any,
+    AsyncContextManager,
+    Callable,
+    TYPE_CHECKING,
+    Iterable,
+    Literal,
+)
 
 if TYPE_CHECKING:
     from skill.entities import Activity, Tip, TipsTopic, User
@@ -54,23 +61,25 @@ class BaseRepo(abc.ABC):
         pass
 
     @abc.abstractmethod
-    async def insert_tips(self, tips: Iterable[Tip]) -> Tip:
+    async def insert_tips(self, tips: Iterable[Tip]) -> list[Tip]:
         pass
 
     @abc.abstractmethod
-    async def delete_user(self, user: User) -> User:
+    async def delete_user(self, user: User) -> User | None:
         pass
 
     @abc.abstractmethod
-    async def delete_activity(self, activity: Activity) -> User:
+    async def delete_activity(self, activity: Activity) -> Activity | None:
         pass
 
     @abc.abstractmethod
-    async def delete_tips_topic(self, tips_topic: TipsTopic) -> TipsTopic:
+    async def delete_tips_topic(
+        self, tips_topic: TipsTopic
+    ) -> TipsTopic | None:
         pass
 
     @abc.abstractmethod
-    async def delete_tip(self, tip: Tip) -> Tip:
+    async def delete_tip(self, tip: Tip) -> Tip | None:
         pass
 
     @abc.abstractmethod
@@ -180,4 +189,20 @@ class BaseRepo(abc.ABC):
         Returns:
             list[User]: list with objects
         """
+        pass
+
+    @abc.abstractmethod
+    async def count_all_users(self) -> int:
+        pass
+
+    @abc.abstractmethod
+    async def count_users_with_streak(
+        self,
+        streak: int,
+        condition: Literal["<"]
+        | Literal[">"]
+        | Literal["<="]
+        | Literal[">="]
+        | Literal["=="],
+    ) -> int:
         pass
