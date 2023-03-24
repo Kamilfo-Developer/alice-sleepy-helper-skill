@@ -8,7 +8,7 @@ from skill.utils import IdComparable, TextWithTTS
 class User(IdComparable):
     _id: str
     _streak: int
-    lask_skill_use: datetime
+    lask_skill_use: datetime | None
     _heard_tips: list[Tip]
     _join_date: datetime
 
@@ -16,7 +16,7 @@ class User(IdComparable):
         self,
         id: str,
         streak: int,
-        last_skill_use: datetime,
+        last_skill_use: datetime | None,
         heard_tips: list[Tip],
         join_date: datetime,
         repo: BaseRepo,
@@ -54,6 +54,7 @@ class Activity(IdComparable):
     _created_date: datetime
     occupation_time: timedelta
 
+    # description: TextWithTTS
     @property
     def description(self) -> TextWithTTS:
         return self.__description
@@ -62,7 +63,7 @@ class Activity(IdComparable):
     def description(self, value: TextWithTTS):
         if len(max(value.text, value.tts, key=len)) > 512:
             raise ValueError(
-                "Text and its speech format lengths should both be < 1024"
+                "Text and its speech format lengths should both be < 512"
             )
 
         self.__description = value
@@ -87,6 +88,7 @@ class Tip(IdComparable):
     _created_date: datetime
     tips_topic: TipsTopic
 
+    # short_description: TextWithTTS
     @property
     def short_description(self) -> TextWithTTS:
         return self.__short_description
@@ -95,11 +97,12 @@ class Tip(IdComparable):
     def short_description(self, value: TextWithTTS):
         if len(max(value.text, value.tts, key=len)) > 256:
             raise ValueError(
-                "Text and its speech format lengths should both be < 1024"
+                "Text and its speech format lengths should both be < 256"
             )
 
         self.__short_description = value
 
+    # tip_content: TextWithTTS
     @property
     def tip_content(self) -> TextWithTTS:
         return self.__tip_content
@@ -143,7 +146,7 @@ class TipsTopic(IdComparable):
     def name(self, value: TextWithTTS):
         if len(max(value.text, value.tts, key=len)) > 1024:
             raise ValueError(
-                "Text and its speech format lengths should both be < 128"
+                "Text and its speech format lengths should both be < 1024"
             )
 
         self.__name = value

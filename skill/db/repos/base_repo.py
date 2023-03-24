@@ -1,7 +1,7 @@
 from __future__ import annotations
 import abc
 from uuid import UUID
-from typing import Any, AsyncContextManager, Callable, TYPE_CHECKING
+from typing import Any, AsyncContextManager, Callable, TYPE_CHECKING, Iterable
 
 if TYPE_CHECKING:
     from skill.entities import Activity, Tip, TipsTopic, User
@@ -26,7 +26,17 @@ class BaseRepo(abc.ABC):
         pass
 
     @abc.abstractmethod
-    async def insert_activity(self, activity: Activity) -> User:
+    async def insert_users(self, users: Iterable[User]) -> list[User]:
+        pass
+
+    @abc.abstractmethod
+    async def insert_activity(self, activity: Activity) -> Activity:
+        pass
+
+    @abc.abstractmethod
+    async def insert_activities(
+        self, activities: Iterable[Activity]
+    ) -> list[Activity]:
         pass
 
     @abc.abstractmethod
@@ -34,7 +44,17 @@ class BaseRepo(abc.ABC):
         pass
 
     @abc.abstractmethod
+    async def insert_tips_topics(
+        self, tips_topics: Iterable[TipsTopic]
+    ) -> list[TipsTopic]:
+        pass
+
+    @abc.abstractmethod
     async def insert_tip(self, tip: Tip) -> Tip:
+        pass
+
+    @abc.abstractmethod
+    async def insert_tips(self, tips: Iterable[Tip]) -> Tip:
         pass
 
     @abc.abstractmethod
@@ -46,11 +66,11 @@ class BaseRepo(abc.ABC):
         pass
 
     @abc.abstractmethod
-    async def delete_tips_topic(self, tips_topic: TipsTopic) -> User:
+    async def delete_tips_topic(self, tips_topic: TipsTopic) -> TipsTopic:
         pass
 
     @abc.abstractmethod
-    async def delete_tip(self, tip: Tip) -> User:
+    async def delete_tip(self, tip: Tip) -> Tip:
         pass
 
     @abc.abstractmethod
@@ -74,7 +94,7 @@ class BaseRepo(abc.ABC):
         pass
 
     @abc.abstractmethod
-    async def get_activity_by_id(self, id: UUID) -> User | None:
+    async def get_activity_by_id(self, id: UUID) -> Activity | None:
         pass
 
     @abc.abstractmethod

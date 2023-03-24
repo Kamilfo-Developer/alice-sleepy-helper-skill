@@ -1,5 +1,6 @@
-from typing import Callable
+from typing import Callable, Iterable
 
+from sqlalchemy.orm import selectinload
 from sqlalchemy import select
 from skill.db.models.sa_models import (
     ActivityModel,
@@ -11,6 +12,7 @@ from skill.db.repos.base_repo import BaseRepo, RepoConfig
 from sqlalchemy.ext.asyncio import AsyncSession
 from skill.entities import Activity, Tip, TipsTopic, User
 from uuid import UUID
+import asyncio
 
 
 class SARepoConfig(RepoConfig):
@@ -34,7 +36,22 @@ class SARepo(BaseRepo):
 
             await session.commit()
 
-            return model.as_entity(self)
+            return await self.get_user_by_id(model.id)  # type: ignore
+
+    async def insert_users(self, users: Iterable[User]) -> list[User]:
+        async with self.__config.connection_provider() as session:
+            models = [UserModel(user) for user in users]
+
+            session.add_all(models)
+
+            await session.commit()
+
+            return [
+                entity
+                for entity in await asyncio.gather(
+                    *[self.get_user_by_id(model.id) for model in models]
+                )
+            ]  # type: ignore
 
     async def insert_activity(self, activity: Activity) -> Activity:
         async with self.__config.connection_provider() as session:
@@ -44,7 +61,24 @@ class SARepo(BaseRepo):
 
             await session.commit()
 
-            return model.as_entity(self)
+            return await self.get_activity_by_id(model.id)  # type: ignore
+
+    async def insert_activities(
+        self, activities: Iterable[Activity]
+    ) -> list[Activity]:
+        async with self.__config.connection_provider() as session:
+            models = [ActivityModel(activity) for activity in activities]
+
+            session.add_all(models)
+
+            await session.commit()
+
+            return [
+                entity
+                for entity in await asyncio.gather(
+                    *[self.get_activity_by_id(model.id) for model in models]
+                )
+            ]  # type: ignore
 
     async def insert_tips_topic(self, tips_topic: TipsTopic) -> TipsTopic:
         async with self.__config.connection_provider() as session:
@@ -54,7 +88,24 @@ class SARepo(BaseRepo):
 
             await session.commit()
 
-            return model.as_entity(self)
+            return await self.get_tips_topic_by_id(model.id)  # type: ignore
+
+    async def insert_tips_topics(
+        self, tips_topics: Iterable[TipsTopic]
+    ) -> list[TipsTopic]:
+        async with self.__config.connection_provider() as session:
+            models = [TipsTopicModel(tips_topic) for tips_topic in tips_topics]
+
+            session.add_all(models)
+
+            await session.commit()
+
+            return [
+                entity
+                for entity in await asyncio.gather(
+                    *[self.get_tips_topic_by_id(model.id) for model in models]
+                )
+            ]  # type: ignore
 
     async def insert_tip(self, tip: Tip) -> Tip:
         async with self.__config.connection_provider() as session:
@@ -64,41 +115,58 @@ class SARepo(BaseRepo):
 
             await session.commit()
 
-            await session.refresh(model, ["tips_topic"])
+            return await self.get_tip_by_id(model.id)  # type: ignore
 
-            return model.as_entity(self)
+    async def insert_tips(self, tips: Iterable[Tip]) -> list[Tip]:
+        async with self.__config.connection_provider() as session:
+            models = [TipModel(tip) for tip in tips]
+
+            session.add_all(models)
+
+            await session.commit()
+
+            return [
+                entity
+                for entity in await asyncio.gather(
+                    *[self.get_tip_by_id(model.id) for model in models]
+                )
+            ]  # type: ignore
 
     async def delete_user(self, user: User) -> None:
         async with self.__config.connection_provider() as session:
-            model = UserModel(user)
+            model = await session.get(UserModel, user._id)
 
-            await session.delete(model)
+            if model:
+                await session.delete(model)
 
-            await session.commit()
+                await session.commit()
 
     async def delete_activity(self, activity: Activity) -> None:
         async with self.__config.connection_provider() as session:
-            model = ActivityModel(activity)
+            model = await session.get(ActivityModel, activity._id)
 
-            await session.delete(model)
+            if model:
+                await session.delete(model)
 
-            await session.commit()
+                await session.commit()
 
     async def delete_tips_topic(self, tips_topic: TipsTopic) -> None:
         async with self.__config.connection_provider() as session:
-            model = TipsTopicModel(tips_topic)
+            model = await session.get(TipsTopicModel, tips_topic._id)
 
-            await session.delete(model)
+            if model:
+                await session.delete(model)
 
-            await session.commit()
+                await session.commit()
 
     async def delete_tip(self, tip: Tip) -> None:
         async with self.__config.connection_provider() as session:
-            model = TipModel(tip)
+            model = await session.get(TipModel, tip._id)
 
-            await session.delete(model)
+            if model:
+                await session.delete(model)
 
-            await session.commit()
+                await session.commit()
 
     async def update_user(self, user: User) -> User:
         async with self.__config.connection_provider() as session:
@@ -221,8 +289,8 @@ class SARepo(BaseRepo):
         async with self.__config.connection_provider() as session:
             q = (
                 select(TipModel)
-                .where(TipModel.tips_topic_id)
-                .order_by(TipsTopicModel.created_date)
+                .where(TipModel.tips_topic_id == topic_id)
+                .order_by(TipModel.created_date)
                 .limit(limit)
             )
 
