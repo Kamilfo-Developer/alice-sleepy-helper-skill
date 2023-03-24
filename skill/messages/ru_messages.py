@@ -29,36 +29,30 @@ class RUMessages(BaseMessages):
                 greeting = TextWithTTS("Доброй ночи!")
 
         intro = TextWithTTS(
-                f"Я {DASH} Сонный Помощник. Я помогаю вам организовать"
-                " ваш сон."
-            )
+            f"Я {DASH} Сонный Помощник. Я помогаю вам организовать" " ваш сон."
+        )
 
         man = TextWithTTS(
-                "Вы можете попросить меня рассчитать оптимальное для "
-                "вас время сна, за которое вы можете выспаться. "
-                f"Для этого скажите {LAQUO}Я хочу спать{RAQUO}. "
-                "А ещё вы можете попросить меня дать вам пару "
-                "советов по тому, как лучше высыпаться."
-            )
+            "Вы можете попросить меня рассчитать оптимальное для "
+            "вас время сна, за которое вы можете выспаться. "
+            f"Для этого скажите {LAQUO}Я хочу спать{RAQUO}. "
+            "А ещё вы можете попросить меня дать вам пару "
+            "советов по тому, как лучше высыпаться."
+        )
 
         replicas_tail = [
             TextWithTTS("Чем я могу помочь?"),
             TextWithTTS("Чем могу помочь?"),
             TextWithTTS("Чем могу быть полезен?"),
             # TODO:                         ^^ Assure gender consistency
-            TextWithTTS("Я к вашим услугам.")
+            TextWithTTS("Я к вашим услугам."),
         ]
 
-        twtts = TextWithTTS(' ').join(
-            (
-                greeting,
-                intro,
-                man,
-                random.choice(replicas_tail)
-            )
+        message = TextWithTTS(" ").join(
+            (greeting, intro, man, random.choice(replicas_tail))
         )
 
-        return twtts
+        return message
 
     def get_start_message_comeback(
         self, time: datetime.datetime, streak: int, scoreboard: int
@@ -75,7 +69,7 @@ class RUMessages(BaseMessages):
             case Daytime.NIGHT:
                 greeting = TextWithTTS("Доброй ночи!")
 
-        twtts = greeting
+        message = greeting
 
         if streak > 1:
             praise = TextWithTTS(
@@ -88,26 +82,26 @@ class RUMessages(BaseMessages):
                 TextWithTTS("Здорово!"),
                 TextWithTTS("Ура!"),
                 TextWithTTS("Прекрасно!"),
-                TextWithTTS("Продолжайте в том же духе!")
+                TextWithTTS("Продолжайте в том же духе!"),
             ]
             praise += random.choice(replicas_insert)
             praise += TextWithTTS(
                 f" Вы спите лучше, чем {scoreboard}% пользователей! "
             )
 
-            twtts += praise
+            message += praise
 
         replicas_tail = [
             TextWithTTS("Чем я могу помочь?"),
             TextWithTTS("Чем могу помочь?"),
             TextWithTTS("Чем могу быть полезен?"),
             # TODO:                         ^^ Assure gender consistency
-            TextWithTTS("Я к вашим услугам.")
+            TextWithTTS("Я к вашим услугам."),
         ]
 
-        twtts += random.choice(replicas_tail)
+        message += random.choice(replicas_tail)
 
-        return twtts
+        return message
 
     def get_menu_welcome_message(self) -> TextWithTTS:
         replicas_a = [
@@ -127,15 +121,14 @@ class RUMessages(BaseMessages):
             # NOTE:      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Informal
         ]
 
-        twtts = construct_random_message(replicas_a, replicas_b)
+        message = construct_random_message(replicas_a, replicas_b)
 
-        return twtts
+        return message
 
     def get_info_message(self) -> TextWithTTS:
         replicas_a = [
             TextWithTTS(
-                f"Я {DASH} Сонный Помощник."
-                " Я могу помочь вам со сном."
+                f"Я {DASH} Сонный Помощник." " Я могу помочь вам со сном."
             ),
             TextWithTTS(
                 f"Я {DASH} Сонный Помощник. Я помогаю вам организовать"
@@ -151,11 +144,9 @@ class RUMessages(BaseMessages):
             ),
             TextWithTTS(
                 f"Я {DASH} Сонный Помощник, я могу помочь вам лучше спать."
-
             ),
             TextWithTTS(
-                f"Я {DASH} Сонный Помощник, я могу помочь вам"
-                " высыпаться."
+                f"Я {DASH} Сонный Помощник, я могу помочь вам" " высыпаться."
             ),
         ]
 
@@ -179,9 +170,7 @@ class RUMessages(BaseMessages):
         ]
 
         replicas_c = [
-            TextWithTTS(
-                f"Для этого скажите {LAQUO}Я хочу спать{RAQUO}."
-            ),
+            TextWithTTS(f"Для этого скажите {LAQUO}Я хочу спать{RAQUO}."),
             TextWithTTS(
                 "Чтобы вызвать эту функцию, скажитe "
                 f"{LAQUO}Я хочу спать{RAQUO}."
@@ -197,9 +186,7 @@ class RUMessages(BaseMessages):
                 "Или вы можете попросить у меня совет по тому, "
                 "как лучше спать."
             ),
-            TextWithTTS(
-                "А ещё я могу поделиться советом по здоровому сну."
-            ),
+            TextWithTTS("А ещё я могу поделиться советом по здоровому сну."),
             TextWithTTS(
                 "А ещё я могу дать вам небольшой совет по "
                 "интересующему вас виду сна."
@@ -214,16 +201,15 @@ class RUMessages(BaseMessages):
             ),
         ]
 
-        twtts = construct_random_message(replicas_a, replicas_b,
-                                         replicas_c, replicas_d)
+        message = construct_random_message(
+            replicas_a, replicas_b, replicas_c, replicas_d
+        )
 
-        return twtts
+        return message
 
     def get_ask_tip_topic_message(self) -> TextWithTTS:
         replicas = [
-            TextWithTTS(
-                "Вас интересует совет по дневному или ночному сну?"
-            ),
+            TextWithTTS("Вас интересует совет по дневному или ночному сну?"),
             TextWithTTS(
                 "По какому сну вы хотите получить совет, дневному, "
                 "или ночному? "
@@ -235,9 +221,7 @@ class RUMessages(BaseMessages):
             TextWithTTS(
                 "С каким сном вам нужна помощь? С дневным или ночным?"
             ),
-            TextWithTTS(
-                "Вам нужна помощь по дневному или ночному сну?"
-            ),
+            TextWithTTS("Вам нужна помощь по дневному или ночному сну?"),
         ]
         # NOTE: Tip topic options are currently hardcoded.
         #       This may cause issues if new tip topics
@@ -264,13 +248,10 @@ class RUMessages(BaseMessages):
                 "Как много вы хотите спать? Выберите "
                 "один из режимов сна: короткий или длинный сон"
             ),
+            TextWithTTS("Вас интересует длинный или короткий сон?"),
             TextWithTTS(
-                "Вас интересует длинный или короткий сон?"
+                "Какой режим сна вы бы предпочли, длинный " "или короткий?"
             ),
-            TextWithTTS(
-                "Какой режим сна вы бы предпочли, длинный "
-                "или короткий?"
-            )
         ]
         return random.choice(replicas)
 
@@ -278,17 +259,21 @@ class RUMessages(BaseMessages):
         self, bed_time: datetime.time, activities: List[Activity]
     ) -> TextWithTTS:
 
-        twtts = TextWithTTS("Хорошо, рекомендую вам лечь в "
-                            f"{bed_time.isoformat(timespec='minutes')}. ")
+        message = TextWithTTS(
+            "Хорошо, рекомендую вам лечь в "
+            f"{bed_time.isoformat(timespec='minutes')}. "
+        )
         if activities:
-            twtts += TextWithTTS("За этот вечер вы можете успеть, например, ")
+            message += TextWithTTS(
+                "За этот вечер вы можете успеть, например, "
+            )
 
-            activities_twtts = [act.description for act in activities]
+            activities_textwithtts = [act.description for act in activities]
             if len(activities) > 1:
-                activities_twtts[-1] = TextWithTTS(" или ").join(
-                    (activities_twtts[-2], activities_twtts[-1])
+                activities_textwithtts[-1] = TextWithTTS(" или ").join(
+                    (activities_textwithtts[-2], activities_textwithtts[-1])
                 )
-            twtts += TextWithTTS(", ").join(activities_twtts) + ". "
+            message += TextWithTTS(", ").join(activities_textwithtts) + ". "
 
         replica_tail = [
             TextWithTTS("Не желаете-ли получить совет по сну?"),
@@ -299,9 +284,9 @@ class RUMessages(BaseMessages):
             TextWithTTS("Вас интересует совет по сну?"),
             TextWithTTS("Хотите совет по сну?"),
         ]
-        twtts += random.choice(replica_tail)
+        message += random.choice(replica_tail)
 
-        return twtts
+        return message
 
     def get_good_night_message(self) -> TextWithTTS:
         replicas = [

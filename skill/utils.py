@@ -22,6 +22,7 @@ class Daytime(enum.Enum):
         Returns:
             Daytime: one of daytime options according to the given time
         """
+
         if isinstance(time, datetime.datetime):
             time = time.time()
         morning = datetime.time(5, 0, 0)
@@ -47,7 +48,8 @@ class TextWithTTS:
     def __init__(self, text: str, tts: str | None = None):
         self.text = text
         if tts is None:
-            tts = text
+            self.tts = text
+            return
         self.tts = tts
 
     def __eq__(self, __o: object) -> bool:
@@ -62,17 +64,13 @@ class TextWithTTS:
 
     def __add__(self, __o: Union[str, TextWithTTS]) -> TextWithTTS:
         if isinstance(__o, TextWithTTS):
-            return TextWithTTS(self.text + __o.text,
-                               self.tts + __o.tts)
-        return TextWithTTS(self.text + __o,
-                           self.tts + __o)
+            return TextWithTTS(self.text + __o.text, self.tts + __o.tts)
+        return TextWithTTS(self.text + __o, self.tts + __o)
 
     def __radd__(self, __o: Union[str, TextWithTTS]) -> TextWithTTS:
         if isinstance(__o, TextWithTTS):
-            return TextWithTTS(__o.text + self.text,
-                               __o.tts + self.tts)
-        return TextWithTTS(__o + self.text,
-                           __o + self.text)
+            return TextWithTTS(__o.text + self.text, __o.tts + self.tts)
+        return TextWithTTS(__o + self.text, __o + self.text)
 
     def __iadd__(self, __o: Union[str, TextWithTTS]) -> TextWithTTS:
         return self + __o
@@ -89,8 +87,7 @@ class TextWithTTS:
             TextWithTTS: new TextWithTTS with transformed strings
         """
 
-        return TextWithTTS(func(self.text),
-                           func(self.tts))
+        return TextWithTTS(func(self.text), func(self.tts))
 
     def join(self, __iterable: Iterable[TextWithTTS], /):
         """Likewise str.join, concatenate any number of TextWithTTS.
@@ -106,9 +103,12 @@ class TextWithTTS:
         Returns:
             TextWithTTS: the concatenation result
         """
+
         i1, i2 = itertools.tee(__iterable, 2)
-        return TextWithTTS(self.text.join(map(lambda x: x.text, i1)),
-                           self.tts.join(map(lambda x: x.tts, i2)))
+        return TextWithTTS(
+            self.text.join(map(lambda x: x.text, i1)),
+            self.tts.join(map(lambda x: x.tts, i2)),
+        )
 
 
 class IdComparable:
@@ -151,6 +151,10 @@ def construct_random_message(*parts: List[TextWithTTS], insert_spaces=True):
     Returns:
         TextWithTTS: constructed message
     """
-    return TextWithTTS(" " if insert_spaces else "").join(
-        map(lambda x: random.choice(x),
-            parts))
+
+    if insert_spaces:
+        delimiter = TextWithTTS(" ")
+    else:
+        delimiter = TextWithTTS("")
+
+    return delimiter.join(map(lambda x: random.choice(x), parts))

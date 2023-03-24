@@ -8,37 +8,38 @@ def messages_showcase(messages_class):
     class QuaziTip:
         tip_content = TextWithTTS(
             "ложитесь спать в полдень, это помогает пищеварению",
-            "лажитесь спать в п+олдень - это помогает пищеварению"
-            )
+            "лажитесь спать в п+олдень - это помогает пищеварению",
+        )
 
     class QuaziAct:
-        description = TextWithTTS(
-            "выкинуть мусор",
-            "в+ыкинуть м+усор"
-            )
+        description = TextWithTTS("выкинуть мусор", "в+ыкинуть м+усор")
 
-    def prtwtts(twtts):
-        print(f"Text: {twtts.text}")
-        print(f"TTS: {twtts.tts}")
-        print()
-
-    prtwtts(msg.get_start_message_intro(datetime.datetime.now()))
-    prtwtts(msg.get_start_message_comeback(datetime.datetime.now(), 42, 26))
-    prtwtts(msg.get_menu_welcome_message())
-    prtwtts(msg.get_info_message())
-    prtwtts(msg.get_ask_tip_topic_message())
-    prtwtts(
+    print(msg.get_start_message_intro(datetime.datetime.now()))
+    print()
+    print(msg.get_start_message_comeback(datetime.datetime.now(), 42, 26))
+    print()
+    print(msg.get_menu_welcome_message())
+    print()
+    print(msg.get_info_message())
+    print()
+    print(msg.get_ask_tip_topic_message())
+    print()
+    print(
         msg.get_propose_yesterday_wake_up_time_message(
             datetime.datetime.now().time()
-            )
-    )
-    prtwtts(msg.get_ask_wake_up_time_message())
-    prtwtts(msg.get_ask_sleep_mode_message())
-    prtwtts(msg.get_tip_message(QuaziTip()))
-    prtwtts(
-        msg.get_sleep_calc_time_message(
-            datetime.datetime.now().time(),
-            [QuaziAct()] * 4
         )
     )
-    prtwtts(msg.get_good_night_message())
+    print()
+    print(msg.get_ask_wake_up_time_message())
+    print()
+    print(msg.get_ask_sleep_mode_message())
+    print()
+    print(msg.get_tip_message(QuaziTip()))
+    print()
+    print(
+        msg.get_sleep_calc_time_message(
+            datetime.datetime.now().time(), [QuaziAct()] * 4
+        )
+    )
+    print()
+    print(msg.get_good_night_message())
