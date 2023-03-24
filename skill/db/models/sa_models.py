@@ -34,7 +34,9 @@ class UserModel(BaseModel):
 
     id: Mapped[str] = mapped_column(String(64), primary_key=True)
     streak: Mapped[int] = mapped_column(Integer)
-    last_skill_use: Mapped[datetime] = mapped_column(DateTime(True))
+    last_skill_use: Mapped[datetime | None] = mapped_column(
+        DateTime(True), default=None
+    )
     join_date: Mapped[datetime] = mapped_column(DateTime(True))
 
     heard_tips: Mapped[list[TipModel]] = relationship(
