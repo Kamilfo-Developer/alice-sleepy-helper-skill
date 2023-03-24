@@ -1,5 +1,2 @@
-# request for file rename
-
-
-class SHInvalidInput(Exception):
+class SHInvalidInputError(Exception):
     pass

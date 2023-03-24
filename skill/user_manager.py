@@ -14,11 +14,18 @@ class UserManager:
     repo: BaseRepo
     messages: BaseMessages
 
+    def __init__(
+        self, user: User, repo: BaseRepo, messages: BaseMessages
+    ) -> None:
+        self.user = user
+        self.repo = repo
+        self.messages = messages
+
     @classmethod
-    async def init_manager(
+    async def new_manager(
         cls, user_id: str, repo: BaseRepo, messages: BaseMessages
     ) -> UserManager | None:
-        """Sets up UserManager with given userm repo and messages.
+        """Sets up UserManager with given user repo and messages.
 
         Args:
             user_id (str): User's ID as it is stored in the DB
@@ -34,14 +41,11 @@ class UserManager:
             UserManager | None: proper UserManager instance. If
             the user is not found in the repo, returns None
         """
-        inst = cls()
         user = await repo.get_user_by_id(user_id)
         if user is None:
             return None
 
-        inst.user = user
-        inst.repo = repo
-        inst.messages = messages
+        inst = cls(user=user, repo=repo, messages=messages)
         return inst
 
     async def count_scoreboard(self, percentages: bool = True) -> int:
@@ -62,19 +66,15 @@ class UserManager:
         """
 
         streak = self.user._streak
-        # TODO:            ^^^^^^^ External access to a private field.
-        #                          Must be replaced with proper getter method
-        #                          call when the method is implemented
+
         users = map(lambda x: x._streak, await self.repo.get_users())
-        # TODO:                 ^^^^^^^ External access to a private
-        #                               field. --//--
+
         scores = sorted(users)
         score = scores.index(streak)
         if not percentages:
             return score
         total = len(scores)
         percentage = round(score / total * 100)
-        self.check_in
         return percentage
 
     async def check_in(
@@ -124,10 +124,7 @@ class UserManager:
         if new_user:
             return self.messages.get_start_message_intro(now)
         streak = self.user._streak
-        # TODO:            ^^^^^^^ External access to a private field.
-        #                          Must be replaced with proper getter
-        #                          method call when the method is
-        #                          implemented
+
         scoreboard = await self.count_scoreboard(percentages=True)
         return self.messages.get_start_message_comeback(
             time=now, streak=streak, scoreboard=scoreboard
@@ -154,10 +151,7 @@ class UserManager:
 
         tips = await self.repo.get_topic_tips(topic_id=topic_id)
         heard_tips = self.user._heard_tips
-        # TODO:                ^^^^^^^^^^^ External access to a private field.
-        #                                  Must be replaced with proper getter
-        #                                  method call when the method is
-        #                                  implemented
+
         if len(heard_tips) == len(tips):
             self.user.drop_heard_tips()
             heard_tips = []
@@ -204,18 +198,15 @@ class UserManager:
         """
 
         now_time = now.time()
-        if wake_up_time < now_time:
-            wake_up_datetime = datetime.datetime.combine(
-                date=(
-                    now + datetime.timedelta(days=1)
-                ).date(),  # Tommorrow date
-                time=wake_up_time,
-            )
-        else:
-            wake_up_datetime = datetime.datetime.combine(
-                date=now.date(),  # Today date
-                time=wake_up_time,
-            )
+
+        wake_up_datetime = datetime.datetime.combine(
+            date=(
+                (now + datetime.timedelta(days=1)).date()
+                if wake_up_time < now_time
+                else now.date()
+            ),
+            time=wake_up_time,
+        )
 
         bed_time = SleepCalculator.calc(now, wake_up_datetime, mode)
         if not reply:
