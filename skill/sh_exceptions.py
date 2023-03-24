@@ -1,4 +1,4 @@
-# request for file rename 
+# request for file rename
 
 
 class SHInvalidInput(Exception):
