@@ -3,6 +3,7 @@ from uuid import UUID
 from sqlalchemy import (
     Integer,
     Table,
+    Time,
     Uuid,
     ForeignKey,
     DateTime,
@@ -13,7 +14,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, relationship
 from skill.db.repos.base_repo import BaseRepo
 from skill.entities import User, Activity, Tip, TipsTopic
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
 from skill.utils import TextWithTTS
 
 
@@ -37,6 +38,9 @@ class UserModel(BaseModel):
     last_skill_use: Mapped[datetime | None] = mapped_column(
         DateTime(True), default=None
     )
+    last_wake_up_time: Mapped[time | None] = mapped_column(
+        Time(), default=None
+    )
     join_date: Mapped[datetime] = mapped_column(DateTime(True))
 
     heard_tips: Mapped[list[TipModel]] = relationship(
@@ -51,6 +55,7 @@ class UserModel(BaseModel):
         self.id = entity._id
         self.streak = entity._streak
         self.last_skill_use = entity.last_skill_use
+        self.last_wake_up_time = entity.last_wake_up_time
         self.join_date = entity._join_date
 
         self.heard_tips = [
@@ -62,6 +67,7 @@ class UserModel(BaseModel):
             id=self.id,
             streak=self.streak,
             last_skill_use=self.last_skill_use,
+            last_wake_up_time=self.last_wake_up_time,
             join_date=self.join_date,
             heard_tips=[tip.as_entity(repo) for tip in self.heard_tips],
             repo=repo,
