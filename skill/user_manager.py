@@ -62,7 +62,7 @@ class UserManager:
                 id=user_id,
                 streak=0,
                 last_skill_use=None,
-                last_wake_up_time=None,  # type: ignore
+                last_wake_up_time=None,
                 heard_tips=[],
                 join_date=datetime.datetime.now(),
                 repo=repo
@@ -201,7 +201,7 @@ class UserManager:
         they want to wake up. The selected message depends on whether
         the user have already used the sleep calculator or not."""
 
-        last_wake_up_time = self.user.lask_wake_up_time  # type: ignore
+        last_wake_up_time = self.user.last_wake_up_time
         if last_wake_up_time is not None:
             return self.messages.get_propose_yesterday_wake_up_time_message(
                 last_wake_up_time
@@ -243,7 +243,7 @@ class UserManager:
             timestamp for a user to go to bed.
         """
         if remember_time:
-            self.user.lask_wake_up_time = wake_up_time  # type: ignore
+            self.user.last_wake_up_time = wake_up_time
             await self.repo.update_user(self.user)
 
         now_time = now.time()
