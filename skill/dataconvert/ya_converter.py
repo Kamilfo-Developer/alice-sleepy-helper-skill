@@ -15,26 +15,25 @@ class YaDataConverter(BaseDataConverter):
         if obj["type"] != "YANDEX.DATETIME":
             raise InvalidInputError(
                 "obj must be Alice API YANDEX.DATETIME object"
-                )
-        if isinstance(timezone, str):
-            tzinfo = pytz.timezone(timezone)
-        elif isinstance(timezone, datetime.tzinfo):
-            tzinfo = timezone  # type: ignore
-        else:
-            raise InvalidInputError("Invalid timezone type")
-
-        try:
-            time = datetime.time(
-                hour=obj["value"]["hour"],
-                minute=obj["value"]["minute"],
-                tzinfo=tzinfo
             )
-        except KeyError as e:
-            if "hour" not in obj or "minute" not in obj:
-                raise InvalidInputError(
-                    "obj should contain hour and minute information"
-                    )
-            raise e
+
+        tzinfo = (
+            timezone
+            if isinstance(timezone, datetime.tzinfo)
+            else pytz.timezone(timezone)
+        )
+
+        if "hour" not in obj["value"] or "minute" not in obj["value"]:
+            raise InvalidInputError(
+                "obj should contain hour and minute information"
+            )
+
+        time = datetime.time(
+            hour=obj["value"]["hour"],
+            minute=obj["value"]["minute"],
+            tzinfo=tzinfo,
+        )
+
         return time
 
     @staticmethod
@@ -45,7 +44,7 @@ class YaDataConverter(BaseDataConverter):
         if obj["type"] != "YANDEX.DATETIME":
             raise InvalidInputError(
                 "obj must be Alice API YANDEX.DATETIME object"
-                )
+            )
         if isinstance(timezone, str):
             tzinfo = pytz.timezone(timezone)
         elif isinstance(timezone, datetime.tzinfo):
@@ -53,18 +52,21 @@ class YaDataConverter(BaseDataConverter):
         else:
             raise InvalidInputError("Invalid timezone type")
 
-        try:
-            result_datetime = datetime.datetime(
-                year=obj["value"]["year"],
-                month=obj["value"]["month"],
-                day=obj["value"]["day"],
-                hour=obj["value"]["hour"],
-                minute=obj["value"]["minute"],
-                tzinfo=tzinfo
-            )
-        except KeyError as e:
-            if "year" not in obj or "month" not in obj or "day" not in obj \
-                    or "hour" not in obj or "minute" not in obj:
-                raise InvalidInputError(f"Incomplete obj: {e}")
-            raise e
+        if not (
+            "year" in obj["value"]
+            and "month" in obj["value"]
+            and "day" in obj["value"]
+            and "hour" in obj["value"]
+            and "minute" in obj["value"]
+        ):
+            raise InvalidInputError("Incomplete obj")
+
+        result_datetime = datetime.datetime(
+            year=obj["value"]["year"],
+            month=obj["value"]["month"],
+            day=obj["value"]["day"],
+            hour=obj["value"]["hour"],
+            minute=obj["value"]["minute"],
+            tzinfo=tzinfo,
+        )
         return result_datetime

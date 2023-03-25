@@ -268,14 +268,21 @@ class RUMessages(BaseMessages):
                 "За этот вечер вы можете успеть, например, "
             )
 
-            activities_textwithtts = [act.description for act in activities]
+            activities_text_with_tts = [act.description for act in activities]
             if len(activities) > 1:
-                activities_textwithtts[-1] = TextWithTTS(" или ").join(
-                    (activities_textwithtts[-2], activities_textwithtts[-1])
-                )
-                activities_textwithtts.pop(-2)
+                # Construct activity enumerating statement in proper Russian
+                # syntax: objects are seperated by a comma and a whitespace
+                # except for the last two, which have the word "или" inbetween.
+                activities_text_with_tts[-1] = TextWithTTS(" или ").join(
+                    (
+                        activities_text_with_tts[-2],
+                        activities_text_with_tts[-1],
+                    )
+                )  # Glue the last two objects together with the word "или"
+                activities_text_with_tts.pop(-2)  # Get rid of the penultimate
+                #                                   object duplicate
 
-            message += TextWithTTS(", ").join(activities_textwithtts) + ". "
+            message += TextWithTTS(", ").join(activities_text_with_tts) + ". "
 
         replica_tail = [
             TextWithTTS("Не желаете-ли получить совет по сну?"),

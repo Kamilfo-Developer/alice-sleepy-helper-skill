@@ -41,11 +41,10 @@ class SleepCalculator:
                 "Closing boundary cannot be less than the opening boundary"
             )
         delta = time_b - time_a
-        matching_activities = filter(
-            lambda x: x.occupation_time < delta, all_activities
-        )
         sorted_activities = sorted(
-            matching_activities, reverse=True, key=lambda x: x.occupation_time
+            filter(lambda x: x.occupation_time < delta, all_activities),
+            reverse=True,
+            key=lambda x: x.occupation_time,
         )
         return sorted_activities[:limit]
 
