@@ -1,9 +1,304 @@
+from __future__ import annotations
+from typing import List, TYPE_CHECKING
+import datetime
+import random
+from skill.utils import TextWithTTS, Daytime, gentle_capitalize
+from skill.utils import construct_random_message
+from skill.messages.unicode_literals import DASH, LAQUO, RAQUO
 from skill.messages.base_messages import BaseMessages
+
+if TYPE_CHECKING:
+    from skill.entities import Tip, Activity
 
 
 class RUMessages(BaseMessages):
     def __init__(self):
         pass
 
-    def get_start_message(self):
-        pass
+    def get_start_message_intro(self, time: datetime.datetime) -> TextWithTTS:
+        daytime = Daytime.from_time(time)
+        greeting = TextWithTTS("Здравствуйте!")
+        match daytime:
+            case Daytime.DAY:
+                greeting = TextWithTTS("Добрый день!")
+            case Daytime.MORNING:
+                greeting = TextWithTTS("Доброе утро!")
+            case Daytime.EVENING:
+                greeting = TextWithTTS("Добрый вечер!")
+            case Daytime.NIGHT:
+                greeting = TextWithTTS("Доброй ночи!")
+
+        intro = TextWithTTS(
+            f"Я {DASH} Сонный Помощник. Я помогаю вам организовать" " ваш сон."
+        )
+
+        man = TextWithTTS(
+            "Вы можете попросить меня рассчитать оптимальное для "
+            "вас время сна, за которое вы можете выспаться. "
+            f"Для этого скажите {LAQUO}Я хочу спать{RAQUO}. "
+            "А ещё вы можете попросить меня дать вам пару "
+            "советов по тому, как лучше высыпаться."
+        )
+
+        replicas_tail = [
+            TextWithTTS("Чем я могу помочь?"),
+            TextWithTTS("Чем могу помочь?"),
+            TextWithTTS("Чем могу быть полезен?"),
+            # TODO:                         ^^ Assure gender consistency
+            TextWithTTS("Я к вашим услугам."),
+        ]
+
+        message = TextWithTTS(" ").join(
+            (greeting, intro, man, random.choice(replicas_tail))
+        )
+
+        return message
+
+    def get_start_message_comeback(
+        self, time: datetime.datetime, streak: int, scoreboard: int
+    ) -> TextWithTTS:
+        daytime = Daytime.from_time(time)
+        greeting = TextWithTTS("Здравствуйте!")
+        match daytime:
+            case Daytime.DAY:
+                greeting = TextWithTTS("Добрый день!")
+            case Daytime.MORNING:
+                greeting = TextWithTTS("Доброе утро!")
+            case Daytime.EVENING:
+                greeting = TextWithTTS("Добрый вечер!")
+            case Daytime.NIGHT:
+                greeting = TextWithTTS("Доброй ночи!")
+
+        message = greeting
+
+        if streak > 1:
+            praise = TextWithTTS(
+                f" Сегодня вы пользуетесь Сонным Помощником {streak}"
+                " день подряд. "
+            )
+            replicas_insert = [
+                TextWithTTS("Так держать!"),
+                TextWithTTS("Замечательно!"),
+                TextWithTTS("Здорово!"),
+                TextWithTTS("Ура!"),
+                TextWithTTS("Прекрасно!"),
+                TextWithTTS("Продолжайте в том же духе!"),
+            ]
+            praise += random.choice(replicas_insert)
+            praise += TextWithTTS(
+                f" Вы спите лучше, чем {scoreboard}% пользователей! "
+            )
+
+            message += praise
+
+        replicas_tail = [
+            TextWithTTS("Чем я могу помочь?"),
+            TextWithTTS("Чем могу помочь?"),
+            TextWithTTS("Чем могу быть полезен?"),
+            # TODO:                         ^^ Assure gender consistency
+            TextWithTTS("Я к вашим услугам."),
+        ]
+
+        message += random.choice(replicas_tail)
+
+        return message
+
+    def get_menu_welcome_message(self) -> TextWithTTS:
+        replicas_a = [
+            TextWithTTS("Вы находитесь в главном меню."),
+            TextWithTTS("Это главное меню Сонного Помощника."),
+            TextWithTTS("Вы в главном меню."),
+            TextWithTTS("Вы находитесь в главном меню Сонного Помощника."),
+        ]
+
+        replicas_b = [
+            TextWithTTS("Здесь вам доступны все функции навыка."),
+            TextWithTTS("Чем я могу помочь?"),
+            TextWithTTS("Чем могу быть полезен?"),
+            # TODO:                         ^^ Assure gender consistency
+            TextWithTTS("Я к вашим услугам."),
+            TextWithTTS("Что угодно, лишь бы вы спали хорошо."),
+            # NOTE:      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Informal
+        ]
+
+        message = construct_random_message(replicas_a, replicas_b)
+
+        return message
+
+    def get_info_message(self) -> TextWithTTS:
+        replicas_a = [
+            TextWithTTS(
+                f"Я {DASH} Сонный Помощник." " Я могу помочь вам со сном."
+            ),
+            TextWithTTS(
+                f"Я {DASH} Сонный Помощник. Я помогаю вам организовать"
+                " свой сон."
+            ),
+            TextWithTTS(
+                f"Я {DASH} Сонный Помощник. Моя цель {DASH} помочь вам"
+                " обеспечить себе правильный здоровый сон."
+            ),
+            TextWithTTS(
+                f"Я {DASH} Сонный Помощник. Моя цель {DASH} помочь вам"
+                " обеспечить себе хороший комфортный сон."
+            ),
+            TextWithTTS(
+                f"Я {DASH} Сонный Помощник, я могу помочь вам лучше спать."
+            ),
+            TextWithTTS(
+                f"Я {DASH} Сонный Помощник, я могу помочь вам" " высыпаться."
+            ),
+        ]
+
+        replicas_b = [
+            TextWithTTS(
+                "Вы можете попросить меня рассчитать оптимальное для "
+                "вас время сна, за которое вы можете выспаться."
+            ),
+            TextWithTTS(
+                "Я могу рассчитать для вас оптимальное "
+                "время сна, за которое вы можете выспаться."
+            ),
+            TextWithTTS(
+                "С помощью меня, вы можете узнать, во сколько "
+                "вам стоит сегодня лечь, чтобы выспаться."
+            ),
+            TextWithTTS(
+                "Я могу помочь вам подобрать подходящее для вас "
+                "время сна, чтобы вы смогли выспаться."
+            ),
+        ]
+
+        replicas_c = [
+            TextWithTTS(f"Для этого скажите {LAQUO}Я хочу спать{RAQUO}."),
+            TextWithTTS(
+                "Чтобы вызвать эту функцию, скажитe "
+                f"{LAQUO}Я хочу спать{RAQUO}."
+            ),
+        ]
+
+        replicas_d = [
+            TextWithTTS(
+                "А ещё вы можете попросить у меня совет по тому, "
+                "как лучше спать."
+            ),
+            TextWithTTS(
+                "Или вы можете попросить у меня совет по тому, "
+                "как лучше спать."
+            ),
+            TextWithTTS("А ещё я могу поделиться советом по здоровому сну."),
+            TextWithTTS(
+                "А ещё я могу дать вам небольшой совет по "
+                "интересующему вас виду сна."
+            ),
+            TextWithTTS(
+                "Ещё я могу дать вам пару советов по улучшению "
+                "качества вашего сна."
+            ),
+            TextWithTTS(
+                "А ещё я могу дать вам пару советов по тому, "
+                "как высыпаться."
+            ),
+        ]
+
+        message = construct_random_message(
+            replicas_a, replicas_b, replicas_c, replicas_d
+        )
+
+        return message
+
+    def get_ask_tip_topic_message(self) -> TextWithTTS:
+        replicas = [
+            TextWithTTS("Вас интересует совет по дневному или ночному сну?"),
+            TextWithTTS(
+                "По какому сну вы хотите получить совет, дневному, "
+                "или ночному? "
+            ),
+            TextWithTTS(
+                "Я могу дать вам совет по дневному или ночному сну. "
+                "Какой сон вас интересует?"
+            ),
+            TextWithTTS(
+                "С каким сном вам нужна помощь? С дневным или ночным?"
+            ),
+            TextWithTTS("Вам нужна помощь по дневному или ночному сну?"),
+        ]
+        # NOTE: Tip topic options are currently hardcoded.
+        #       This may cause issues if new tip topics
+        #       are planned to be added in the future.
+        return random.choice(replicas)
+
+    def get_tip_message(self, tip: Tip) -> TextWithTTS:
+        return tip.tip_content.transform(gentle_capitalize)
+
+    def get_propose_yesterday_wake_up_time_message(
+        self, last_time: datetime.time
+    ) -> TextWithTTS:
+        return TextWithTTS(
+            text="Вы хотите завтра встать как в прошлый раз,"
+            f" в {last_time.isoformat(timespec='minutes')}?"
+        )
+
+    def get_ask_wake_up_time_message(self) -> TextWithTTS:
+        return TextWithTTS(text="Во сколько вы хотите завтра проснуться?")
+
+    def get_ask_sleep_mode_message(self) -> TextWithTTS:
+        replicas = [
+            TextWithTTS(
+                "Как много вы хотите спать? Выберите "
+                "один из режимов сна: короткий или длинный сон"
+            ),
+            TextWithTTS("Вас интересует длинный или короткий сон?"),
+            TextWithTTS(
+                "Какой режим сна вы бы предпочли, длинный " "или короткий?"
+            ),
+        ]
+        return random.choice(replicas)
+
+    def get_sleep_calc_time_message(
+        self, bed_time: datetime.time, activities: List[Activity]
+    ) -> TextWithTTS:
+
+        message = TextWithTTS(
+            "Хорошо, рекомендую вам лечь в "
+            f"{bed_time.isoformat(timespec='minutes')}. "
+        )
+        if activities:
+            message += TextWithTTS(
+                "За этот вечер вы можете успеть, например, "
+            )
+
+            activities_textwithtts = [act.description for act in activities]
+            if len(activities) > 1:
+                activities_textwithtts[-1] = TextWithTTS(" или ").join(
+                    (activities_textwithtts[-2], activities_textwithtts[-1])
+                )
+            message += TextWithTTS(", ").join(activities_textwithtts) + ". "
+
+        replica_tail = [
+            TextWithTTS("Не желаете-ли получить совет по сну?"),
+            TextWithTTS("Не хотите-ли получить совет по сну?"),
+            TextWithTTS("Хотите получить совет по сну?"),
+            TextWithTTS("Как насчёт совета по сну?"),
+            TextWithTTS("Как насчёт небольшого совета по сну?"),
+            TextWithTTS("Вас интересует совет по сну?"),
+            TextWithTTS("Хотите совет по сну?"),
+        ]
+        message += random.choice(replica_tail)
+
+        return message
+
+    def get_good_night_message(self) -> TextWithTTS:
+        replicas = [
+            TextWithTTS(text="Хорошего сна!"),
+            TextWithTTS(text="Спокойной ночи!"),
+            TextWithTTS(text="Доброй ночи!"),
+            TextWithTTS(text="Сладких снов!"),
+            TextWithTTS(text="Споки!"),
+            # NOTE:           ^^^^^ Cringe
+            TextWithTTS(text="Хороших вам сноведений!"),
+            TextWithTTS(text="Крепкого сна!"),
+            TextWithTTS(text="Отбой!"),
+            # NOTE:           ^^^^^ Informal
+        ]
+        return random.choice(replicas)
