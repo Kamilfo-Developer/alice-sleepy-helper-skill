@@ -79,11 +79,25 @@ def makeRequest(command: str) -> dict:
     }
 
 
-def test__start_request():
-    r.post("http://localhost:5555/", json=makeRequest('Привет, \"Соный Помощник\"'))
+def sendRequest(req: dict) -> str:
+    resp = r.post("http://localhost:5555/", json=req)
+    return resp.json()["response"]["text"]
+
+
+def test_start():
+    req = makeRequest("Привет")
+    print(sendRequest(req))
 
 
 def test_time():
-    r.post("http://localhost:5555/", json=TIME_REQUEST)
+    print(sendRequest(TIME_REQUEST))
 
 
+def test_mode():
+    req = makeRequest("Длинный")
+    print(sendRequest(req))
+
+
+def test_sleep():
+    req = makeRequest("Я хочу спать")
+    print(sendRequest(req))
