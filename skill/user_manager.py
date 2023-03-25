@@ -135,12 +135,16 @@ class UserManager:
 
         if self.user.last_skill_use is not None:
             new_user = True
-            delta = now - self.user.last_skill_use
-            borderline = datetime.timedelta(days=1)
-            if delta > borderline:
-                self.user.drop_streak()
-            else:
+            yesterday = (now - datetime.timedelta(days=1)).day
+            today = now.day
+            if self.user.last_skill_use.day == yesterday:
+                # Last skill use was yesterday, streak increased
                 self.user.increase_streak()
+            elif self.user.last_skill_use.day != today:
+                # Last skill use was neither yesterday, nor today,
+                # thus streak dropped.
+                self.user.drop_streak()
+
         self.user.last_skill_use = now
 
         await self.repo.update_user(self.user)
