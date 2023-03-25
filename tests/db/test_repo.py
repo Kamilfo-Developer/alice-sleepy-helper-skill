@@ -2,6 +2,7 @@ from datetime import datetime, time, timedelta, timezone
 from uuid import uuid4
 
 import pytest_asyncio
+from skill.exceptions import NoSuchEntityInDB
 from skill.utils import TextWithTTS
 from tests.db.sa_db_settings import sa_repo_config
 from skill.db.repos.sa_repo import SARepo
@@ -119,7 +120,15 @@ async def test_users(repo: BaseRepo, init_db):
 
     deleted_user = await repo.delete_user(user)
 
-    assert deleted_user == user and await repo.delete_user(user) is None
+    assert deleted_user == user
+
+    with pytest.raises(NoSuchEntityInDB):
+        await repo.delete_user(user)
+
+    with pytest.raises(NoSuchEntityInDB):
+        user.increase_streak()
+
+        await repo.update_user(user)
 
     assert await repo.get_user_by_id(user._id) is None
 
@@ -161,10 +170,16 @@ async def test_activities(repo: BaseRepo, init_db):
 
     deleted_activity = await repo.delete_activity(activity)
 
-    assert (
-        deleted_activity == activity
-        and await repo.delete_activity(activity) is None
-    )
+    assert deleted_activity == activity
+
+    with pytest.raises(NoSuchEntityInDB):
+        await repo.delete_activity(activity)
+
+    with pytest.raises(NoSuchEntityInDB):
+        activity.description = TextWithTTS(
+            "Huge description", "+Huge description"
+        )
+        await repo.update_activity(activity)
 
     assert await repo.get_activity_by_id(activity._id) is None
 
@@ -209,10 +224,16 @@ async def test_tips_topics(repo: BaseRepo, init_db):
 
     deleted_tips_topic = await repo.delete_tips_topic(topic)
 
-    assert (
-        deleted_tips_topic == topic
-        and await repo.delete_tips_topic(topic) is None
-    )
+    assert deleted_tips_topic == topic
+
+    with pytest.raises(NoSuchEntityInDB):
+        await repo.delete_tips_topic(topic)
+
+    with pytest.raises(NoSuchEntityInDB):
+        topic.topic_description = TextWithTTS(
+            "Huge description", "+Huge description"
+        )
+        await repo.update_tips_topic(topic)
 
     assert await repo.get_tips_topic_by_id(topic._id) is None
 
@@ -262,7 +283,16 @@ async def test_tips(repo: BaseRepo, insert_values):
 
     deleted_tip = await repo.delete_tip(tip)
 
-    assert deleted_tip == tip and await repo.delete_tip(tip) is None
+    assert deleted_tip == tip
+
+    with pytest.raises(NoSuchEntityInDB):
+        await repo.delete_tip(tip)
+
+    with pytest.raises(NoSuchEntityInDB):
+        tip.short_description = TextWithTTS(
+            "Huge description", "+Huge description"
+        )
+        await repo.update_tip(tip)
 
     assert await repo.get_tip_by_id(tip._id) is None
 
