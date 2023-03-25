@@ -1,37 +1,46 @@
 version: "3.8"
 services:
-  bot:
-    build: 
-      context: .
+  skill:
+    image: sleepy-helper-skill
     restart: always
     env_file:
       - .env
     environment:
-      - POSTGRES_HOST=db
+      - DB_PROVIDER=postgres
+      - POSTGRES_HOST=database
     depends_on:
-      - db
+      - database
+      - migration
     networks:
-      - bot_network
+      - skill_network
     ports: 
       - '5555:5555'
 
+  migration:
+    build: .
+    image: sleepy-helper-skill
+    depends_on: 
+      - database
+    command: bash -c "cd /app/skill/db/migrations && alembic upgrade head && cd /app"
+    networks:
+      - skill_network
 
-  db:
+  database:
     image: postgres:latest
     restart: always
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - skill-database-data:/var/lib/postgresql/data
     env_file:
       - .env
     networks:
-      - bot_network
+      - skill_network
     ports:
       - '5432:5432'
 
 networks:
-  bot_network:
+  skill_network:
     driver: bridge
 
 volumes:
-  db-data:
+  skill-database-data:
 
