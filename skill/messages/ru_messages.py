@@ -250,7 +250,7 @@ class RUMessages(BaseMessages):
             ),
             TextWithTTS("Вас интересует длинный или короткий сон?"),
             TextWithTTS(
-                "Какой режим сна вы бы предпочли, длинный " "или короткий?"
+                "Какой режим сна вы бы предпочли, длинный или короткий?"
             ),
         ]
         return random.choice(replicas)

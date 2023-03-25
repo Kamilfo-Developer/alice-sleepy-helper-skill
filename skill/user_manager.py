@@ -172,12 +172,25 @@ class UserManager:
             return tip
         return self.messages.get_tip_message(tip)
 
+    async def get_ask_sleep_time_message(self) -> TextWithTTS:
+        """Get the proper message to ask a user the time at which
+        they want to wake up. The selected message depends on whether
+        the user have already used the sleep calculator or not."""
+
+        last_wake_up_time = self.user.lask_wake_up_time  # type: ignore
+        if last_wake_up_time is not None:
+            return self.messages.get_propose_yesterday_wake_up_time_message(
+                last_wake_up_time
+            )
+        return self.messages.get_ask_wake_up_time_message()
+
     async def ask_sleep_time(
         self,
         now: datetime.datetime,
         wake_up_time: datetime.time,
         mode: SleepMode,
         reply: bool = True,
+        remember_time: bool = True
     ) -> TextWithTTS | datetime.datetime:
         """Calculate user's sleep time. If reply argument is set to True,
         this method constructs a response message, in which it proposes the
@@ -196,11 +209,18 @@ class UserManager:
             reply (bool, optional): whether to return a response message or not
             Defaults to True.
 
+            remember_time (bool, optional): whether to record the time at which
+            the user wants to wake up to the DB or not
+            Defaults to True.
+
         Returns:
             TextWithTTS | datetime.datetime: if reply is set to True, a
             response message in a form of TextWithTTS. Otherwise the proposed
             timestamp for a user to go to bed.
         """
+        if remember_time:
+            self.user.lask_wake_up_time = wake_up_time  # type: ignore
+            await self.repo.update_user(self.user)
 
         now_time = now.time()
 
