@@ -46,7 +46,7 @@ TIME_REQUEST = {
 }
 
 
-def makeRequest(command: str) -> dict:
+def make_request(command: str) -> dict:
     return {
         "meta": {
             "locale": "ru-RU",
@@ -79,23 +79,23 @@ def makeRequest(command: str) -> dict:
     }
 
 
-def sendRequest(req: dict) -> str:
+def send_request(req: dict) -> str:
     resp = r.post("http://localhost:5555/", json=req)
     return resp.json()["response"]["text"]
 
 
 def test_start():
-    req = makeRequest("Привет")
-    print(sendRequest(req))
+    req = make_request("Привет")
+    print(send_request(req))
 
 
 def test_time():
-    print(sendRequest(TIME_REQUEST))
+    print(send_request(TIME_REQUEST))
 
 
 def test_mode():
-    req = makeRequest("Длинный")
-    print(sendRequest(req))
+    req = make_request("Длинный")
+    print(send_request(req))
 
 
 def test_sleep():
