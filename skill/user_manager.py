@@ -131,10 +131,10 @@ class UserManager:
         if now is None:
             now = datetime.datetime.now()
 
-        new_user = False
+        new_user = True
 
         if self.user.last_skill_use is not None:
-            new_user = True
+            new_user = False
             yesterday = (now - datetime.timedelta(days=1)).date()
             today = now.date()
             if self.user.last_skill_use.date() == yesterday:
@@ -189,6 +189,9 @@ class UserManager:
 
         if heard_tips:
             tips = list(filter(lambda x: x not in heard_tips, tips))
+
+        print(tips)
+        print(heard_tips)
 
         tip = random.choice(tips)
 

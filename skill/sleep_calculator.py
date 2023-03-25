@@ -36,7 +36,7 @@ class SleepCalculator:
             list[Activity]: the list of best fitting activities compilation
         """
 
-        if time_b <= time_a:
+        if time_b < time_a:
             raise SHInvalidInputError(
                 "Closing boundary cannot be less than the opening boundary"
             )

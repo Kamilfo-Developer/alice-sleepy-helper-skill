@@ -58,22 +58,22 @@ class RUMessages(BaseMessages):
         self, time: datetime.datetime, streak: int, scoreboard: int
     ) -> TextWithTTS:
         daytime = Daytime.from_time(time)
-        greeting = TextWithTTS("Здравствуйте!")
+        greeting = TextWithTTS("Здравствуйте! ")
         match daytime:
             case Daytime.DAY:
-                greeting = TextWithTTS("Добрый день!")
+                greeting = TextWithTTS("Добрый день! ")
             case Daytime.MORNING:
-                greeting = TextWithTTS("Доброе утро!")
+                greeting = TextWithTTS("Доброе утро! ")
             case Daytime.EVENING:
-                greeting = TextWithTTS("Добрый вечер!")
+                greeting = TextWithTTS("Добрый вечер! ")
             case Daytime.NIGHT:
-                greeting = TextWithTTS("Доброй ночи!")
+                greeting = TextWithTTS("Доброй ночи! ")
 
         message = greeting
 
         if streak > 1:
             praise = TextWithTTS(
-                f" Сегодня вы пользуетесь Сонным Помощником {streak}"
+                f"Сегодня вы пользуетесь Сонным Помощником {streak}"
                 " день подряд. "
             )
             replicas_insert = [
@@ -273,6 +273,8 @@ class RUMessages(BaseMessages):
                 activities_textwithtts[-1] = TextWithTTS(" или ").join(
                     (activities_textwithtts[-2], activities_textwithtts[-1])
                 )
+                activities_textwithtts.pop(-2)
+                
             message += TextWithTTS(", ").join(activities_textwithtts) + ". "
 
         replica_tail = [
