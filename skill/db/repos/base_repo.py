@@ -65,37 +65,124 @@ class BaseRepo(abc.ABC):
         pass
 
     @abc.abstractmethod
-    async def delete_user(self, user: User) -> User | None:
+    async def delete_user(self, user: User) -> User:
+        """Deletes the passed user entity from the db
+
+        Args:
+            user (User): user that is going to be deleted
+
+        Raises:
+            NoSuchEntityInDB: raised if no such entity in the DB
+
+        Returns:
+            User: deleted entity
+        """
         pass
 
     @abc.abstractmethod
-    async def delete_activity(self, activity: Activity) -> Activity | None:
+    async def delete_activity(self, activity: Activity) -> Activity:
+        """Deletes the passed activity entity from the db
+
+        Args:
+            activity (Activity): activity that is going to be deleted
+
+        Raises:
+            NoSuchEntityInDB: raised if no such entity in the DB
+
+        Returns:
+            Activity: deleted entity
+        """
         pass
 
     @abc.abstractmethod
-    async def delete_tips_topic(
-        self, tips_topic: TipsTopic
-    ) -> TipsTopic | None:
+    async def delete_tips_topic(self, tips_topic: TipsTopic) -> TipsTopic:
+        """Deletes the passed tips topic entity from the db
+        with all the related tips
+
+        Args:
+            tips_topic (TipsTopic): tips topic that is going to be deleted
+
+        Raises:
+            NoSuchEntityInDB: raised if no such entity in the DB
+
+        Returns:
+            TipsTopic: deleted entity
+        """
         pass
 
     @abc.abstractmethod
-    async def delete_tip(self, tip: Tip) -> Tip | None:
+    async def delete_tip(self, tip: Tip) -> Tip:
+        """Deletes the passed tip entity from the db
+
+        Args:
+            tip (Tip): tip that is going to be deleted
+
+        Raises:
+            NoSuchEntityInDB: raised if no such entity in the DB
+
+        Returns:
+            Tip: deleted entity
+        """
         pass
 
     @abc.abstractmethod
     async def update_user(self, user: User) -> User:
+        """Updates the passed user entity in the db
+
+        Args:
+            user (User): user that is going to be updated
+
+        Raises:
+            NoSuchEntityInDB: raised if no such entity in the DB
+
+        Returns:
+            User: updated entity
+        """
         pass
 
     @abc.abstractmethod
     async def update_activity(self, activity: Activity) -> Activity:
+        """Updates the passed user entity in the db
+
+        Args:
+            activity (User): activity that is going to be updated
+
+        Raises:
+            NoSuchEntityInDB: raised if no such entity in the DB
+
+        Returns:
+            Activity: updated entity
+        """
         pass
 
     @abc.abstractmethod
     async def update_tips_topic(self, tips_topic: TipsTopic) -> TipsTopic:
+        """Updates the passed tips topic entity in the db
+
+        Args:
+            tips_topic (TipsTopic): tips topic that is going to be updated
+
+        Raises:
+            NoSuchEntityInDB: raised if no such entity in the DB
+
+        Returns:
+            TipsTopic: updated entity
+        """
         pass
 
     @abc.abstractmethod
     async def update_tip(self, tip: Tip) -> Tip:
+        """Updates the passed tip entity in the db
+
+        Args:
+            tip (Tip): tip that is going to be updated
+
+        Raises:
+            NoSuchEntityInDB: raised if no such entity in the DB
+
+        Returns:
+            Tip: updated entity
+        """
         pass
 
     @abc.abstractmethod
