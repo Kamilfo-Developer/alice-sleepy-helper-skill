@@ -1,6 +1,6 @@
 from tests.user_manager.sa_db_settings import sa_repo_config
 from skill.db.repos.sa_repo import SARepo
-from skill.entities import User, Activity, Tip, TipsTopic
+from skill.entities import User, Activity, TipsTopic
 from skill.user_manager import UserManager
 from skill.messages.ru_messages import RUMessages
 from skill.sleep_calculator import SleepMode
@@ -245,32 +245,24 @@ async def test_tips():
 
     await repo.insert_tips_topic(tips_topic)
 
-    tip1 = Tip(
-        id=uuid4(),
+    await tips_topic.add_tip(
         short_description=TextWithTTS("святая вода"),
         tip_content=TextWithTTS("[1] мойте руки святой водой кншн"),
         tips_topic=tips_topic,
-        created_date=now,
-        repo=repo
+        created_date=now
     )
-    tip2 = Tip(
-        id=uuid4(),
+    await tips_topic.add_tip(
         short_description=TextWithTTS("зачем"),
         tip_content=TextWithTTS("[2] не мойте руки вообще никак вы что дурак"),
         tips_topic=tips_topic,
-        created_date=now,
-        repo=repo
+        created_date=now
     )
-    tip3 = Tip(
-        id=uuid4(),
+    await tips_topic.add_tip(
         short_description=TextWithTTS("оближи"),
         tip_content=TextWithTTS("[3] всё что нам нужно у нас в руках"),
         tips_topic=tips_topic,
-        created_date=now,
-        repo=repo
+        created_date=now
     )
-
-    await repo.insert_tips((tip1, tip2, tip3))
 
     for _ in range(10):
         user = await repo.update_user(user_manager.user.drop_heard_tips())
