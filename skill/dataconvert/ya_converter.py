@@ -1,6 +1,6 @@
 import datetime
 import pytz
-from skill.sh_exceptions import SHInvalidInputError
+from skill.exceptions import InvalidInputError
 from skill.dataconvert.base_converter import BaseDataConverter
 
 
@@ -13,7 +13,7 @@ class YaDataConverter(BaseDataConverter):
         given timezone"""
 
         if obj["type"] != "YANDEX.DATETIME":
-            raise SHInvalidInputError(
+            raise InvalidInputError(
                 "obj must be Alice API YANDEX.DATETIME object"
                 )
         if isinstance(timezone, str):
@@ -21,7 +21,7 @@ class YaDataConverter(BaseDataConverter):
         elif isinstance(timezone, datetime.tzinfo):
             tzinfo = timezone  # type: ignore
         else:
-            raise SHInvalidInputError("Invalid timezone type")
+            raise InvalidInputError("Invalid timezone type")
 
         try:
             time = datetime.time(
@@ -31,7 +31,7 @@ class YaDataConverter(BaseDataConverter):
             )
         except KeyError as e:
             if "hour" not in obj or "minute" not in obj:
-                raise SHInvalidInputError(
+                raise InvalidInputError(
                     "obj should contain hour and minute information"
                     )
             raise e
@@ -43,7 +43,7 @@ class YaDataConverter(BaseDataConverter):
         given timezone"""
 
         if obj["type"] != "YANDEX.DATETIME":
-            raise SHInvalidInputError(
+            raise InvalidInputError(
                 "obj must be Alice API YANDEX.DATETIME object"
                 )
         if isinstance(timezone, str):
@@ -51,7 +51,7 @@ class YaDataConverter(BaseDataConverter):
         elif isinstance(timezone, datetime.tzinfo):
             tzinfo = timezone  # type: ignore
         else:
-            raise SHInvalidInputError("Invalid timezone type")
+            raise InvalidInputError("Invalid timezone type")
 
         try:
             result_datetime = datetime.datetime(
@@ -65,6 +65,6 @@ class YaDataConverter(BaseDataConverter):
         except KeyError as e:
             if "year" not in obj or "month" not in obj or "day" not in obj \
                     or "hour" not in obj or "minute" not in obj:
-                raise SHInvalidInputError(f"Incomplete obj: {e}")
+                raise InvalidInputError(f"Incomplete obj: {e}")
             raise e
         return result_datetime

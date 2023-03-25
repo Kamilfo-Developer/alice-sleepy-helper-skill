@@ -1,2 +1,0 @@
-class SHInvalidInputError(Exception):
-    pass

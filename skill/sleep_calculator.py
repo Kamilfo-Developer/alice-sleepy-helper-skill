@@ -1,6 +1,6 @@
 import enum
 import datetime
-from skill.sh_exceptions import SHInvalidInputError
+from skill.exceptions import InvalidInputError
 from typing import Iterable
 from skill.entities import Activity
 
@@ -37,7 +37,7 @@ class SleepCalculator:
         """
 
         if time_b < time_a:
-            raise SHInvalidInputError(
+            raise InvalidInputError(
                 "Closing boundary cannot be less than the opening boundary"
             )
         delta = time_b - time_a
@@ -76,7 +76,7 @@ class SleepCalculator:
             origin_time = datetime.datetime.now()
 
         if wake_up_time <= origin_time:
-            raise SHInvalidInputError(
+            raise InvalidInputError(
                 "Wake up time is earlier than current time"
             )
 
@@ -90,4 +90,4 @@ class SleepCalculator:
             delta_steps = delta // step
             return wake_up_time - ((delta_steps) * step)
 
-        raise SHInvalidInputError(f"Invalid sleep mode given: {mode}")
+        raise InvalidInputError(f"Invalid sleep mode given: {mode}")

@@ -274,7 +274,7 @@ class RUMessages(BaseMessages):
                     (activities_textwithtts[-2], activities_textwithtts[-1])
                 )
                 activities_textwithtts.pop(-2)
-                
+
             message += TextWithTTS(", ").join(activities_textwithtts) + ". "
 
         replica_tail = [
