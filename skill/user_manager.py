@@ -65,7 +65,7 @@ class UserManager:
                 last_wake_up_time=None,
                 heard_tips=[],
                 join_date=datetime.datetime.now(),
-                repo=repo
+                repo=repo,
             )
             await repo.insert_user(user)
 
@@ -214,7 +214,7 @@ class UserManager:
         wake_up_time: datetime.time,
         mode: SleepMode,
         reply: bool = True,
-        remember_time: bool = True
+        remember_time: bool = True,
     ) -> TextWithTTS | datetime.datetime:
         """Calculate user's sleep time. If reply argument is set to True,
         this method constructs a response message, in which it proposes the
@@ -257,7 +257,9 @@ class UserManager:
             time=wake_up_time,
         )
 
-        bed_time = SleepCalculator.calc(now, wake_up_datetime, mode)
+        bed_time = SleepCalculator.calc(
+            wake_up_time=wake_up_datetime, origin_time=now, mode=mode
+        )
         if not reply:
             return bed_time
 

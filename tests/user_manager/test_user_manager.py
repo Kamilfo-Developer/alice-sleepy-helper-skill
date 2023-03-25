@@ -32,25 +32,21 @@ async def test_check_in():
     loser_user = User(
         id=generate_random_string_id(),
         streak=0,
-        last_skill_use=(
-            now - datetime.timedelta(days=1)
-        ),
+        last_skill_use=(now - datetime.timedelta(days=1)),
         last_wake_up_time=datetime.time(hour=4, minute=20),
         heard_tips=[],
         join_date=datetime.datetime(year=2022, month=1, day=1),
-        repo=repo
+        repo=repo,
     )
 
     user = User(
         id=test_user_id,
         streak=4,
-        last_skill_use=(
-            now - datetime.timedelta(days=1)
-        ),
+        last_skill_use=(now - datetime.timedelta(days=1)),
         last_wake_up_time=datetime.time(hour=4, minute=20),
         heard_tips=[],
         join_date=datetime.datetime(year=2022, month=1, day=1),
-        repo=repo
+        repo=repo,
     )
     await repo.insert_users((user, loser_user))
 
@@ -109,20 +105,13 @@ async def test_sleep_calc():
     assert "как в прошлый раз" not in message1.text
 
     now = datetime.datetime(
-        year=1420,
-        month=1,
-        day=1,
-        hour=1,
-        minute=0,
-        second=0
+        year=1420, month=1, day=1, hour=1, minute=0, second=0
     )
 
     wake_up_time = datetime.time(hour=14, minute=0, second=0)
 
     message2 = await user_manager.ask_sleep_time(
-        now,
-        wake_up_time,
-        SleepMode.LONG
+        now, wake_up_time, SleepMode.LONG
     )
 
     assert not user_manager.is_new_user()
@@ -130,9 +119,7 @@ async def test_sleep_calc():
     assert "02:00" in message2.text  # type: ignore
 
     message2 = await user_manager.ask_sleep_time(
-        now,
-        wake_up_time,
-        SleepMode.SHORT
+        now, wake_up_time, SleepMode.SHORT
     )
 
     assert "12:30" in message2.text  # type: ignore
@@ -154,12 +141,7 @@ async def test_activities_proposal():
     assert bool(user_test) and bool(user_manager)
 
     now = datetime.datetime(
-        year=1420,
-        month=1,
-        day=1,
-        hour=11,
-        minute=00,
-        second=0
+        year=1420, month=1, day=1, hour=11, minute=00, second=0
     )
 
     for activity in await repo.get_activities():
@@ -170,21 +152,21 @@ async def test_activities_proposal():
         description=TextWithTTS("[FINDME_1] моргнуть"),
         created_date=now,
         occupation_time=datetime.timedelta(hours=0, minutes=0, seconds=1),
-        repo=repo
+        repo=repo,
     )
     activity2 = Activity(
         id=uuid4(),
         description=TextWithTTS("[FINDME_2] анжуманя"),
         created_date=now,
         occupation_time=datetime.timedelta(hours=1, minutes=29, seconds=1),
-        repo=repo
+        repo=repo,
     )
     activity3 = Activity(
         id=uuid4(),
         description=TextWithTTS("[EXCLUDEME] бегит"),
         created_date=now,
         occupation_time=datetime.timedelta(hours=2, minutes=29, seconds=1),
-        repo=repo
+        repo=repo,
     )
 
     await repo.insert_activities((activity1, activity2, activity3))
@@ -192,9 +174,7 @@ async def test_activities_proposal():
     wake_up_time = datetime.time(hour=14, minute=0, second=0)
 
     message1 = await user_manager.ask_sleep_time(
-        now,
-        wake_up_time,
-        SleepMode.SHORT
+        now, wake_up_time, SleepMode.SHORT
     )
 
     assert message1.text.count("[FINDME_1]") == 1  # type: ignore
@@ -202,18 +182,11 @@ async def test_activities_proposal():
     assert message1.text.count("[EXCLUDEME]") == 0  # type: ignore
 
     now = datetime.datetime(
-        year=1420,
-        month=1,
-        day=1,
-        hour=12,
-        minute=30,
-        second=0
+        year=1420, month=1, day=1, hour=12, minute=30, second=0
     )
 
     message2 = await user_manager.ask_sleep_time(
-        now,
-        wake_up_time,
-        SleepMode.SHORT
+        now, wake_up_time, SleepMode.SHORT
     )
 
     assert message2.text.count("[FINDME_1]") == 0  # type: ignore
@@ -240,7 +213,7 @@ async def test_tips():
         name=TextWithTTS("как правильно мыть руки"),
         topic_description=TextWithTTS("вот как"),
         created_date=now,
-        repo=repo
+        repo=repo,
     )
 
     await repo.insert_tips_topic(tips_topic)
@@ -249,19 +222,19 @@ async def test_tips():
         short_description=TextWithTTS("святая вода"),
         tip_content=TextWithTTS("[1] мойте руки святой водой кншн"),
         tips_topic=tips_topic,
-        created_date=now
+        created_date=now,
     )
     await tips_topic.add_tip(
         short_description=TextWithTTS("зачем"),
         tip_content=TextWithTTS("[2] не мойте руки вообще никак вы что дурак"),
         tips_topic=tips_topic,
-        created_date=now
+        created_date=now,
     )
     await tips_topic.add_tip(
         short_description=TextWithTTS("оближи"),
         tip_content=TextWithTTS("[3] всё что нам нужно у нас в руках"),
         tips_topic=tips_topic,
-        created_date=now
+        created_date=now,
     )
 
     for _ in range(10):
