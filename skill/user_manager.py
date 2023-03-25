@@ -135,12 +135,12 @@ class UserManager:
 
         if self.user.last_skill_use is not None:
             new_user = True
-            yesterday = (now - datetime.timedelta(days=1)).day
-            today = now.day
-            if self.user.last_skill_use.day == yesterday:
+            yesterday = (now - datetime.timedelta(days=1)).date()
+            today = now.date()
+            if self.user.last_skill_use.date() == yesterday:
                 # Last skill use was yesterday, streak increased
                 self.user.increase_streak()
-            elif self.user.last_skill_use.day != today:
+            elif self.user.last_skill_use.date() != today:
                 # Last skill use was neither yesterday, nor today,
                 # thus streak dropped.
                 self.user.drop_streak()
