@@ -1,5 +1,5 @@
 from __future__ import annotations
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
 from uuid import UUID, uuid4
 from skill.db.repos.base_repo import BaseRepo
 from skill.utils import IdComparable, TextWithTTS
@@ -9,6 +9,7 @@ class User(IdComparable):
     _id: str
     _streak: int
     lask_skill_use: datetime | None
+    last_wake_up_time: time | None
     _heard_tips: list[Tip]
     _join_date: datetime
 
@@ -17,6 +18,7 @@ class User(IdComparable):
         id: str,
         streak: int,
         last_skill_use: datetime | None,
+        last_wake_up_time: time | None,
         heard_tips: list[Tip],
         join_date: datetime,
         repo: BaseRepo,
@@ -24,6 +26,7 @@ class User(IdComparable):
         self._id = id
         self._streak = streak
         self.last_skill_use = last_skill_use
+        self.last_wake_up_time = last_wake_up_time
         self._heard_tips = heard_tips
         self._join_date = join_date
         self.__repo = repo

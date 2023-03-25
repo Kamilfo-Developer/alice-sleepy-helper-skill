@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta, timezone
 from uuid import uuid4
 
 import pytest_asyncio
@@ -26,9 +26,25 @@ def generate_random_string_id() -> str:
 async def insert_values(repo: BaseRepo, init_db):
     now = datetime.now()
 
-    user = User(generate_random_string_id(), 0, now, [], now, repo)
+    user = User(
+        id=generate_random_string_id(),
+        streak=0,
+        last_skill_use=now,
+        heard_tips=[],
+        last_wake_up_time=time(12, 5, 30),
+        join_date=now,
+        repo=repo,
+    )
 
-    new_user = User(generate_random_string_id(), 100, now, [], now, repo)
+    new_user = User(
+        id=generate_random_string_id(),
+        streak=100,
+        last_skill_use=None,
+        heard_tips=[],
+        last_wake_up_time=time(12, 5, 30),
+        join_date=now,
+        repo=repo,
+    )
 
     await repo.insert_users([user, new_user])
 
@@ -89,7 +105,15 @@ async def insert_values(repo: BaseRepo, init_db):
 async def test_users(repo: BaseRepo, init_db):
     now = datetime.now()
 
-    user = User(generate_random_string_id(), 0, now, [], now, repo)
+    user = User(
+        id=generate_random_string_id(),
+        streak=0,
+        last_skill_use=now,
+        heard_tips=[],
+        last_wake_up_time=time(12, 5, 30),
+        join_date=now,
+        repo=repo,
+    )
 
     await repo.insert_user(user)
 
@@ -99,7 +123,15 @@ async def test_users(repo: BaseRepo, init_db):
 
     assert await repo.get_user_by_id(user._id) is None
 
-    new_user = User(generate_random_string_id(), 0, None, [], now, repo)
+    new_user = User(
+        id=generate_random_string_id(),
+        streak=0,
+        last_skill_use=None,
+        heard_tips=[],
+        last_wake_up_time=time(12, 5, 30),
+        join_date=now,
+        repo=repo,
+    )
 
     await repo.insert_users([user, new_user])
 
@@ -340,13 +372,20 @@ async def test_update(repo: BaseRepo, insert_values):
 
     user.add_heard_tip(new_tip)
 
+    user.last_skill_use = datetime.now()
+
+    user.last_wake_up_time = time(1, 50, 32)
+
     updated_user = await repo.update_user(user)
 
-    assert (
-        user._streak == updated_user._streak
-        and new_tip in user._heard_tips
-        and new_tip in updated_user._heard_tips
+    assert user._streak == updated_user._streak
+
+    assert updated_user.last_skill_use == user.last_skill_use.astimezone(
+        timezone(timedelta(0))
     )
+    assert updated_user.last_wake_up_time == user.last_wake_up_time
+    assert new_tip in user._heard_tips
+    assert new_tip in updated_user._heard_tips
 
     user.drop_heard_tips()
 
