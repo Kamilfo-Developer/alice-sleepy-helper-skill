@@ -25,8 +25,8 @@ class YaDataConverter(BaseDataConverter):
 
         try:
             time = datetime.time(
-                hour=obj["hour"],
-                minute=obj["minute"],
+                hour=obj["value"]["hour"],
+                minute=obj["value"]["minute"],
                 tzinfo=tzinfo
             )
         except KeyError as e:
@@ -55,11 +55,11 @@ class YaDataConverter(BaseDataConverter):
 
         try:
             result_datetime = datetime.datetime(
-                year=obj["year"],
-                month=obj["month"],
-                day=obj["day"],
-                hour=obj["hour"],
-                minute=obj["minute"],
+                year=obj["value"]["year"],
+                month=obj["value"]["month"],
+                day=obj["value"]["day"],
+                hour=obj["value"]["hour"],
+                minute=obj["value"]["minute"],
                 tzinfo=tzinfo
             )
         except KeyError as e:
