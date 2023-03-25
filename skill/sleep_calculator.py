@@ -50,20 +50,21 @@ class SleepCalculator:
 
     @staticmethod
     def calc(
-        origin_time: datetime.datetime | None,
         wake_up_time: datetime.datetime,
+        origin_time: datetime.datetime | None = None,
         mode: SleepMode = SleepMode.LONG,
     ) -> datetime.datetime:
         """Returns the time at which the user need to go to bed according to
         their request.
 
         Args:
-            origin_time (datetime.datetime | None): the starting point in
-            time from which the calculations are made.
-            If None is passed, origin_time sets to datetime.datetime.now()
-            result.
-
             wake_up_time (datetime.datetime): user's desired time to wake up
+
+            origin_time (datetime.datetime | None, optional): the starting
+            point in time from which the calculations are made.
+            If None is passed, origin_time sets to datetime.datetime.now()
+            result with the timezone of wake_up_time.
+            Defaults to None
 
             mode (SleepMode.SHORT | Sleepmode.LONG): user's desired sleep mode
 
@@ -72,7 +73,7 @@ class SleepCalculator:
         """
 
         if origin_time is None:
-            origin_time = datetime.datetime.now()
+            origin_time = datetime.datetime.now(tz=wake_up_time.tzinfo)
 
         if wake_up_time <= origin_time:
             raise InvalidInputError(
