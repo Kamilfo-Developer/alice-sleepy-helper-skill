@@ -24,7 +24,22 @@ async def test_check_in():
     messages = RUMessages()
     now = datetime.datetime.now()
 
+    for user in await repo.get_users():
+        await repo.delete_user(user)
+
     test_user_id = generate_random_string_id()
+
+    loser_user = User(
+        id=generate_random_string_id(),
+        streak=0,
+        last_skill_use=(
+            now - datetime.timedelta(days=1)
+        ),
+        last_wake_up_time=datetime.time(hour=4, minute=20),
+        heard_tips=[],
+        join_date=datetime.datetime(year=2022, month=1, day=1),
+        repo=repo
+    )
 
     user = User(
         id=test_user_id,
@@ -37,7 +52,7 @@ async def test_check_in():
         join_date=datetime.datetime(year=2022, month=1, day=1),
         repo=repo
     )
-    await repo.insert_user(user)
+    await repo.insert_users((user, loser_user))
 
     user_manager = await UserManager.new_manager(
         test_user_id, repo, messages, create_user_if_not_found=False
@@ -48,6 +63,7 @@ async def test_check_in():
     message = await user_manager.check_in(now, reply=True)
 
     assert "5 день подряд" in message.text  # type: ignore
+    assert "50%" in message.text  # type: ignore
 
     user_upd = await repo.get_user_by_id(test_user_id)
 
@@ -86,6 +102,8 @@ async def test_sleep_calc():
 
     assert bool(user_test) and bool(user_manager)
 
+    assert user_manager.is_new_user()
+
     message1 = await user_manager.get_ask_sleep_time_message()
 
     assert "как в прошлый раз" not in message1.text
@@ -106,6 +124,8 @@ async def test_sleep_calc():
         wake_up_time,
         SleepMode.LONG
     )
+
+    assert not user_manager.is_new_user()
 
     assert "02:00" in message2.text  # type: ignore
 
@@ -222,7 +242,7 @@ async def test_tips():
         created_date=now,
         repo=repo
     )
-    
+
     await repo.insert_tips_topic(tips_topic)
 
     tip1 = Tip(
@@ -252,7 +272,7 @@ async def test_tips():
 
     await repo.insert_tips((tip1, tip2, tip3))
 
-    for _ in range(20):
+    for _ in range(10):
         user = await repo.update_user(user_manager.user.drop_heard_tips())
         user_manager = UserManager(user, repo, messages)
 

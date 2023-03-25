@@ -72,11 +72,10 @@ class UserManager:
         inst = cls(user=user, repo=repo, messages=messages)
         return inst
 
+    def is_new_user(self):
+        return not (self.user.last_skill_use or self.user.last_wake_up_time)
+
     async def count_scoreboard(self, percentages: bool = True) -> int:
-        # TODO:^^^^^^^^^^^^^^^
-        #      Potentially heavy function when dealing
-        #      with a large number of users. Maybe the
-        #      feature can be done with SQL queries? RFC
         """Calculates user's position in the global streak scoreboard,
         starting from the lowest.
 
@@ -91,13 +90,10 @@ class UserManager:
 
         streak = self.user._streak
 
-        users = map(lambda x: x._streak, await self.repo.get_users())
-
-        scores = sorted(users)
-        score = scores.index(streak)
+        score = await self.repo.count_users_with_streak(streak, "<=") - 1
         if not percentages:
             return score
-        total = len(scores)
+        total = await self.repo.count_all_users()
         percentage = round(score / total * 100)
         return percentage
 
@@ -189,9 +185,6 @@ class UserManager:
 
         if heard_tips:
             tips = list(filter(lambda x: x not in heard_tips, tips))
-
-        print(tips)
-        print(heard_tips)
 
         tip = random.choice(tips)
 
