@@ -80,9 +80,20 @@ async def choose_short_duration(alice_request):
     user_id = alice_request.session.user_id
     await dp.storage.set_state(user_id, SkillStates.CALCULATED)
     time = await dp.storage.get_data(user_id)
-    # Here must be smth which takes time from somewhere
+    wake_up_time = datetime.datetime.now().replace(
+        hour=time["hour"], minute=time["minute"]
+    )
+    if (
+        datetime.datetime.now() > wake_up_time
+    ):  # Если это время уже прошло, значит нам нужен завтрашний день
+        wake_up_time = wake_up_time + datetime.timedelta(days=1)
+    time_target = SleepCalculator.calc(
+        now=datetime.datetime.now(), wake_up_time=wake_up_time, mode=SleepMode.SHORT
+    )
     return alice_request.response(
-        RUMessages().get_sleep_calc_time_message(bed_time=None, activities=[]).text
+        RUMessages()
+        .get_sleep_calc_time_message(bed_time=time_target, activities=[])
+        .text
     )
 
 
@@ -91,12 +102,20 @@ async def choose_long_duration(alice_request):
     user_id = alice_request.session.user_id
     await dp.storage.set_state(user_id, SkillStates.CALCULATED)
     time = await dp.storage.get_data(user_id)
-    time_target = SleepCalculator.calc(
-        now=datetime.datetime.now(),
+    wake_up_time = datetime.datetime.now().replace(
+        hour=time["hour"], minute=time["minute"]
     )
-    # Here must be smth which takes time from somewhere
+    if (
+        datetime.datetime.now() > wake_up_time
+    ):  # Если это время уже прошло, значит нам нужен завтрашний день
+        wake_up_time = wake_up_time + datetime.timedelta(days=1)
+    time_target = SleepCalculator.calc(
+        now=datetime.datetime.now(), wake_up_time=wake_up_time, mode=SleepMode.LONG
+    )
     return alice_request.response(
-        RUMessages().get_sleep_calc_time_message(bed_time=None, activities=[]).text
+        RUMessages()
+        .get_sleep_calc_time_message(bed_time=time_target, activities=[])
+        .text
     )
 
 
