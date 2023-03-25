@@ -108,7 +108,8 @@ class UserManager:
             now = datetime.datetime.now()
 
         new_user = False
-        if self.user.lask_skill_use is not None:
+
+        if self.user.last_skill_use is not None:
             new_user = True
             delta = now - self.user.last_skill_use
             borderline = datetime.timedelta(days=1)
@@ -118,8 +119,10 @@ class UserManager:
                 self.user.increase_streak()
         self.user.last_skill_use = now
 
+        await self.repo.update_user(self.user)
+
         if not reply:
-            return
+            return None
 
         if new_user:
             return self.messages.get_start_message_intro(now)
@@ -162,6 +165,8 @@ class UserManager:
         tip = random.choice(tips)
 
         self.user.add_heard_tip(tip)
+
+        await self.repo.update_user(self.user)
 
         if not reply:
             return tip
