@@ -58,22 +58,22 @@ class RUMessages(BaseMessages):
         self, time: datetime.datetime, streak: int, scoreboard: int
     ) -> TextWithTTS:
         daytime = Daytime.from_time(time)
-        greeting = TextWithTTS("Здравствуйте!")
+        greeting = TextWithTTS("Здравствуйте! ")
         match daytime:
             case Daytime.DAY:
-                greeting = TextWithTTS("Добрый день!")
+                greeting = TextWithTTS("Добрый день! ")
             case Daytime.MORNING:
-                greeting = TextWithTTS("Доброе утро!")
+                greeting = TextWithTTS("Доброе утро! ")
             case Daytime.EVENING:
-                greeting = TextWithTTS("Добрый вечер!")
+                greeting = TextWithTTS("Добрый вечер! ")
             case Daytime.NIGHT:
-                greeting = TextWithTTS("Доброй ночи!")
+                greeting = TextWithTTS("Доброй ночи! ")
 
         message = greeting
 
         if streak > 1:
             praise = TextWithTTS(
-                f" Сегодня вы пользуетесь Сонным Помощником {streak}"
+                f"Сегодня вы пользуетесь Сонным Помощником {streak}"
                 " день подряд. "
             )
             replicas_insert = [
@@ -250,7 +250,7 @@ class RUMessages(BaseMessages):
             ),
             TextWithTTS("Вас интересует длинный или короткий сон?"),
             TextWithTTS(
-                "Какой режим сна вы бы предпочли, длинный " "или короткий?"
+                "Какой режим сна вы бы предпочли, длинный или короткий?"
             ),
         ]
         return random.choice(replicas)
@@ -268,12 +268,21 @@ class RUMessages(BaseMessages):
                 "За этот вечер вы можете успеть, например, "
             )
 
-            activities_textwithtts = [act.description for act in activities]
+            activities_text_with_tts = [act.description for act in activities]
             if len(activities) > 1:
-                activities_textwithtts[-1] = TextWithTTS(" или ").join(
-                    (activities_textwithtts[-2], activities_textwithtts[-1])
-                )
-            message += TextWithTTS(", ").join(activities_textwithtts) + ". "
+                # Construct activity enumerating statement in proper Russian
+                # syntax: objects are seperated by a comma and a whitespace
+                # except for the last two, which have the word "или" inbetween.
+                activities_text_with_tts[-1] = TextWithTTS(" или ").join(
+                    (
+                        activities_text_with_tts[-2],
+                        activities_text_with_tts[-1],
+                    )
+                )  # Glue the last two objects together with the word "или"
+                activities_text_with_tts.pop(-2)  # Get rid of the penultimate
+                #                                   object duplicate
+
+            message += TextWithTTS(", ").join(activities_text_with_tts) + ". "
 
         replica_tail = [
             TextWithTTS("Не желаете-ли получить совет по сну?"),
