@@ -29,7 +29,7 @@ match DB_PROVIDER:
 
         POSTGRES_HOST = os.getenv("POSTGRES_HOST") or "localhost"
 
-        POSTGRES_DB_PORT = os.getenv("POSTGRES_DB_PORT") or "5432"
+        POSTGRES_PORT = os.getenv("POSTGRES_PORT") or "5432"
 
         POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
 
@@ -41,7 +41,7 @@ match DB_PROVIDER:
         DB_URL = (
             f"postgresql+{POSTGRES_DRIVER_NAME}://"
             + f"{POSTGRES_USERNAME}:{POSTGRES_PASSWORD}"
-            + f"@{POSTGRES_HOST}:{POSTGRES_DB_PORT}"
+            + f"@{POSTGRES_HOST}:{POSTGRES_PORT}"
             + f"/{POSTGRES_DB_NAME}"
         )
 
