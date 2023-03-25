@@ -23,9 +23,15 @@ class UserManager:
 
     @classmethod
     async def new_manager(
-        cls, user_id: str, repo: BaseRepo, messages: BaseMessages
+        cls,
+        user_id: str,
+        repo: BaseRepo,
+        messages: BaseMessages,
+        create_user_if_not_found: bool = True,
     ) -> UserManager | None:
         """Sets up UserManager with given user repo and messages.
+        If user_id is not found in the DB and create_user_if_not_found
+        is True, creates a new user.
 
         Args:
             user_id (str): User's ID as it is stored in the DB
@@ -37,13 +43,31 @@ class UserManager:
             messages (BaseMessages): the messages generator used
             by reply constructors
 
+            create_user_if_not_found (bool, optional): whether to create
+            a new user if user_id is not found in the DB or not.
+            Defaults to True.
+
         Returns:
             UserManager | None: proper UserManager instance. If
-            the user is not found in the repo, returns None
+            the user_id is not found in the DB and create_user_if_not_found
+            is False, returns None
         """
+
         user = await repo.get_user_by_id(user_id)
-        if user is None:
+        if not user and not create_user_if_not_found:
             return None
+
+        if not user:
+            user = User(
+                id=user_id,
+                streak=0,
+                last_skill_use=None,
+                last_wake_up_time=None,  # type: ignore
+                heard_tips=[],
+                join_date=datetime.datetime.now(),
+                repo=repo
+            )
+            await repo.insert_user(user)
 
         inst = cls(user=user, repo=repo, messages=messages)
         return inst
