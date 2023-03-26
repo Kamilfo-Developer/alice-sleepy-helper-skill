@@ -1,6 +1,7 @@
 from __future__ import annotations
 import datetime
 import random
+import pytz
 from uuid import UUID
 from skill.entities import User, Tip
 from skill.db.repos.base_repo import BaseRepo
@@ -111,8 +112,8 @@ class UserManager:
         Args:
             now (datetime.datetime | None, optional): the time at which the
             user started the skill. If not set, the method will recieve the
-            time with datetime.datetime.now(). However, leaving this
-            parameter to None is deprecated due to the possible difference
+            time with datetime.datetime.now() (using UTC). However, leaving
+            this parameter to None is deprecated due to the possible difference
             between the request time and the execution time.
             Defaults to None.
 
@@ -120,7 +121,7 @@ class UserManager:
             TextWithTTS: a greeting message.
         """
         if now is None:
-            now = datetime.datetime.now()
+            now = datetime.datetime.now(pytz.utc)
 
         new_user = True
 
@@ -221,7 +222,13 @@ class UserManager:
             self.user.last_wake_up_time = wake_up_time
             await self.repo.update_user(self.user)
 
-        now_time = now.time()
+        now_time = datetime.time(
+            hour=now.hour,
+            minute=now.minute,
+            second=now.second,
+            microsecond=now.microsecond,
+            tzinfo=now.tzinfo
+        )
 
         wake_up_datetime = datetime.datetime.combine(
             date=(
