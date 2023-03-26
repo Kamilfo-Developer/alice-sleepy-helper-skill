@@ -311,3 +311,10 @@ class RUMessages(BaseMessages):
             # NOTE:           ^^^^^ Informal
         ]
         return random.choice(replicas)
+
+    def get_wrong_topic_message(self, topic_name: str) -> TextWithTTS:
+        return TextWithTTS(
+            "Пожалуйста, выберите один из вариантов тем для совета: "
+            " дневной сон или ночной сон"
+        )
+        # TODO: Rephrase replica and add variety

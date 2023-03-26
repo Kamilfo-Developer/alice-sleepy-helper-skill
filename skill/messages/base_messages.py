@@ -57,3 +57,7 @@ class BaseMessages(abc.ABC):
     @abc.abstractmethod
     def get_good_night_message(self) -> TextWithTTS:
         pass
+
+    @abc.abstractmethod
+    def get_wrong_topic_message(self, topic_name: str) -> TextWithTTS:
+        pass

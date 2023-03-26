@@ -149,21 +149,21 @@ class UserManager:
             time=now, streak=streak, scoreboard=scoreboard
         )
 
-    async def ask_tip(self, topic_name: str) -> TextWithTTS | None:
+    async def ask_tip(self, topic_name: str) -> TextWithTTS:
         """Chooses a tip on given topic that has most likely never
         been heard before by the user and tracks the heard tips buffer.
 
         Args:
-            topic_id (str): the name of the topic of tips
+            topic_name (str): the name of the topic of tips
 
         Returns:
-            TextWithTTS | None: a tip message in a form of TextWithTTS or
-            None if the topic is not found.
+            TextWithTTS: a tip message in a form of TextWithTTS or
+            error message if the topic is not found.
         """
-        
+
         topic = await self.repo.get_tips_topic_by_name(topic_name)
         if topic is None:
-            return None
+            return self.messages.get_wrong_topic_message(topic_name)
         tips = await self.repo.get_topic_tips(topic_id=topic._id)
         heard_tips = self.user._heard_tips
 
@@ -230,7 +230,7 @@ class UserManager:
             minute=now.minute,
             second=now.second,
             microsecond=now.microsecond,
-            tzinfo=now.tzinfo
+            tzinfo=now.tzinfo,
         )
 
         wake_up_datetime = datetime.datetime.combine(

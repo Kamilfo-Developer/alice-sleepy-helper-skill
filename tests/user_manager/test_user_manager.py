@@ -272,7 +272,7 @@ async def test_tips():
         user = await repo.update_user(user_manager.user.drop_heard_tips())
         user_manager = UserManager(user, repo, messages)
 
-        message1 = await user_manager.ask_tip(tips_topic._id)
+        message1 = await user_manager.ask_tip(tips_topic.name.text)
         assert isinstance(message1, TextWithTTS)
         exclude = False
         for tag in ("[1]", "[2]", "[3]"):
@@ -280,6 +280,6 @@ async def test_tips():
                 exclude = tag
                 break
         assert exclude
-        message2 = await user_manager.ask_tip(tips_topic._id)
+        message2 = await user_manager.ask_tip(tips_topic.name.text)
         assert isinstance(message2, TextWithTTS)
         assert exclude not in message2.text
