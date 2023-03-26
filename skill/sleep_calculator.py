@@ -73,7 +73,7 @@ class SleepCalculator:
         """
 
         if origin_time is None:
-            origin_time = datetime.datetime.now(tz=wake_up_time.tzinfo)
+            origin_time = datetime.datetime.now(wake_up_time.tzinfo)
 
         if wake_up_time <= origin_time:
             raise InvalidInputError(
