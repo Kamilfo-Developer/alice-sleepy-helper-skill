@@ -1,10 +1,10 @@
-from datetime import datetime, time, timedelta, timezone
+from datetime import UTC, datetime, time, timedelta, timezone
 from uuid import uuid4
 
 import pytest_asyncio
 from skill.exceptions import NoSuchEntityInDB
 from skill.utils import TextWithTTS
-from tests.db.sa_db_settings import sa_repo_config
+from tests.sa_db_settings import sa_repo_config
 from skill.db.repos.sa_repo import SARepo
 from skill.db.repos.base_repo import BaseRepo
 from skill.entities import Activity, Tip, TipsTopic, User
@@ -25,7 +25,7 @@ def generate_random_string_id() -> str:
 # @pytest.mark.parametrize("repo", repos_to_test)
 @pytest_asyncio.fixture()
 async def insert_values(repo: BaseRepo, init_db):
-    now = datetime.now()
+    now = datetime.now(UTC)
 
     user = User(
         id=generate_random_string_id(),

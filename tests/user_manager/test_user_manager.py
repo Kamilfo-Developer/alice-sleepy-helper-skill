@@ -1,4 +1,5 @@
-from tests.user_manager.sa_db_settings import sa_repo_config
+from pytz import timezone
+from tests.sa_db_settings import sa_repo_config
 from skill.db.repos.sa_repo import SARepo
 from skill.entities import User, Activity, TipsTopic
 from skill.user_manager import UserManager
@@ -22,7 +23,7 @@ def generate_random_string_id() -> str:
 async def test_check_in():
     repo = SARepo(sa_repo_config)
     messages = RUMessages()
-    now = datetime.datetime.now()
+    now = datetime.datetime.now(datetime.UTC)
 
     for user in await repo.get_users():
         await repo.delete_user(user)
@@ -141,7 +142,13 @@ async def test_activities_proposal():
     assert bool(user_test) and bool(user_manager)
 
     now = datetime.datetime(
-        year=1420, month=1, day=1, hour=11, minute=00, second=0
+        year=1420,
+        month=1,
+        day=1,
+        hour=11,
+        minute=00,
+        second=0,
+        tzinfo=datetime.UTC,
     )
 
     for activity in await repo.get_activities():

@@ -255,6 +255,7 @@ class UserManager:
                 else now.date()
             ),
             time=wake_up_time,
+            tzinfo=now.tzinfo,
         )
 
         bed_time = SleepCalculator.calc(
