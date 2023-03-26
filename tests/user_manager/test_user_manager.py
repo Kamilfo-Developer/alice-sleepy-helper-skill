@@ -56,7 +56,7 @@ async def test_check_in():
 
     assert user_manager is not None
 
-    message = await user_manager.check_in(now, reply=True)
+    message = await user_manager.check_in(now)
 
     assert "5 день подряд" in message.text  # type: ignore
     assert "50%" in message.text  # type: ignore

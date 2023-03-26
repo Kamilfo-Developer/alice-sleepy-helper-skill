@@ -98,7 +98,7 @@ class UserManager:
         return percentage
 
     async def check_in(
-        self, now: datetime.datetime | None = None, reply: bool = True
+        self, now: datetime.datetime | None = None
     ) -> TextWithTTS | None:
         """Perform all needed processes when a user starts the skill.
         To be more precise, this method:
@@ -106,8 +106,7 @@ class UserManager:
         - Increases user's streak if the streak is kept
         - Updates user's last_skill_use field
 
-        If reply argument is set to True, this method constructs a greeting
-        message and returns it.
+        Returns a properly constructed greeting message to welcome the user
 
         Args:
             now (datetime.datetime | None, optional): the time at which the
@@ -117,12 +116,8 @@ class UserManager:
             between the request time and the execution time.
             Defaults to None.
 
-            reply (bool, optional): whether to return a greeting message or not
-            Defaults to True.
-
         Returns:
-            TextWithTTS | None: if reply is set to True, a greeting message.
-            Otherwise None.
+            TextWithTTS: a greeting message.
         """
         if now is None:
             now = datetime.datetime.now()
@@ -145,9 +140,6 @@ class UserManager:
 
         await self.repo.update_user(self.user)
 
-        if not reply:
-            return None
-
         if new_user:
             return self.messages.get_start_message_intro(now)
         streak = self.user._streak
@@ -157,23 +149,15 @@ class UserManager:
             time=now, streak=streak, scoreboard=scoreboard
         )
 
-    async def ask_tip(
-        self, topic_id: UUID, reply: bool = True
-    ) -> TextWithTTS | Tip:
+    async def ask_tip(self, topic_id: UUID) -> TextWithTTS | Tip:
         """Chooses a tip on given topic that has most likely never
         been heard before by the user and tracks the heard tips buffer.
-        If reply argument is set to True, this method constructs a tip
-        message and returns it.
 
         Args:
             topic_id (UUID): the UUID of the topic of tips
 
-            reply (bool, optional): whether to return a tip message or not
-            Defaults to True.
-
         Returns:
-            TextWithTTS | Tip: if reply is set to True, a tip message in
-            a form of TextWithTTS. Otherwise the selected tip.
+            TextWithTTS: a tip message in a form of TextWithTTS.
         """
 
         tips = await self.repo.get_topic_tips(topic_id=topic_id)
@@ -191,9 +175,6 @@ class UserManager:
         self.user.add_heard_tip(tip)
 
         await self.repo.update_user(self.user)
-
-        if not reply:
-            return tip
         return self.messages.get_tip_message(tip)
 
     async def get_ask_sleep_time_message(self) -> TextWithTTS:
@@ -213,12 +194,11 @@ class UserManager:
         now: datetime.datetime,
         wake_up_time: datetime.time,
         mode: SleepMode,
-        reply: bool = True,
         remember_time: bool = True,
     ) -> TextWithTTS | datetime.datetime:
-        """Calculate user's sleep time. If reply argument is set to True,
-        this method constructs a response message, in which it proposes the
-        user a number of activities for the evening, and returns the message.
+        """Calculate user's sleep time. Constructs a response message,
+        in which it proposes the user a number of activities for the rest of
+        the evening, and returns the message.
 
         Args:
             now (datetime.datetime): the timestamp at which the user asks to
@@ -230,17 +210,12 @@ class UserManager:
             mode (SleepMode.LONG | SleepMode.SHORT): user's selected
             sleep mode
 
-            reply (bool, optional): whether to return a response message or not
-            Defaults to True.
-
             remember_time (bool, optional): whether to record the time at which
             the user wants to wake up to the DB or not
             Defaults to True.
 
         Returns:
-            TextWithTTS | datetime.datetime: if reply is set to True, a
-            response message in a form of TextWithTTS. Otherwise the proposed
-            timestamp for a user to go to bed.
+            TextWithTTS: a response message in a form of TextWithTTS.
         """
         if remember_time:
             self.user.last_wake_up_time = wake_up_time
@@ -260,9 +235,6 @@ class UserManager:
         bed_time = SleepCalculator.calc(
             wake_up_time=wake_up_datetime, origin_time=now, mode=mode
         )
-        if not reply:
-            return bed_time
-
         all_activities = await self.repo.get_activities()
         activities = SleepCalculator.activities_compilation(
             now, bed_time, all_activities
