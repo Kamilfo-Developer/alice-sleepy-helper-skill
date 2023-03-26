@@ -2,8 +2,7 @@ from __future__ import annotations
 import datetime
 import random
 import pytz
-from uuid import UUID
-from skill.entities import User, Tip
+from skill.entities import User
 from skill.db.repos.base_repo import BaseRepo
 from skill.messages.base_messages import BaseMessages
 from skill.utils import TextWithTTS
@@ -100,7 +99,7 @@ class UserManager:
 
     async def check_in(
         self, now: datetime.datetime | None = None
-    ) -> TextWithTTS | None:
+    ) -> TextWithTTS:
         """Perform all needed processes when a user starts the skill.
         To be more precise, this method:
         - Drops user's streak if the streak is lost
@@ -150,18 +149,22 @@ class UserManager:
             time=now, streak=streak, scoreboard=scoreboard
         )
 
-    async def ask_tip(self, topic_id: UUID) -> TextWithTTS | Tip:
+    async def ask_tip(self, topic_name: str) -> TextWithTTS | None:
         """Chooses a tip on given topic that has most likely never
         been heard before by the user and tracks the heard tips buffer.
 
         Args:
-            topic_id (UUID): the UUID of the topic of tips
+            topic_id (str): the name of the topic of tips
 
         Returns:
-            TextWithTTS: a tip message in a form of TextWithTTS.
+            TextWithTTS | None: a tip message in a form of TextWithTTS or
+            None if the topic is not found.
         """
-
-        tips = await self.repo.get_topic_tips(topic_id=topic_id)
+        
+        topic = await self.repo.get_tips_topic_by_name(topic_name)
+        if topic is None:
+            return None
+        tips = await self.repo.get_topic_tips(topic_id=topic._id)
         heard_tips = self.user._heard_tips
 
         if len(heard_tips) == len(tips):
@@ -196,7 +199,7 @@ class UserManager:
         wake_up_time: datetime.time,
         mode: SleepMode,
         remember_time: bool = True,
-    ) -> TextWithTTS | datetime.datetime:
+    ) -> TextWithTTS:
         """Calculate user's sleep time. Constructs a response message,
         in which it proposes the user a number of activities for the rest of
         the evening, and returns the message.
