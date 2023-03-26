@@ -1,4 +1,3 @@
-from pytz import timezone
 from tests.sa_db_settings import sa_repo_config
 from skill.db.repos.sa_repo import SARepo
 from skill.entities import User, Activity, TipsTopic
@@ -10,6 +9,7 @@ import pytest
 import datetime
 import random
 from uuid import uuid4
+import pytz
 
 
 def generate_random_string_id() -> str:
@@ -23,7 +23,7 @@ def generate_random_string_id() -> str:
 async def test_check_in():
     repo = SARepo(sa_repo_config)
     messages = RUMessages()
-    now = datetime.datetime.now(datetime.UTC)
+    now = datetime.datetime.now(tz=pytz.utc)
 
     for user in await repo.get_users():
         await repo.delete_user(user)
@@ -34,9 +34,13 @@ async def test_check_in():
         id=generate_random_string_id(),
         streak=0,
         last_skill_use=(now - datetime.timedelta(days=1)),
-        last_wake_up_time=datetime.time(hour=4, minute=20),
+        last_wake_up_time=datetime.time(
+            hour=4, minute=20, tzinfo=pytz.utc
+        ),
         heard_tips=[],
-        join_date=datetime.datetime(year=2022, month=1, day=1),
+        join_date=datetime.datetime(
+            year=2022, month=1, day=1, tzinfo=pytz.utc
+        ),
         repo=repo,
     )
 
@@ -44,9 +48,13 @@ async def test_check_in():
         id=test_user_id,
         streak=4,
         last_skill_use=(now - datetime.timedelta(days=1)),
-        last_wake_up_time=datetime.time(hour=4, minute=20),
+        last_wake_up_time=datetime.time(
+            hour=4, minute=20, tzinfo=pytz.utc
+        ),
         heard_tips=[],
-        join_date=datetime.datetime(year=2022, month=1, day=1),
+        join_date=datetime.datetime(
+            year=2022, month=1, day=1, tzinfo=pytz.utc
+        ),
         repo=repo,
     )
     await repo.insert_users((user, loser_user))
@@ -57,7 +65,7 @@ async def test_check_in():
 
     assert user_manager is not None
 
-    message = await user_manager.check_in(now, reply=True)
+    message = await user_manager.check_in(now)
 
     assert "5 день подряд" in message.text  # type: ignore
     assert "50%" in message.text  # type: ignore
@@ -106,10 +114,18 @@ async def test_sleep_calc():
     assert "как в прошлый раз" not in message1.text
 
     now = datetime.datetime(
-        year=1420, month=1, day=1, hour=1, minute=0, second=0
+        year=1420,
+        month=1,
+        day=1,
+        hour=1,
+        minute=0,
+        second=0,
+        tzinfo=pytz.utc
     )
 
-    wake_up_time = datetime.time(hour=14, minute=0, second=0)
+    wake_up_time = datetime.time(
+        hour=14, minute=0, second=0, tzinfo=pytz.utc
+    )
 
     message2 = await user_manager.ask_sleep_time(
         now, wake_up_time, SleepMode.LONG
@@ -148,7 +164,7 @@ async def test_activities_proposal():
         hour=11,
         minute=00,
         second=0,
-        tzinfo=datetime.UTC,
+        tzinfo=pytz.utc,
     )
 
     for activity in await repo.get_activities():
@@ -178,7 +194,9 @@ async def test_activities_proposal():
 
     await repo.insert_activities((activity1, activity2, activity3))
 
-    wake_up_time = datetime.time(hour=14, minute=0, second=0)
+    wake_up_time = datetime.time(
+        hour=14, minute=0, second=0, tzinfo=pytz.utc
+    )
 
     message1 = await user_manager.ask_sleep_time(
         now, wake_up_time, SleepMode.SHORT
@@ -189,7 +207,13 @@ async def test_activities_proposal():
     assert message1.text.count("[EXCLUDEME]") == 0  # type: ignore
 
     now = datetime.datetime(
-        year=1420, month=1, day=1, hour=12, minute=30, second=0
+        year=1420,
+        month=1,
+        day=1,
+        hour=12,
+        minute=30,
+        second=0,
+        tzinfo=pytz.utc
     )
 
     message2 = await user_manager.ask_sleep_time(
@@ -213,7 +237,7 @@ async def test_tips():
     for tip in await repo.get_tips():
         await repo.delete_tip(tip)
 
-    now = datetime.datetime.now()
+    now = datetime.datetime.now(pytz.utc)
 
     tips_topic = TipsTopic(
         id=uuid4(),
