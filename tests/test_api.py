@@ -96,12 +96,13 @@ def test_handler_main_func_short():
 
     make_test("Долгий", str(States.CALCULATED))
 
-    # make_test("Да", str(States.ASKING_FOR_TIP))
+    make_test("Да", str(States.MAIN_MENU))
 
-    make_test("Меню", str(States.MAIN_MENU))
+    # make_test("Ночной сон", str(States.MAIN_MENU))
 
 
 def test_handler_main_func_long():
+
     make_test("Я хочу спать", str(States.TIME_PROPOSED))
 
     make_test("Да", str(States.IN_CALCULATOR))
@@ -112,9 +113,10 @@ def test_handler_main_func_long():
 
 
 def test_handler_ask_tip():
+
     make_test("Посоветуй", str(States.ASKING_FOR_TIP))
 
-    make_test("Меню", str(States.MAIN_MENU))
+    make_test("Ночной сон", str(States.MAIN_MENU))
 
 
 def test_handler_info():
