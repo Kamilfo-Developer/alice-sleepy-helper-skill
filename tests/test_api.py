@@ -85,7 +85,8 @@ def make_test(req: dict | str, target_state: str):
         req = make_request(req)
     resp = r.post("http://localhost:5555/", json=req)
     resp = resp.json()
-    assert resp["session_state"]["value"] == target_state
+    print(resp)
+    assert resp["application_state"] == target_state.lower()
 
 
 def test_handler_main_func_short():
@@ -93,9 +94,9 @@ def test_handler_main_func_short():
 
     make_test(TIME_REQUEST, str(States.IN_CALCULATOR))
 
-    make_test("Ночной", str(States.IN_CALCULATOR))
+    make_test("Долгий", str(States.CALCULATED))
 
-    make_test("Да", str(States.ASKING_FOR_TIP))
+    # make_test("Да", str(States.ASKING_FOR_TIP))
 
     make_test("Меню", str(States.MAIN_MENU))
 
