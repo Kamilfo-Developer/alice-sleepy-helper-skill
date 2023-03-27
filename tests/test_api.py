@@ -84,20 +84,42 @@ def send_request(req: dict) -> str:
     return resp.json()["response"]["text"]
 
 
-def test_start():
+def test_start_handler():
     req = make_request("Привет")
     print(send_request(req))
 
 
-def test_time():
+def test_time_handler():
     print(send_request(TIME_REQUEST))
 
 
-def test_mode():
+def test_mode_handler():
     req = make_request("Длинный")
     print(send_request(req))
 
 
-def test_sleep():
-    req = makeRequest("Я хочу спать")
-    print(sendRequest(req))
+def test_sleep_handler():
+    req = make_request("Я хочу спать")
+    print(send_request(req))
+
+
+def test_yes_handler():
+    req = make_request("Да")
+    print(send_request(req))
+
+
+def test_day_handler():
+    req = make_request("Дневной")
+    print(send_request(req))
+
+
+def test_handler_1():
+    req = make_request("Расскажи о навыке")
+    print(send_request(req))
+
+
+def test_scenario_1():
+    reqs = ["Привет", "Посоветуй", "Дневной"]
+    for req in reqs:
+        req = make_request(req)
+        print(send_request(req))
