@@ -3,6 +3,9 @@ from aioalice.dispatcher import MemoryStorage
 from aioalice.utils.helper import Helper, HelperMode, Item
 from skill.messages.ru_messages import RUMessages
 from skill.sleep_calculator import SleepCalculator, SleepMode
+from skill.user_manager import UserManager
+from skill.db.repos.sa_repo import SARepo
+from skill.db.sa_db_settings import sa_repo_config
 import datetime
 
 dp = Dispatcher(storage=MemoryStorage())
@@ -59,7 +62,11 @@ async def give_info(alice_request):
 @dp.request_handler(state=SkillStates.ASKING_FOR_TIP, contains=WANT_NIGHT_TIP)
 async def send_night_tip(alice_request):
     user_id = alice_request.session.user_id
-    response = RUMessages().get_tip_message().text
+    user_manager = await UserManager.new_manager(
+        user_id=user_id, repo=SARepo(sa_repo_config), messages=RUMessages()
+    )
+    response = await user_manager.ask_tip("Night")
+    response = response.text
     await dp.storage.set_state(user_id, SkillStates.MAIN_MENU)
     return alice_request.response(response)
 
@@ -67,7 +74,11 @@ async def send_night_tip(alice_request):
 @dp.request_handler(state=SkillStates.ASKING_FOR_TIP, contains=WANT_DAY_TIP)
 async def send_day_tip(alice_request):
     user_id = alice_request.session.user_id
-    response = RUMessages().get_tip_message().text
+    user_manager = await UserManager.new_manager(
+        user_id=user_id, repo=SARepo(sa_repo_config), messages=RUMessages()
+    )
+    response = await user_manager.ask_tip("Day")
+    response = response.text
     await dp.storage.set_state(user_id, SkillStates.MAIN_MENU)
     return alice_request.response(response)
 
@@ -85,19 +96,16 @@ async def choose_short_duration(alice_request):
     user_id = alice_request.session.user_id
     # time when user wants to get up, saved from previous dialogues
     time = await dp.storage.get_data(user_id)
-    wake_up_time = datetime.datetime.now().replace(
-        hour=time["hour"], minute=time["minute"]
+    wake_up_time = (
+        datetime.datetime.now().replace(hour=time["hour"], minute=time["minute"]).time()
     )
-    if datetime.datetime.now() > wake_up_time:
-        wake_up_time = wake_up_time + datetime.timedelta(days=1)
-    time_target = SleepCalculator.calc(
-        now=datetime.datetime.now(), wake_up_time=wake_up_time, mode=SleepMode.SHORT
+    user_manager = await UserManager.new_manager(
+        user_id=user_id, repo=SARepo(sa_repo_config), messages=RUMessages()
     )
-    response = (
-        RUMessages()
-        .get_sleep_calc_time_message(bed_time=time_target, activities=[])
-        .text
+    response = await user_manager.ask_sleep_time(
+        now=datetime.datetime.now(), wake_up_time=wake_up_time, mode=SleepMode.LONG
     )
+    response = response.text
     await dp.storage.set_state(user_id, SkillStates.CALCULATED)
     return alice_request.response(response)
 
@@ -107,21 +115,16 @@ async def choose_long_duration(alice_request):
     user_id = alice_request.session.user_id
     # time when user wants to get up, saved from previous dialogues
     time = await dp.storage.get_data(user_id)
-    wake_up_time = datetime.datetime.now().replace(
-        hour=time["hour"], minute=time["minute"]
+    wake_up_time = (
+        datetime.datetime.now().replace(hour=time["hour"], minute=time["minute"]).time()
     )
-    if (
-        datetime.datetime.now() > wake_up_time
-    ):  # Если это время уже прошло, значит нам нужен завтрашний день
-        wake_up_time = wake_up_time + datetime.timedelta(days=1)
-    time_target = SleepCalculator.calc(
+    user_manager = await UserManager.new_manager(
+        user_id=user_id, repo=SARepo(sa_repo_config), messages=RUMessages()
+    )
+    response = await user_manager.ask_sleep_time(
         now=datetime.datetime.now(), wake_up_time=wake_up_time, mode=SleepMode.LONG
     )
-    response = (
-        RUMessages()
-        .get_sleep_calc_time_message(bed_time=time_target, activities=[])
-        .text
-    )
+    response = response.text
     await dp.storage.set_state(user_id, SkillStates.CALCULATED)
     return alice_request.response(response)
 
@@ -132,6 +135,7 @@ async def enter_calculator(alice_request):
     value = alice_request.request._raw_kwargs["nlu"]["intents"]["sleep_calc"]["slots"][
         "time"
     ]["value"]
+    # save time sleep time
     await dp.storage.set_data(user_id, value)
     response = RUMessages().get_ask_sleep_mode_message().text
     await dp.storage.set_state(user_id, SkillStates.IN_CALCULATOR)
@@ -168,7 +172,11 @@ dp.register_request_handler(
 @dp.request_handler(func=lambda areq: areq.session.new)
 async def welcome_user(alice_request):
     user_id = alice_request.session.user_id
-    response = RUMessages().get_start_message_intro(time=datetime.datetime.now()).text
+    user_manager = await UserManager.new_manager(
+        user_id=user_id, repo=SARepo(sa_repo_config), messages=RUMessages()
+    )
+    response = await user_manager.check_in(now=datetime.datetime.now())
+    response = response.text
     await dp.storage.set_state(user_id, SkillStates.MAIN_MENU)
     return alice_request.response(response)
 
@@ -176,8 +184,10 @@ async def welcome_user(alice_request):
 @dp.request_handler()
 async def welcome_old_user(alice_request):
     user_id = alice_request.session.user_id
-    response = (
-        RUMessages().get_start_message_comeback(time=datetime.datetime.now()).text
+    user_manager = await UserManager.new_manager(
+        user_id=user_id, repo=SARepo(sa_repo_config), messages=RUMessages()
     )
+    response = await user_manager.check_in(now=datetime.datetime.now())
+    response = response.text
     await dp.storage.set_state(user_id, SkillStates.MAIN_MENU)
     return alice_request.response(response)
