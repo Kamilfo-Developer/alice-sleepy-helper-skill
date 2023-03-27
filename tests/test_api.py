@@ -1,4 +1,5 @@
 import requests as r
+from skill.states import States
 
 TIME_REQUEST = {
     "meta": {
@@ -79,47 +80,41 @@ def make_request(command: str) -> dict:
     }
 
 
-def send_request(req: dict) -> str:
-    resp = r.post("http://localhost:5555/", json=req)
-    return resp.json()["response"]["text"]
-
-
-def test_start_handler():
-    req = make_request("Привет")
-    print(send_request(req))
-
-
-def test_time_handler():
-    print(send_request(TIME_REQUEST))
-
-
-def test_mode_handler():
-    req = make_request("Длинный")
-    print(send_request(req))
-
-
-def test_sleep_handler():
-    req = make_request("Я хочу спать")
-    print(send_request(req))
-
-
-def test_yes_handler():
-    req = make_request("Да")
-    print(send_request(req))
-
-
-def test_day_handler():
-    req = make_request("Дневной")
-    print(send_request(req))
-
-
-def test_handler_1():
-    req = make_request("Расскажи о навыке")
-    print(send_request(req))
-
-
-def test_scenario_1():
-    reqs = ["Привет", "Посоветуй", "Дневной"]
-    for req in reqs:
+def make_test(req: dict | str, target_state: str):
+    if type(req) == str:
         req = make_request(req)
-        print(send_request(req))
+    resp = r.post("http://localhost:5555/", json=req)
+    resp = resp.json()
+    assert resp["session_state"]["value"] == target_state
+
+
+def test_handler_main_func_short():
+    make_test("Привет", str(States.MAIN_MENU))
+
+    make_test(TIME_REQUEST, str(States.IN_CALCULATOR))
+
+    make_test("Ночной", str(States.IN_CALCULATOR))
+
+    make_test("Да", str(States.ASKING_FOR_TIP))
+
+    make_test("Меню", str(States.MAIN_MENU))
+
+
+def test_handler_main_func_long():
+    make_test("Я хочу спать", str(States.TIME_PROPOSED))
+
+    make_test("Да", str(States.IN_CALCULATOR))
+
+    make_test("Короткий", str(States.CALCULATED))
+
+    make_test("Меню", str(States.MAIN_MENU))
+
+
+def test_handler_ask_tip():
+    make_test("Посоветуй", str(States.ASKING_FOR_TIP))
+
+    make_test("Меню", str(States.MAIN_MENU))
+
+
+def test_handler_info():
+    make_test("Расскажи о навыке", str(States.MAIN_MENU))
