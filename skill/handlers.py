@@ -10,28 +10,28 @@ import datetime
 
 dp = Dispatcher(storage=MemoryStorage())
 
-# Списки ключевых слов для:
-# выхода в главное меню
+# Key words for:
+# Escaping to main menu
 TO_MENU_REPLICS = ["выйди", "меню"]
-# вызова информации
+# Asking info
 GIVE_INFO_REPLICS = ["расскажи о навыке", "что ты делаешь"]
-# запроса совета
+# Asking tip
 ASK_FOR_TIP_REPLICS = ["посоветуй"]
-# входа в главную ветку сценария (рассчет времени отбоя)
+# Using main functionality (sleep time calculation)
 MAIN_FUNCTIONALITY_ENTER = ["я хочу спать"]
-# быстрый в ход в главную ветку
+# Using main functionality (sleep time calculation) (skip asking the time)
 MAIN_FUNCTIONALITY_ENTER_FAST = ["Во сколько", "Когда", "Через сколько"]
-# выбора короткого режима сна
+# Choosing short sleep mode
 SHORT_SLEEP_KEYWORDS = ["маленький", "короткий", "недолгий", "небольшой"]
-# выбора длинного режима сна
+# Choosing long sleep mode
 LONG_SLEEP_KEYWORDS = ["большой", "длинный", "долгий"]
-# ответа да
+# Yes answer
 YES_REPLICS = ["да", "конечно", "естественно", "хочу"]
-# ответа нет
+# No answer
 NO_REPLICS = ["нет", "отказываюсь", "не хочу"]
-# получения ночного совета
+# Asking tip about night sleep
 WANT_NIGHT_TIP = ["ночной"]
-# получения дневного совета
+# Asking tip abot day slip
 WANT_DAY_TIP = ["дневной"]
 
 
