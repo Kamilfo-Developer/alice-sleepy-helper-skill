@@ -2,7 +2,7 @@ from aioalice import Dispatcher
 from aioalice.dispatcher import MemoryStorage
 from skill.messages.ru_messages import RUMessages
 from skill.sleep_calculator import SleepMode
-from skill.user_manager import UserManager
+from skill.user_manager import UserManager, SkillResponse
 from skill.db.repos.sa_repo import SARepo
 from skill.db.sa_db_settings import sa_repo_config
 from skill.states import States
@@ -39,59 +39,59 @@ WANT_DAY_TIP = ["дневной"]
 async def go_to_menu(alice_request):
     user_id = alice_request.session.user_id
     response = RUMessages().get_menu_welcome_message().text
-    await dp.storage.set_state(user_id, SkillStates.MAIN_MENU)
+    await dp.storage.set_state(user_id, States.MAIN_MENU)
     return alice_request.response(response)
 
 
-@dp.request_handler(state=SkillStates.MAIN_MENU, contains=GIVE_INFO_REPLICS)
+@dp.request_handler(state=States.MAIN_MENU, contains=GIVE_INFO_REPLICS)
 async def give_info(alice_request):
     response = RUMessages().get_info_message().text
     return alice_request.response(response)
 
 
-@dp.request_handler(state=SkillStates.ASKING_FOR_TIP, contains=WANT_NIGHT_TIP)
+@dp.request_handler(state=States.ASKING_FOR_TIP, contains=WANT_NIGHT_TIP)
 async def send_night_tip(alice_request):
     user_id = alice_request.session.user_id
     user_manager = await UserManager.new_manager(
         user_id=user_id, repo=SARepo(sa_repo_config), messages=RUMessages()
     )
-    response = await user_manager.ask_tip("Night")
-    response = response.text
-    await dp.storage.set_state(user_id, SkillStates.MAIN_MENU)
-    return alice_request.response(response)
+    response = await user_manager.ask_tip("Ночной сон")
+    await dp.storage.set_state(user_id, response.state)
+    return alice_request.response(response.text_with_tts.text)
 
 
-@dp.request_handler(state=SkillStates.ASKING_FOR_TIP, contains=WANT_DAY_TIP)
+@dp.request_handler(state=States.ASKING_FOR_TIP, contains=WANT_DAY_TIP)
 async def send_day_tip(alice_request):
     user_id = alice_request.session.user_id
     user_manager = await UserManager.new_manager(
         user_id=user_id, repo=SARepo(sa_repo_config), messages=RUMessages()
     )
-    response = await user_manager.ask_tip("Day")
-    response = response.text
-    await dp.storage.set_state(user_id, SkillStates.MAIN_MENU)
+    response = await user_manager.ask_tip("Дневной сон")
+    await dp.storage.set_state(user_id, response.state)
+    return alice_request.response(response.text_with_tts.text)
+
+
+@dp.request_handler(state=States.ASKING_FOR_TIP)
+async def reask_tip_topic(alice_request):
+    response = RUMessages().get_wrong_topic_message("").text
     return alice_request.response(response)
 
 
-@dp.request_handler(state=SkillStates.MAIN_MENU, contains=ASK_FOR_TIP_REPLICS)
+@dp.request_handler(state=States.MAIN_MENU, contains=ASK_FOR_TIP_REPLICS)
 async def send_tip(alice_request):
     user_id = alice_request.session.user_id
     response = RUMessages().get_ask_tip_topic_message().text
-    await dp.storage.set_state(user_id, SkillStates.ASKING_FOR_TIP)
+    await dp.storage.set_state(user_id, States.ASKING_FOR_TIP)
     return alice_request.response(response)
 
 
-@dp.request_handler(
-    state=SkillStates.IN_CALCULATOR, contains=SHORT_SLEEP_KEYWORDS
-)
+@dp.request_handler(state=States.IN_CALCULATOR, contains=SHORT_SLEEP_KEYWORDS)
 async def choose_short_duration(alice_request):
     user_id = alice_request.session.user_id
     # time when user wants to get up, saved from previous dialogues
     time = await dp.storage.get_data(user_id)
     wake_up_time = (
-        datetime.datetime.now()
-        .replace(hour=time["hour"], minute=time["minute"])
-        .time()
+        datetime.datetime.now().replace(hour=time["hour"], minute=time["minute"]).time()
     )
     user_manager = await UserManager.new_manager(
         user_id=user_id, repo=SARepo(sa_repo_config), messages=RUMessages()
@@ -102,21 +102,17 @@ async def choose_short_duration(alice_request):
         mode=SleepMode.LONG,
     )
     response = response.text
-    await dp.storage.set_state(user_id, SkillStates.CALCULATED)
+    await dp.storage.set_state(user_id, States.CALCULATED)
     return alice_request.response(response)
 
 
-@dp.request_handler(
-    state=SkillStates.IN_CALCULATOR, contains=LONG_SLEEP_KEYWORDS
-)
+@dp.request_handler(state=States.IN_CALCULATOR, contains=LONG_SLEEP_KEYWORDS)
 async def choose_long_duration(alice_request):
     user_id = alice_request.session.user_id
     # time when user wants to get up, saved from previous dialogues
     time = await dp.storage.get_data(user_id)
     wake_up_time = (
-        datetime.datetime.now()
-        .replace(hour=time["hour"], minute=time["minute"])
-        .time()
+        datetime.datetime.now().replace(hour=time["hour"], minute=time["minute"]).time()
     )
     user_manager = await UserManager.new_manager(
         user_id=user_id, repo=SARepo(sa_repo_config), messages=RUMessages()
@@ -127,33 +123,31 @@ async def choose_long_duration(alice_request):
         mode=SleepMode.LONG,
     )
     response = response.text
-    await dp.storage.set_state(user_id, SkillStates.CALCULATED)
+    await dp.storage.set_state(user_id, States.CALCULATED)
     return alice_request.response(response)
 
 
-@dp.request_handler(state=SkillStates.SELECTING_TIME)
+@dp.request_handler(state=States.SELECTING_TIME)
 async def enter_calculator(alice_request):
     user_id = alice_request.session.user_id
-    value = alice_request.request._raw_kwargs["nlu"]["intents"]["sleep_calc"][
-        "slots"
-    ]["time"]["value"]
+    value = alice_request.request._raw_kwargs["nlu"]["intents"]["sleep_calc"]["slots"][
+        "time"
+    ]["value"]
     # save time sleep time
     await dp.storage.set_data(user_id, value)
     response = RUMessages().get_ask_sleep_mode_message().text
-    await dp.storage.set_state(user_id, SkillStates.IN_CALCULATOR)
+    await dp.storage.set_state(user_id, States.IN_CALCULATOR)
     return alice_request.response(response)
 
 
 dp.register_request_handler(
     enter_calculator,
-    state=SkillStates.MAIN_MENU,
+    state=States.MAIN_MENU,
     contains=MAIN_FUNCTIONALITY_ENTER_FAST,
 )
 
 
-@dp.request_handler(
-    state=SkillStates.MAIN_MENU, contains=MAIN_FUNCTIONALITY_ENTER
-)
+@dp.request_handler(state=States.MAIN_MENU, contains=MAIN_FUNCTIONALITY_ENTER)
 async def enter_calculator_with_no_time(alice_request):
     user_id = alice_request.session.user_id
     user_manager = await UserManager.new_manager(
@@ -166,22 +160,22 @@ async def enter_calculator_with_no_time(alice_request):
             .get_propose_yesterday_wake_up_time_message(last_wake_up_time)
             .text
         )
-        await dp.storage.set_state(user_id, SkillStates.TIME_PROPOSED)
+        await dp.storage.set_state(user_id, States.TIME_PROPOSED)
         return alice_request.response(response)
     response = RUMessages().get_ask_wake_up_time_message().text
-    await dp.storage.set_state(user_id, SkillStates.SELECTING_TIME)
+    await dp.storage.set_state(user_id, States.SELECTING_TIME)
     return alice_request.response(response)
 
 
-@dp.request_handler(state=SkillStates.TIME_PROPOSED, contains=NO_REPLICS)
+@dp.request_handler(state=States.TIME_PROPOSED, contains=NO_REPLICS)
 async def enter_calculator_new_time(alice_request):
     user_id = alice_request.session.user_id
     response = RUMessages().get_ask_wake_up_time_message().text
-    await dp.storage.set_state(user_id, SkillStates.SELECTING_TIME)
+    await dp.storage.set_state(user_id, States.SELECTING_TIME)
     return alice_request.response(response)
 
 
-@dp.request_handler(state=SkillStates.TIME_PROPOSED, contains=YES_REPLICS)
+@dp.request_handler(state=States.TIME_PROPOSED, contains=YES_REPLICS)
 async def enter_calculator_proposed_time(alice_request):
     user_id = alice_request.session.user_id
     user_manager = await UserManager.new_manager(
@@ -193,11 +187,11 @@ async def enter_calculator_proposed_time(alice_request):
     }
     await dp.storage.set_data(user_id, time)
     response = RUMessages().get_ask_sleep_mode_message().text
-    await dp.storage.set_state(user_id, SkillStates.IN_CALCULATOR)
+    await dp.storage.set_state(user_id, States.IN_CALCULATOR)
     return alice_request.response(response)
 
 
-@dp.request_handler(state=SkillStates.CALCULATED, contains=NO_REPLICS)
+@dp.request_handler(state=States.CALCULATED, contains=NO_REPLICS)
 async def end_skill(alice_request):
     # It must end skill
     response = RUMessages().get_good_night_message().text
@@ -205,7 +199,7 @@ async def end_skill(alice_request):
 
 
 dp.register_request_handler(
-    send_night_tip, state=SkillStates.CALCULATED, contains=YES_REPLICS
+    send_night_tip, state=States.CALCULATED, contains=YES_REPLICS
 )
 
 
@@ -217,7 +211,7 @@ async def welcome_user(alice_request):
     )
     response = await user_manager.check_in(now=datetime.datetime.now())
     response = response.text
-    await dp.storage.set_state(user_id, SkillStates.MAIN_MENU)
+    await dp.storage.set_state(user_id, States.MAIN_MENU)
     return alice_request.response(response)
 
 
@@ -229,5 +223,5 @@ async def welcome_old_user(alice_request):
     )
     response = await user_manager.check_in(now=datetime.datetime.now())
     response = response.text
-    await dp.storage.set_state(user_id, SkillStates.MAIN_MENU)
+    await dp.storage.set_state(user_id, States.MAIN_MENU)
     return alice_request.response(response)
