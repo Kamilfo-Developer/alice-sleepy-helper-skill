@@ -136,7 +136,7 @@ async def choose_short_duration(alice_request: AliceRequest):
     # time when user wants to get up, saved from previous dialogues
     time = await dp.storage.get_data(user_id)
     wake_up_time = (
-        datetime.datetime.now(alice_request.meta.timezone)
+        datetime.datetime.now(timezone(alice_request.meta.timezone))
         .replace(hour=time["hour"], minute=time["minute"])
         .time()
     )
@@ -144,7 +144,7 @@ async def choose_short_duration(alice_request: AliceRequest):
         user_id=user_id, repo=SARepo(sa_repo_config), messages=RUMessages()
     )
     response = await user_manager.ask_sleep_time(
-        now=datetime.datetime.now(alice_request.meta.timezone),
+        now=datetime.datetime.now(timezone(alice_request.meta.timezone)),
         wake_up_time=wake_up_time,
         mode=SleepMode.LONG,
     )
@@ -163,7 +163,7 @@ async def choose_long_duration(alice_request: AliceRequest):
     # time when user wants to get up, saved from previous dialogues
     time = await dp.storage.get_data(user_id)
     wake_up_time = (
-        datetime.datetime.now(alice_request.meta.timezone)
+        datetime.datetime.now(timezone(alice_request.meta.timezone))
         .replace(hour=time["hour"], minute=time["minute"])
         .time()
     )
@@ -171,7 +171,7 @@ async def choose_long_duration(alice_request: AliceRequest):
         user_id=user_id, repo=SARepo(sa_repo_config), messages=RUMessages()
     )
     response = await user_manager.ask_sleep_time(
-        now=datetime.datetime.now(alice_request.meta.timezone),
+        now=datetime.datetime.now(timezone(alice_request.meta.timezone)),
         wake_up_time=wake_up_time,
         mode=SleepMode.LONG,
     )
@@ -286,7 +286,7 @@ async def welcome_user(alice_request: AliceRequest):
         user_id=user_id, repo=SARepo(sa_repo_config), messages=RUMessages()
     )
     response = await user_manager.check_in(
-        now=datetime.datetime.now(alice_request.meta.timezone)
+        now=datetime.datetime.now(timezone(alice_request.meta.timezone))
     )
     text_with_tts = response.text_with_tts
     await dp.storage.set_state(user_id, States.MAIN_MENU)
@@ -305,7 +305,7 @@ async def welcome_old_user(alice_request: AliceRequest):
         user_id=user_id, repo=SARepo(sa_repo_config), messages=RUMessages()
     )
     response = await user_manager.check_in(
-        now=datetime.datetime.now(alice_request.meta.timezone)
+        now=datetime.datetime.now(timezone(alice_request.meta.timezone))
     )
     text_with_tts = response.text_with_tts
     await dp.storage.set_state(user_id, States.MAIN_MENU)
