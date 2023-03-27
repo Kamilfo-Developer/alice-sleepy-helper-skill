@@ -101,7 +101,7 @@ async def choose_short_duration(alice_request):
         wake_up_time=wake_up_time,
         mode=SleepMode.LONG,
     )
-    response = response.text
+    response = response.text_with_tts.text
     await dp.storage.set_state(user_id, States.CALCULATED)
     return alice_request.response(response)
 
@@ -122,7 +122,7 @@ async def choose_long_duration(alice_request):
         wake_up_time=wake_up_time,
         mode=SleepMode.LONG,
     )
-    response = response.text
+    response = response.text_with_tts
     await dp.storage.set_state(user_id, States.CALCULATED)
     return alice_request.response(response)
 
@@ -130,6 +130,9 @@ async def choose_long_duration(alice_request):
 @dp.request_handler(state=States.SELECTING_TIME)
 async def enter_calculator(alice_request):
     user_id = alice_request.session.user_id
+    if not "nlu" in alice_request.request._raw_kwargs.keys:
+        response = RUMessages().get_ask_wake_up_time_message().text
+        return response
     value = alice_request.request._raw_kwargs["nlu"]["intents"]["sleep_calc"]["slots"][
         "time"
     ]["value"]
@@ -153,18 +156,9 @@ async def enter_calculator_with_no_time(alice_request):
     user_manager = await UserManager.new_manager(
         user_id=user_id, repo=SARepo(sa_repo_config), messages=RUMessages()
     )
-    last_wake_up_time = user_manager.user.last_wake_up_time
-    if last_wake_up_time is not None:
-        response = (
-            RUMessages()
-            .get_propose_yesterday_wake_up_time_message(last_wake_up_time)
-            .text
-        )
-        await dp.storage.set_state(user_id, States.TIME_PROPOSED)
-        return alice_request.response(response)
-    response = RUMessages().get_ask_wake_up_time_message().text
-    await dp.storage.set_state(user_id, States.SELECTING_TIME)
-    return alice_request.response(response)
+    response = await user_manager.get_ask_sleep_time_message()
+    await dp.storage.set_state(user_id, response.state)
+    return alice_request.response(response.text_with_tts.text)
 
 
 @dp.request_handler(state=States.TIME_PROPOSED, contains=NO_REPLICS)
@@ -210,7 +204,7 @@ async def welcome_user(alice_request):
         user_id=user_id, repo=SARepo(sa_repo_config), messages=RUMessages()
     )
     response = await user_manager.check_in(now=datetime.datetime.now())
-    response = response.text
+    response = response.text_with_tts.text
     await dp.storage.set_state(user_id, States.MAIN_MENU)
     return alice_request.response(response)
 
@@ -222,6 +216,6 @@ async def welcome_old_user(alice_request):
         user_id=user_id, repo=SARepo(sa_repo_config), messages=RUMessages()
     )
     response = await user_manager.check_in(now=datetime.datetime.now())
-    response = response.text
+    response = response.text_with_tts.text
     await dp.storage.set_state(user_id, States.MAIN_MENU)
     return alice_request.response(response)
