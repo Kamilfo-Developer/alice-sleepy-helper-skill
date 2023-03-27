@@ -5,6 +5,12 @@ from typing import Any, List
 
 
 class BaseMessages(abc.ABC):
+    MENU_BUTTON_TEXT: list[str]
+    TIP_TOPIC_SELECTION_BUTTON_TEXT: list[str]
+    SLEEP_TIME_PROPOSAL_BUTTON_TEXT: list[str]
+    SLEEP_MODE_SELECTION_BUTTON_TEXT: list[str]
+    POST_SLEEP_CALCULATION_BUTTON_TEXT: list[str]
+
     def __init__(self):
         pass
 
