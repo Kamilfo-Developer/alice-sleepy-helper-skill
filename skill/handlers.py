@@ -47,9 +47,18 @@ def get_buttons_with_text(texts: list[str]) -> list[Button]:
     return result
 
 
-@dp.request_handler(contains=TO_MENU_REPLICS)
+@dp.request_handler(
+    state=[
+        States.IN_CALCULATOR,
+        States.ASKING_FOR_TIP,
+        States.CALCULATED,
+        States.MAIN_MENU,
+        States.SELECTING_TIME,
+        States.TIME_PROPOSED,
+    ],
+    contains=TO_MENU_REPLICS,
+)
 async def go_to_menu(alice_request: AliceRequest):
-    print("menu")
     user_id = alice_request.session.user_id
 
     text_with_tts = RUMessages().get_menu_welcome_message()
