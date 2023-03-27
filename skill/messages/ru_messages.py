@@ -12,6 +12,16 @@ if TYPE_CHECKING:
 
 
 class RUMessages(BaseMessages):
+    MENU_BUTTON_TEXT = [
+        "Дай совет",
+        "Рассчитай сон",
+        "Расскажи о навыке",
+    ]
+    TIP_TOPIC_SELECTION_BUTTON_TEXT = ["Дневной сон", "Ночной сон"]
+    SLEEP_TIME_PROPOSAL_BUTTON_TEXT = ["Да", "Нет"]
+    SLEEP_MODE_SELECTION_BUTTON_TEXT = ["Короткий", "Длинный"]
+    POST_SLEEP_CALCULATION_BUTTON_TEXT = ["Да", "Нет"]
+
     def __init__(self):
         pass
 
