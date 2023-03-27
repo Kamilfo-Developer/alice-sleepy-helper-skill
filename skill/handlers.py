@@ -15,7 +15,7 @@ dp = Dispatcher(storage=MemoryStorage())
 
 # Key words for:
 # Escaping to main menu
-TO_MENU_REPLICS = ["выйди", "меню"]
+TO_MENU_REPLICS = ["выйди", "меню", "Меню"]
 # Asking info
 GIVE_INFO_REPLICS = ["расскажи о навыке", "что ты делаешь", "что ты умеешь"]
 # Asking tip
@@ -41,8 +41,7 @@ WANT_DAY_TIP = ["дневной"]
 def get_buttons_with_text(texts: list[str]) -> list[Button]:
     result = []
     for text in texts:
-        button = Button()
-        button.title = text
+        button = Button(title=text)
         result.append(button)
 
     return result
@@ -50,6 +49,7 @@ def get_buttons_with_text(texts: list[str]) -> list[Button]:
 
 @dp.request_handler(contains=TO_MENU_REPLICS)
 async def go_to_menu(alice_request: AliceRequest):
+    print("menu")
     user_id = alice_request.session.user_id
 
     text_with_tts = RUMessages().get_menu_welcome_message()
@@ -188,7 +188,7 @@ async def choose_long_duration(alice_request: AliceRequest):
 @dp.request_handler(state=States.SELECTING_TIME)
 async def enter_calculator(alice_request: AliceRequest):
     user_id = alice_request.session.user_id
-    if not "nlu" in alice_request.request._raw_kwargs.keys:
+    if "nlu" not in alice_request.request._raw_kwargs.keys():
         response = RUMessages().get_ask_wake_up_time_message().text
         return response
     value = alice_request.request._raw_kwargs["nlu"]["intents"]["sleep_calc"]["slots"][
