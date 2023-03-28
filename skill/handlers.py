@@ -175,7 +175,7 @@ async def choose_short_duration(alice_request: AliceRequest):
     response = await user_manager.ask_sleep_time(
         now=datetime.datetime.now(timezone(alice_request.meta.timezone)),
         wake_up_time=wake_up_time,
-        mode=SleepMode.LONG,
+        mode=SleepMode.SHORT,
     )
     text_with_tts = response.text_with_tts
     await dp.storage.set_state(user_id, States.CALCULATED)
