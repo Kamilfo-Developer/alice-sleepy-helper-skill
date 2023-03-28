@@ -2,6 +2,7 @@ from __future__ import annotations
 import datetime
 import random
 import pytz
+import logging
 from skill.entities import User
 from skill.db.repos.base_repo import BaseRepo
 from skill.messages.base_messages import BaseMessages
@@ -23,9 +24,7 @@ class UserManager:
     repo: BaseRepo
     messages: BaseMessages
 
-    def __init__(
-        self, user: User, repo: BaseRepo, messages: BaseMessages
-    ) -> None:
+    def __init__(self, user: User, repo: BaseRepo, messages: BaseMessages) -> None:
         self.user = user
         self.repo = repo
         self.messages = messages
@@ -106,9 +105,7 @@ class UserManager:
         percentage = round(score / total * 100)
         return percentage
 
-    async def check_in(
-        self, now: datetime.datetime | None = None
-    ) -> SkillResponse:
+    async def check_in(self, now: datetime.datetime | None = None) -> SkillResponse:
         """Perform all needed processes when a user starts the skill.
         To be more precise, this method:
         - Drops user's streak if the streak is lost
@@ -254,6 +251,7 @@ class UserManager:
         Returns:
             TextWithTTS: a response message in a form of TextWithTTS.
         """
+        logging.debug(wake_up_time)
         if remember_time:
             self.user.last_wake_up_time = wake_up_time
             await self.repo.update_user(self.user)
@@ -284,9 +282,7 @@ class UserManager:
             now, bed_time, all_activities
         )
         return SkillResponse(
-            self.messages.get_sleep_calc_time_message(
-                bed_time.time(), activities
-            ),
+            self.messages.get_sleep_calc_time_message(bed_time.time(), activities),
             States.CALCULATED,
             self.messages.POST_SLEEP_CALCULATION_BUTTONS_TEXT,
         )
