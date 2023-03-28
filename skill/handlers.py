@@ -337,11 +337,12 @@ async def enter_calculator_proposed_time(alice_request: AliceRequest):
     func=lambda req: "YANDEX.REJECT" in req.request._raw_kwargs["nlu"].get("intents"),
 )  # type: ignore
 async def end_skill(alice_request: AliceRequest):
+    user_id = alice_request.session.user_id
+    await dp.storage.set_state(user_id, States.MAIN_MENU)
     text_with_tts = RUMessages().get_good_night_message()
     return alice_request.response(
         response_or_text=text_with_tts.text,
         tts=text_with_tts.tts,
-        end_session=True,
     )
 
 
