@@ -78,7 +78,7 @@ class ActivityModel(BaseModel):
     __tablename__ = "activities"
 
     id: Mapped[UUID] = mapped_column(Uuid, primary_key=True)
-    description_text: Mapped[str] = mapped_column(String(512))
+    description_text: Mapped[str] = mapped_column(String(512), unique=True)
     description_tts: Mapped[str] = mapped_column(String(512))
     created_date: Mapped[datetime] = mapped_column(DateTime(True))
     occupation_time: Mapped[timedelta] = mapped_column(Interval)
@@ -108,9 +108,11 @@ class TipModel(BaseModel):
     __tablename__ = "tips"
 
     id: Mapped[UUID] = mapped_column(Uuid, primary_key=True)
-    short_description_text: Mapped[str] = mapped_column(String(256))
+    short_description_text: Mapped[str] = mapped_column(
+        String(256), unique=True
+    )
     short_description_tts: Mapped[str] = mapped_column(String(256))
-    tip_content_text: Mapped[str] = mapped_column(String(1024))
+    tip_content_text: Mapped[str] = mapped_column(String(1024), unique=True)
     tip_content_tts: Mapped[str] = mapped_column(String(1024))
 
     tips_topic_id: Mapped[UUID] = mapped_column(
@@ -161,9 +163,11 @@ class TipsTopicModel(BaseModel):
     __tablename__ = "tips_topics"
 
     id: Mapped[UUID] = mapped_column(Uuid, primary_key=True)
-    name_text: Mapped[str] = mapped_column(String(256))
+    name_text: Mapped[str] = mapped_column(String(256), unique=True)
     name_tts: Mapped[str] = mapped_column(String(256))
-    topic_description_text: Mapped[str] = mapped_column(String(1024))
+    topic_description_text: Mapped[str] = mapped_column(
+        String(1024), unique=True
+    )
     topic_description_tts: Mapped[str] = mapped_column(String(1024))
 
     tips = relationship(
