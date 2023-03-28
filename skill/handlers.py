@@ -289,7 +289,11 @@ async def enter_calculator_proposed_time(alice_request: AliceRequest):
     text_with_tts = RUMessages().get_ask_sleep_mode_message()
     await dp.storage.set_state(user_id, States.IN_CALCULATOR)
     return alice_request.response(
-        response_or_text=text_with_tts.text, tts=text_with_tts.tts
+        response_or_text=text_with_tts.text,
+        tts=text_with_tts.tts,
+        buttons=get_buttons_with_text(
+            RUMessages.SLEEP_MODE_SELECTION_BUTTONS_TEXT
+        ),
     )
 
 
