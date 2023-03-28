@@ -49,6 +49,8 @@ WANT_NIGHT_TIP = ["ночной"]
 WANT_DAY_TIP = ["дневной"]
 # User aking help
 HELP_REPLICS = ["помощь", "помогите", "справка"]
+# User wants to stop skill
+QUIT_SKILL_REPLICS = ["выйди", "выход", "закрой навык"]
 
 
 def get_buttons_with_text(texts: list[str] | None) -> list[Button] | None:
@@ -63,14 +65,20 @@ def get_buttons_with_text(texts: list[str] | None) -> list[Button] | None:
 
 
 @dp.request_handler(
-    state=[
-        States.IN_CALCULATOR,
-        States.ASKING_FOR_TIP,
-        States.CALCULATED,
-        States.MAIN_MENU,
-        States.SELECTING_TIME,
-        States.TIME_PROPOSED,
-    ],  # type: ignore
+    state=States.all(),  # type: ignore
+    contains=QUIT_SKILL_REPLICS,
+)
+async def quit_skill(alice_request: AliceRequest):
+    text_with_tts = RUMessages().get_quit_message()
+    return alice_request.response(
+        response_or_text=text_with_tts.text,
+        tts=text_with_tts.tts,
+        end_session=True,
+    )
+
+
+@dp.request_handler(
+    state=States.all(),  # type: ignore
     contains=TO_MENU_REPLICS,
 )
 async def go_to_menu(alice_request: AliceRequest):
@@ -88,14 +96,7 @@ async def go_to_menu(alice_request: AliceRequest):
 
 
 @dp.request_handler(
-    state=[
-        States.IN_CALCULATOR,
-        States.ASKING_FOR_TIP,
-        States.CALCULATED,
-        States.MAIN_MENU,
-        States.SELECTING_TIME,
-        States.TIME_PROPOSED,
-    ],  # type: ignore
+    state=States.all(),  # type: ignore
     contains=HELP_REPLICS,
 )
 async def ask_help(alice_request: AliceRequest):
@@ -258,7 +259,7 @@ async def enter_calculator(alice_request: AliceRequest):
             tts=text_with_tts.tts,
         )
     if "minute" not in value.keys():
-        value["minute"] = 0
+        value["minutes"] = 0
     # save time sleep time
     await dp.storage.set_data(user_id, value)
     text_with_tts = RUMessages().get_ask_sleep_mode_message()
@@ -386,14 +387,7 @@ async def error_handler(alice_request: AliceRequest, e):
 
 
 @dp.request_handler(
-    state=[
-        States.IN_CALCULATOR,
-        States.ASKING_FOR_TIP,
-        States.CALCULATED,
-        States.MAIN_MENU,
-        States.SELECTING_TIME,
-        States.TIME_PROPOSED,
-    ],  # type: ignore
+    state=States.all(),  # type: ignore
 )
 async def universal_handler(alice_request: AliceRequest):
     user_id = alice_request.session.user_id
