@@ -27,7 +27,7 @@ match DB_PROVIDER:
 
         POSTGRES_DB_NAME = os.getenv("TEST_POSTGRES_DB_NAME") or "postgres"
 
-        POSTGRES_USER = os.getenv("TEST_POSTGRES_USER") or "postgres"
+        POSTGRES_USERNAME = os.getenv("TEST_POSTGRES_USERNAME") or "postgres"
 
         POSTGRES_HOST = os.getenv("TEST_POSTGRES_HOST") or "localhost"
 
@@ -42,7 +42,7 @@ match DB_PROVIDER:
 
         DB_URL = (
             f"postgresql+{POSTGRES_DRIVER_NAME}://"
-            + f"{POSTGRES_USER}:{POSTGRES_PASSWORD}"
+            + f"{POSTGRES_USERNAME}:{POSTGRES_PASSWORD}"
             + f"@{POSTGRES_HOST}:{POSTGRES_DB_PORT}"
             + f"/{POSTGRES_DB_NAME}"
         )
@@ -52,7 +52,7 @@ match DB_PROVIDER:
             os.getenv("TEST_SQLITE_DRIVER_NAME") or "aiosqlite"
         )
 
-        SQLITE_DB_NAME = os.getenv("TEST_SQLITE_DB_NAME") or "test_data.db"
+        SQLITE_DB_NAME = os.getenv("TEST_SQLITE_DB_NAME") or "SAMPLEDATA.db"
 
         ROOT_DIR = Path(__file__).parent.parent.parent.resolve()
 

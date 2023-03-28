@@ -8,7 +8,7 @@ from skill.utils import IdComparable, TextWithTTS
 class User(IdComparable):
     _id: str
     _streak: int
-    lask_skill_use: datetime | None
+    last_skill_use: datetime | None
     last_wake_up_time: time | None
     _heard_tips: list[Tip]
     _join_date: datetime

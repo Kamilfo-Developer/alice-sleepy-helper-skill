@@ -5,6 +5,12 @@ from typing import Any, List
 
 
 class BaseMessages(abc.ABC):
+    MENU_BUTTONS_TEXT: list[str]
+    TIP_TOPIC_SELECTION_BUTTONS_TEXT: list[str]
+    SLEEP_TIME_PROPOSAL_BUTTONS_TEXT: list[str]
+    SLEEP_MODE_SELECTION_BUTTONS_TEXT: list[str]
+    POST_SLEEP_CALCULATION_BUTTONS_TEXT: list[str]
+
     def __init__(self):
         pass
 
@@ -56,4 +62,16 @@ class BaseMessages(abc.ABC):
 
     @abc.abstractmethod
     def get_good_night_message(self) -> TextWithTTS:
+        pass
+
+    @abc.abstractmethod
+    def get_wrong_topic_message(self, topic_name: str) -> TextWithTTS:
+        pass
+
+    @abc.abstractmethod
+    def get_generic_error_message(self) -> TextWithTTS:
+        pass
+
+    @abc.abstractmethod
+    def get_wrong_time_message(self) -> TextWithTTS:
         pass
