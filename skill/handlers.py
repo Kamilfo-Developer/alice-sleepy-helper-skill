@@ -78,7 +78,6 @@ async def give_info(alice_request: AliceRequest):
     return alice_request.response(
         response_or_text=text_with_tts.text,
         tts=text_with_tts.tts,
-        application_state=States.MAIN_MENU,
         buttons=get_buttons_with_text(RUMessages.MENU_BUTTONS_TEXT),
     )
 
@@ -304,14 +303,4 @@ async def welcome_old_user(alice_request: AliceRequest):
     )
 
 
-dp.register_request_handler(
-    go_to_menu,
-    state=[
-        States.IN_CALCULATOR,
-        States.ASKING_FOR_TIP,
-        States.CALCULATED,
-        States.MAIN_MENU,
-        States.SELECTING_TIME,
-        States.TIME_PROPOSED,
-    ],
-)
+dp.register_errors_handler(go_to_menu)
