@@ -58,6 +58,24 @@ def get_buttons_with_text(texts: list[str] | None) -> list[Button] | None:
     return result
 
 
+async def upload_some_images(pathToPhoto):
+    # Use `await dp.upload_image(image_url_or_bytes, SKILL_ID, OAUTH_TOKEN)`
+    # If tokens were not provided on dp's initialisation
+
+    try:
+        img_by_bytes = await dp.upload_image(open('/path/to/photo.png', 'rb'))
+    except Exception:
+        logging.exception('Oops! Error uploading image by bytes')
+    else:
+        # origUrl will be `None`
+        return img_by_bytes
+
+    # You have to close session manually
+    # if you called any request outside web app
+    # Session close is added to on_shutdown list
+    # in webhhok.configure_app
+
+
 @dp.request_handler(
     state=[
         States.IN_CALCULATOR,
@@ -86,8 +104,12 @@ async def go_to_menu(alice_request: AliceRequest):
 @dp.request_handler(state=States.MAIN_MENU, contains=GIVE_INFO_REPLICS)  # type: ignore
 async def give_info(alice_request: AliceRequest):
     text_with_tts = RUMessages().get_info_message()
-    return alice_request.response(
-        response_or_text=text_with_tts.text,
+    image_id = upload_some_images("assets/ICO.png")
+    return alice_request.response_big_image(
+        text=text_with_tts.text,
+        image_id=image_id,
+        title="Иконка",
+        description="",
         tts=text_with_tts.tts,
         buttons=get_buttons_with_text(RUMessages.MENU_BUTTONS_TEXT),
     )
