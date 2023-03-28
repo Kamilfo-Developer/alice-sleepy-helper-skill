@@ -187,11 +187,14 @@ async def choose_short_duration(alice_request: AliceRequest):
     # time when user wants to get up, saved from previous dialogues
     time = await dp.storage.get_data(user_id)
     user_timezone = timezone(alice_request.meta.timezone)
-
+    hour = time["hour"]
+    minute = time.get("minute")
+    if minute is None:
+        minute = 0
     wake_up_time = (
         datetime.datetime.now(user_timezone)
         .time()
-        .replace(hour=time["hour"], minute=time.get("minute"), tzinfo=user_timezone)
+        .replace(hour=hour, minute=minute, tzinfo=user_timezone)
     )
     user_manager = await UserManager.new_manager(
         user_id=user_id, repo=SARepo(sa_repo_config), messages=RUMessages()
@@ -218,10 +221,14 @@ async def choose_long_duration(alice_request: AliceRequest):
     # time when user wants to get up, saved from previous dialogues
     time = await dp.storage.get_data(user_id)
     user_timezone = timezone(alice_request.meta.timezone)
+    hour = time["hour"]
+    minute = time.get("minute")
+    if minute is None:
+        minute = 0
     wake_up_time = (
         datetime.datetime.now(user_timezone)
         .time()
-        .replace(hour=time["hour"], minute=time.get("minute"), tzinfo=user_timezone)
+        .replace(hour=hour, minute=minute, tzinfo=user_timezone)
     )
     user_manager = await UserManager.new_manager(
         user_id=user_id, repo=SARepo(sa_repo_config), messages=RUMessages()
