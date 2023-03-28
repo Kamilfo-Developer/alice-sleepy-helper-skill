@@ -16,6 +16,8 @@ logging.basicConfig(format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s"
 
 dp = Dispatcher(storage=MemoryStorage())
 
+ICO_ID = "213044/59d97d1ef9d3288d14e5"
+
 # Key words for:
 # Escaping to main menu
 TO_MENU_REPLICS = ["выйди", "меню", "Меню"]
@@ -58,24 +60,6 @@ def get_buttons_with_text(texts: list[str] | None) -> list[Button] | None:
         result.append(button)
 
     return result
-
-
-async def upload_some_images(pathToPhoto):
-    # Use `await dp.upload_image(image_url_or_bytes, SKILL_ID, OAUTH_TOKEN)`
-    # If tokens were not provided on dp's initialisation
-
-    try:
-        img_by_bytes = await dp.upload_image(open(pathToPhoto, 'rb'))
-    except Exception:
-        logging.exception('Oops! Error uploading image by bytes')
-    else:
-        # origUrl will be `None`
-        return img_by_bytes.id
-
-    # You have to close session manually
-    # if you called any request outside web app
-    # Session close is added to on_shutdown list
-    # in webhhok.configure_app
 
 
 @dp.request_handler(
@@ -124,10 +108,9 @@ async def ask_help(alice_request: AliceRequest):
 @dp.request_handler(state=States.MAIN_MENU, contains=GIVE_INFO_REPLICS)  # type: ignore
 async def give_info(alice_request: AliceRequest):
     text_with_tts = RUMessages().get_info_message()
-    image_id = upload_some_images("assets/ICO.png")
     return alice_request.response_big_image(
         text=text_with_tts.text,
-        image_id=image_id,
+        image_id=ICO_ID,
         title="Иконка",
         description="",
         tts=text_with_tts.tts,
