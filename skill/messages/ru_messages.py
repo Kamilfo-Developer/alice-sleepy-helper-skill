@@ -16,6 +16,7 @@ class RUMessages(BaseMessages):
         "Дай совет",
         "Рассчитай сон",
         "Расскажи о навыке",
+        "Помощь"
     ]
     TIP_TOPIC_SELECTION_BUTTONS_TEXT = ["Дневной сон", "Ночной сон"]
     SLEEP_TIME_PROPOSAL_BUTTONS_TEXT = ["Да", "Нет"]
