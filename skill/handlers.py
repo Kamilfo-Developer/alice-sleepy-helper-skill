@@ -16,7 +16,7 @@ logging.basicConfig(format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s"
 
 dp = Dispatcher(storage=MemoryStorage())
 
-ICO_ID = "213044/59d97d1ef9d3288d14e5"
+ICO_ID = "1540737/a491c8169a8b2597ba37"
 
 # Key words for:
 # Escaping to main menu
@@ -111,8 +111,8 @@ async def give_info(alice_request: AliceRequest):
     return alice_request.response_big_image(
         text=text_with_tts.text,
         image_id=ICO_ID,
-        title="Иконка",
-        description="",
+        title="О навыке",
+        description=text_with_tts.text,
         tts=text_with_tts.tts,
         buttons=get_buttons_with_text(RUMessages.MENU_BUTTONS_TEXT),
     )
