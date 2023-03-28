@@ -153,7 +153,7 @@ class UserManager:
             return SkillResponse(
                 self.messages.get_start_message_intro(now),
                 States.MAIN_MENU,
-                self.messages.MENU_BUTTON_TEXT,
+                self.messages.MENU_BUTTONS_TEXT,
             )
         streak = self.user._streak
 
@@ -163,7 +163,7 @@ class UserManager:
                 time=now, streak=streak, scoreboard=scoreboard
             ),
             States.MAIN_MENU,
-            self.messages.MENU_BUTTON_TEXT,
+            self.messages.MENU_BUTTONS_TEXT,
         )
 
     async def ask_tip(self, topic_name: str) -> SkillResponse:
@@ -183,7 +183,7 @@ class UserManager:
             return SkillResponse(
                 self.messages.get_wrong_topic_message(topic_name),
                 States.ASKING_FOR_TIP,
-                self.messages.TIP_TOPIC_SELECTION_BUTTON_TEXT,
+                self.messages.TIP_TOPIC_SELECTION_BUTTONS_TEXT,
             )
         tips = await self.repo.get_topic_tips(topic_id=topic._id)
         heard_tips = self.user._heard_tips
@@ -203,7 +203,7 @@ class UserManager:
         return SkillResponse(
             self.messages.get_tip_message(tip),
             States.MAIN_MENU,
-            self.messages.MENU_BUTTON_TEXT,
+            self.messages.MENU_BUTTONS_TEXT,
         )
 
     async def get_ask_sleep_time_message(self) -> SkillResponse:
@@ -218,7 +218,7 @@ class UserManager:
                     last_wake_up_time
                 ),
                 States.TIME_PROPOSED,
-                self.messages.SLEEP_TIME_PROPOSAL_BUTTON_TEXT,
+                self.messages.SLEEP_TIME_PROPOSAL_BUTTONS_TEXT,
             )
         return SkillResponse(
             self.messages.get_ask_wake_up_time_message(),
@@ -288,5 +288,5 @@ class UserManager:
                 bed_time.time(), activities
             ),
             States.CALCULATED,
-            self.messages.POST_SLEEP_CALCULATION_BUTTON_TEXT,
+            self.messages.POST_SLEEP_CALCULATION_BUTTONS_TEXT,
         )
