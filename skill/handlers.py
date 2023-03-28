@@ -30,7 +30,7 @@ ASK_FOR_TIP_REPLICS = [
     "подсказка",
 ]
 # Using main functionality (sleep time calculation)
-MAIN_FUNCTIONALITY_ENTER = ["я хочу спать"]
+MAIN_FUNCTIONALITY_ENTER = ["я хочу спать", "рассчитай сон"]
 # Using main functionality (sleep time calculation) (skip asking the time)
 MAIN_FUNCTIONALITY_ENTER_FAST = ["Во сколько", "Когда", "Через сколько"]
 # Choosing short sleep mode
