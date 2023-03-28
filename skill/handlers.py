@@ -64,6 +64,10 @@ def get_buttons_with_text(texts: list[str] | None) -> list[Button] | None:
     return result
 
 
+def contains_intent(req: AliceRequest, intent_name: str) -> bool:
+    return intent_name in req.request._raw_kwargs["nlu"].get("intents")
+
+
 @dp.request_handler(
     state=States.all(),  # type: ignore
     contains=QUIT_SKILL_REPLICS,
@@ -97,7 +101,7 @@ async def go_to_menu(alice_request: AliceRequest):
 
 @dp.request_handler(
     state=States.all(),  # type: ignore
-    contains=HELP_REPLICS,
+    func=lambda req: contains_intent(req, "YANDEX.HELP"),
 )
 async def ask_help(alice_request: AliceRequest):
     text_with_tts = RUMessages().get_help_message()
@@ -298,7 +302,7 @@ async def enter_calculator_with_no_time(alice_request: AliceRequest):
 
 @dp.request_handler(
     state=States.TIME_PROPOSED,
-    func=lambda req: "YANDEX.REJECT" in req.request._raw_kwargs["nlu"].get("intents"),
+    func=lambda req: contains_intent(req, "YANDEX.REJECT"),
 )  # type: ignore
 async def enter_calculator_new_time(alice_request: AliceRequest):
     user_id = alice_request.session.user_id
@@ -311,7 +315,7 @@ async def enter_calculator_new_time(alice_request: AliceRequest):
 
 @dp.request_handler(
     state=States.TIME_PROPOSED,
-    func=lambda req: "YANDEX.CONFIRM" in req.request._raw_kwargs["nlu"].get("intents"),
+    func=lambda req: contains_intent(req, "YANDEX.CONFIRM"),
 )  # type: ignore
 async def enter_calculator_proposed_time(alice_request: AliceRequest):
     user_id = alice_request.session.user_id
@@ -334,7 +338,7 @@ async def enter_calculator_proposed_time(alice_request: AliceRequest):
 
 @dp.request_handler(
     state=States.CALCULATED,
-    func=lambda req: "YANDEX.REJECT" in req.request._raw_kwargs["nlu"].get("intents"),
+    func=lambda req: contains_intent(req, "YANDEX.REJECT"),
 )  # type: ignore
 async def end_skill(alice_request: AliceRequest):
     user_id = alice_request.session.user_id
@@ -349,7 +353,7 @@ async def end_skill(alice_request: AliceRequest):
 dp.register_request_handler(
     send_night_tip,
     state=States.CALCULATED,  # type: ignore
-    func=lambda req: "YANDEX.CONFIRM" in req.request._raw_kwargs["nlu"].get("intents"),
+    func=lambda req: contains_intent(req, "YANDEX.CONFIRM"),
 )
 
 
