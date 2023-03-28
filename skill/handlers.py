@@ -175,7 +175,7 @@ async def choose_short_duration(alice_request: AliceRequest):
     response = await user_manager.ask_sleep_time(
         now=datetime.datetime.now(timezone(alice_request.meta.timezone)),
         wake_up_time=wake_up_time,
-        mode=SleepMode.LONG,
+        mode=SleepMode.SHORT,
     )
     text_with_tts = response.text_with_tts
     await dp.storage.set_state(user_id, States.CALCULATED)
@@ -289,7 +289,11 @@ async def enter_calculator_proposed_time(alice_request: AliceRequest):
     text_with_tts = RUMessages().get_ask_sleep_mode_message()
     await dp.storage.set_state(user_id, States.IN_CALCULATOR)
     return alice_request.response(
-        response_or_text=text_with_tts.text, tts=text_with_tts.tts
+        response_or_text=text_with_tts.text,
+        tts=text_with_tts.tts,
+        buttons=get_buttons_with_text(
+            RUMessages.SLEEP_MODE_SELECTION_BUTTONS_TEXT
+        ),
     )
 
 
