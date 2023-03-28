@@ -91,8 +91,8 @@ async def give_info(alice_request: AliceRequest):
     return alice_request.response_big_image(
         text=text_with_tts.text,
         image_id=ICO_ID,
-        title="Иконка",
-        description="",
+        title="О навыке",
+        description=text_with_tts.text,
         tts=text_with_tts.tts,
         buttons=get_buttons_with_text(RUMessages.MENU_BUTTONS_TEXT),
     )
