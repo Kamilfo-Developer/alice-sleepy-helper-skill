@@ -295,7 +295,10 @@ async def enter_calculator_with_no_time(alice_request: AliceRequest):
     )
 
 
-@dp.request_handler(state=States.TIME_PROPOSED, contains=NO_REPLICS)  # type: ignore
+@dp.request_handler(
+    state=States.TIME_PROPOSED,
+    func=lambda req: "YANDEX.REJECT" in req.request._raw_kwargs["nlu"].get("intents"),
+)  # type: ignore
 async def enter_calculator_new_time(alice_request: AliceRequest):
     user_id = alice_request.session.user_id
     text_with_tts = RUMessages().get_ask_wake_up_time_message()
@@ -305,7 +308,10 @@ async def enter_calculator_new_time(alice_request: AliceRequest):
     )
 
 
-@dp.request_handler(state=States.TIME_PROPOSED, contains=YES_REPLICS)  # type: ignore
+@dp.request_handler(
+    state=States.TIME_PROPOSED,
+    func=lambda req: "YANDEX.CONFIRM" in req.request._raw_kwargs["nlu"].get("intents"),
+)  # type: ignore
 async def enter_calculator_proposed_time(alice_request: AliceRequest):
     user_id = alice_request.session.user_id
     user_manager = await UserManager.new_manager(
@@ -325,7 +331,10 @@ async def enter_calculator_proposed_time(alice_request: AliceRequest):
     )
 
 
-@dp.request_handler(state=States.CALCULATED, contains=NO_REPLICS)  # type: ignore
+@dp.request_handler(
+    state=States.CALCULATED,
+    func=lambda req: "YANDEX.REJECT" in req.request._raw_kwargs["nlu"].get("intents"),
+)  # type: ignore
 async def end_skill(alice_request: AliceRequest):
     text_with_tts = RUMessages().get_good_night_message()
     return alice_request.response(
@@ -338,7 +347,7 @@ async def end_skill(alice_request: AliceRequest):
 dp.register_request_handler(
     send_night_tip,
     state=States.CALCULATED,  # type: ignore
-    contains=YES_REPLICS,
+    func=lambda req: "YANDEX.CONFIRM" in req.request._raw_kwargs["nlu"].get("intents"),
 )
 
 
