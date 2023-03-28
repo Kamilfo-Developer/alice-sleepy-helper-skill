@@ -12,7 +12,9 @@ from pytz import timezone
 import datetime
 import logging
 
-logging.basicConfig(format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
+logging.basicConfig(
+    format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s"
+)
 
 dp = Dispatcher(storage=MemoryStorage())
 
@@ -145,7 +147,9 @@ async def send_tip(alice_request: AliceRequest):
     return alice_request.response(
         response_or_text=text_with_tts.text,
         tts=text_with_tts.tts,
-        buttons=get_buttons_with_text(RUMessages.TIP_TOPIC_SELECTION_BUTTONS_TEXT),
+        buttons=get_buttons_with_text(
+            RUMessages.TIP_TOPIC_SELECTION_BUTTONS_TEXT
+        ),
     )
 
 
@@ -156,10 +160,14 @@ async def choose_short_duration(alice_request: AliceRequest):
     user_id = alice_request.session.user_id
     # time when user wants to get up, saved from previous dialogues
     time = await dp.storage.get_data(user_id)
+    user_timezone = timezone(alice_request.meta.timezone)
+
     wake_up_time = (
-        datetime.datetime.now(timezone(alice_request.meta.timezone))
-        .replace(hour=time["hour"], minute=time["minute"])
+        datetime.datetime.now(user_timezone)
         .time()
+        .replace(
+            hour=time["hour"], minute=time["minute"], tzinfo=user_timezone
+        )
     )
     user_manager = await UserManager.new_manager(
         user_id=user_id, repo=SARepo(sa_repo_config), messages=RUMessages()
@@ -213,9 +221,9 @@ async def enter_calculator(alice_request: AliceRequest):
     if "nlu" not in alice_request.request._raw_kwargs.keys():
         response = RUMessages().get_ask_wake_up_time_message().text
         return response
-    value = alice_request.request._raw_kwargs["nlu"]["intents"]["sleep_calc"]["slots"][
-        "time"
-    ]["value"]
+    value = alice_request.request._raw_kwargs["nlu"]["intents"]["sleep_calc"][
+        "slots"
+    ]["time"]["value"]
     # save time sleep time
     await dp.storage.set_data(user_id, value)
     text_with_tts = RUMessages().get_ask_sleep_mode_message()
@@ -223,7 +231,9 @@ async def enter_calculator(alice_request: AliceRequest):
     return alice_request.response(
         response_or_text=text_with_tts.text,
         tts=text_with_tts.tts,
-        buttons=get_buttons_with_text(RUMessages.SLEEP_MODE_SELECTION_BUTTONS_TEXT),
+        buttons=get_buttons_with_text(
+            RUMessages.SLEEP_MODE_SELECTION_BUTTONS_TEXT
+        ),
     )
 
 
