@@ -1,4 +1,5 @@
 import requests as r
+from skill.states import States
 
 TIME_REQUEST = {
     "meta": {
@@ -79,25 +80,44 @@ def make_request(command: str) -> dict:
     }
 
 
-def send_request(req: dict) -> str:
+def make_test(req: dict | str, target_state: str):
+    if type(req) == str:
+        req = make_request(req)
     resp = r.post("http://localhost:5555/", json=req)
-    return resp.json()["response"]["text"]
+    resp = resp.json()
+    print(resp)
+    assert resp["application_state"] == target_state.lower()
 
 
-def test_start():
-    req = make_request("Привет")
-    print(send_request(req))
+def test_handler_main_func_short():
+    make_test("Привет", str(States.MAIN_MENU))
+
+    make_test(TIME_REQUEST, str(States.IN_CALCULATOR))
+
+    make_test("Долгий", str(States.CALCULATED))
+
+    make_test("Да", str(States.MAIN_MENU))
+
+    # make_test("Ночной сон", str(States.MAIN_MENU))
 
 
-def test_time():
-    print(send_request(TIME_REQUEST))
+def test_handler_main_func_long():
+
+    make_test("Я хочу спать", str(States.TIME_PROPOSED))
+
+    make_test("Да", str(States.IN_CALCULATOR))
+
+    make_test("Короткий", str(States.CALCULATED))
+
+    make_test("Меню", str(States.MAIN_MENU))
 
 
-def test_mode():
-    req = make_request("Длинный")
-    print(send_request(req))
+def test_handler_ask_tip():
+
+    make_test("Посоветуй", str(States.ASKING_FOR_TIP))
+
+    make_test("Ночной сон", str(States.MAIN_MENU))
 
 
-def test_sleep():
-    req = makeRequest("Я хочу спать")
-    print(sendRequest(req))
+def test_handler_info():
+    make_test("Расскажи о навыке", str(States.MAIN_MENU))

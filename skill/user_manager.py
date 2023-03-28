@@ -6,7 +6,16 @@ from skill.entities import User
 from skill.db.repos.base_repo import BaseRepo
 from skill.messages.base_messages import BaseMessages
 from skill.utils import TextWithTTS
+from skill.states import States
 from skill.sleep_calculator import SleepCalculator, SleepMode
+from dataclasses import dataclass
+
+
+@dataclass
+class SkillResponse:
+    text_with_tts: TextWithTTS
+    state: str | None
+    buttons_text: list[str] | None
 
 
 class UserManager:
@@ -28,7 +37,7 @@ class UserManager:
         repo: BaseRepo,
         messages: BaseMessages,
         create_user_if_not_found: bool = True,
-    ) -> UserManager | None:
+    ) -> UserManager:
         """Sets up UserManager with given user repo and messages.
         If user_id is not found in the DB and create_user_if_not_found
         is True, creates a new user.
@@ -54,8 +63,8 @@ class UserManager:
         """
 
         user = await repo.get_user_by_id(user_id)
-        if not user and not create_user_if_not_found:
-            return None
+        # if not user and not create_user_if_not_found:
+        #    return None
 
         if not user:
             user = User(
@@ -99,7 +108,7 @@ class UserManager:
 
     async def check_in(
         self, now: datetime.datetime | None = None
-    ) -> TextWithTTS:
+    ) -> SkillResponse:
         """Perform all needed processes when a user starts the skill.
         To be more precise, this method:
         - Drops user's streak if the streak is lost
@@ -141,15 +150,23 @@ class UserManager:
         await self.repo.update_user(self.user)
 
         if new_user:
-            return self.messages.get_start_message_intro(now)
+            return SkillResponse(
+                self.messages.get_start_message_intro(now),
+                States.MAIN_MENU,
+                self.messages.MENU_BUTTONS_TEXT,
+            )
         streak = self.user._streak
 
         scoreboard = await self.count_scoreboard(percentages=True)
-        return self.messages.get_start_message_comeback(
-            time=now, streak=streak, scoreboard=scoreboard
+        return SkillResponse(
+            self.messages.get_start_message_comeback(
+                time=now, streak=streak, scoreboard=scoreboard
+            ),
+            States.MAIN_MENU,
+            self.messages.MENU_BUTTONS_TEXT,
         )
 
-    async def ask_tip(self, topic_name: str) -> TextWithTTS:
+    async def ask_tip(self, topic_name: str) -> SkillResponse:
         """Chooses a tip on given topic that has most likely never
         been heard before by the user and tracks the heard tips buffer.
 
@@ -163,7 +180,11 @@ class UserManager:
 
         topic = await self.repo.get_tips_topic_by_name(topic_name)
         if topic is None:
-            return self.messages.get_wrong_topic_message(topic_name)
+            return SkillResponse(
+                self.messages.get_wrong_topic_message(topic_name),
+                States.ASKING_FOR_TIP,
+                self.messages.TIP_TOPIC_SELECTION_BUTTONS_TEXT,
+            )
         tips = await self.repo.get_topic_tips(topic_id=topic._id)
         heard_tips = self.user._heard_tips
 
@@ -179,19 +200,31 @@ class UserManager:
         self.user.add_heard_tip(tip)
 
         await self.repo.update_user(self.user)
-        return self.messages.get_tip_message(tip)
+        return SkillResponse(
+            self.messages.get_tip_message(tip),
+            States.MAIN_MENU,
+            self.messages.MENU_BUTTONS_TEXT,
+        )
 
-    async def get_ask_sleep_time_message(self) -> TextWithTTS:
+    async def get_ask_sleep_time_message(self) -> SkillResponse:
         """Get the proper message to ask a user the time at which
         they want to wake up. The selected message depends on whether
         the user have already used the sleep calculator or not."""
 
         last_wake_up_time = self.user.last_wake_up_time
         if last_wake_up_time is not None:
-            return self.messages.get_propose_yesterday_wake_up_time_message(
-                last_wake_up_time
+            return SkillResponse(
+                self.messages.get_propose_yesterday_wake_up_time_message(
+                    last_wake_up_time
+                ),
+                States.TIME_PROPOSED,
+                self.messages.SLEEP_TIME_PROPOSAL_BUTTONS_TEXT,
             )
-        return self.messages.get_ask_wake_up_time_message()
+        return SkillResponse(
+            self.messages.get_ask_wake_up_time_message(),
+            States.SELECTING_TIME,
+            None,
+        )
 
     async def ask_sleep_time(
         self,
@@ -199,7 +232,7 @@ class UserManager:
         wake_up_time: datetime.time,
         mode: SleepMode,
         remember_time: bool = True,
-    ) -> TextWithTTS:
+    ) -> SkillResponse:
         """Calculate user's sleep time. Constructs a response message,
         in which it proposes the user a number of activities for the rest of
         the evening, and returns the message.
@@ -250,6 +283,10 @@ class UserManager:
         activities = SleepCalculator.activities_compilation(
             now, bed_time, all_activities
         )
-        return self.messages.get_sleep_calc_time_message(
-            bed_time.time(), activities
+        return SkillResponse(
+            self.messages.get_sleep_calc_time_message(
+                bed_time.time(), activities
+            ),
+            States.CALCULATED,
+            self.messages.POST_SLEEP_CALCULATION_BUTTONS_TEXT,
         )

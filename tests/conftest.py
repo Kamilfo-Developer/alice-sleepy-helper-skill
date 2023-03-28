@@ -1,5 +1,5 @@
 from skill.db.models.sa_models import BaseModel
-from tests.db.sa_db_settings import engine
+from tests.sa_db_settings import engine
 import pytest_asyncio
 import asyncio
 import pytest

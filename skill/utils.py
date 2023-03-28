@@ -6,7 +6,6 @@ import itertools
 from typing import Union, Any, Iterable, List, Callable
 
 
-
 class Daytime(enum.Enum):
     DAY = enum.auto()
     NIGHT = enum.auto()
@@ -53,7 +52,6 @@ class TextWithTTS:
             return
 
         self.tts = tts
-
 
     def __eq__(self, __o: object) -> bool:
         return (
@@ -161,4 +159,3 @@ def construct_random_message(*parts: List[TextWithTTS], insert_spaces=True):
         delimiter = TextWithTTS("")
 
     return delimiter.join(map(lambda x: random.choice(x), parts))
-

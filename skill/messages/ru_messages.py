@@ -12,6 +12,17 @@ if TYPE_CHECKING:
 
 
 class RUMessages(BaseMessages):
+    MENU_BUTTONS_TEXT = [
+        "Дай совет",
+        "Рассчитай сон",
+        "Расскажи о навыке",
+        "Помощь"
+    ]
+    TIP_TOPIC_SELECTION_BUTTONS_TEXT = ["Дневной сон", "Ночной сон"]
+    SLEEP_TIME_PROPOSAL_BUTTONS_TEXT = ["Да", "Нет"]
+    SLEEP_MODE_SELECTION_BUTTONS_TEXT = ["Короткий", "Длинный"]
+    POST_SLEEP_CALCULATION_BUTTONS_TEXT = ["Да", "Нет"]
+
     def __init__(self):
         pass
 
@@ -58,22 +69,22 @@ class RUMessages(BaseMessages):
         self, time: datetime.datetime, streak: int, scoreboard: int
     ) -> TextWithTTS:
         daytime = Daytime.from_time(time)
-        greeting = TextWithTTS("Здравствуйте!")
+        greeting = TextWithTTS("Здравствуйте! ")
         match daytime:
             case Daytime.DAY:
-                greeting = TextWithTTS("Добрый день!")
+                greeting = TextWithTTS("Добрый день! ")
             case Daytime.MORNING:
-                greeting = TextWithTTS("Доброе утро!")
+                greeting = TextWithTTS("Доброе утро! ")
             case Daytime.EVENING:
-                greeting = TextWithTTS("Добрый вечер!")
+                greeting = TextWithTTS("Добрый вечер! ")
             case Daytime.NIGHT:
-                greeting = TextWithTTS("Доброй ночи!")
+                greeting = TextWithTTS("Доброй ночи! ")
 
         message = greeting
 
         if streak > 1:
             praise = TextWithTTS(
-                f" Сегодня вы пользуетесь Сонным Помощником {streak}"
+                f"Сегодня вы пользуетесь Сонным Помощником {streak}"
                 " день подряд. "
             )
             replicas_insert = [
@@ -128,25 +139,29 @@ class RUMessages(BaseMessages):
     def get_info_message(self) -> TextWithTTS:
         replicas_a = [
             TextWithTTS(
-                f"Я {DASH} Сонный Помощник." " Я могу помочь вам со сном."
+                f"Я {DASH} Сонный Помощник."
+                " Я могу помочь людям, испытывающим проблемы со сном."
             ),
             TextWithTTS(
-                f"Я {DASH} Сонный Помощник. Я помогаю вам организовать"
-                " свой сон."
+                f"Я {DASH} Сонный Помощник. Я помогаю людям, которые хотят"
+                " организовать свой сон."
             ),
             TextWithTTS(
-                f"Я {DASH} Сонный Помощник. Моя цель {DASH} помочь вам"
-                " обеспечить себе правильный здоровый сон."
+                f"Я {DASH} Сонный Помощник. Моя цель {DASH} помочь"
+                " обеспечить себе правильный здоровый сон тем, кому этого не хватало."
             ),
             TextWithTTS(
-                f"Я {DASH} Сонный Помощник. Моя цель {DASH} помочь вам"
-                " обеспечить себе хороший комфортный сон."
+                f"Я {DASH} Сонный Помощник. Моя цель {DASH} помочь"
+                " невыспавшимся людям обеспечить "
+                " себе хороший комфортный сон."
             ),
             TextWithTTS(
-                f"Я {DASH} Сонный Помощник, я могу помочь вам лучше спать."
+                f"Я {DASH} Сонный Помощник, я могу помочь лучше спать тем,"
+                " кто испытывает с этим проблемы."
             ),
             TextWithTTS(
-                f"Я {DASH} Сонный Помощник, я могу помочь вам" " высыпаться."
+                f"Я {DASH} Сонный Помощник, я могу помочь вам высыпаться,"
+                " если у вас есть проблемы со сном."
             ),
         ]
 
@@ -250,7 +265,7 @@ class RUMessages(BaseMessages):
             ),
             TextWithTTS("Вас интересует длинный или короткий сон?"),
             TextWithTTS(
-                "Какой режим сна вы бы предпочли, длинный " "или короткий?"
+                "Какой режим сна вы бы предпочли, длинный или короткий?"
             ),
         ]
         return random.choice(replicas)
@@ -268,12 +283,21 @@ class RUMessages(BaseMessages):
                 "За этот вечер вы можете успеть, например, "
             )
 
-            activities_textwithtts = [act.description for act in activities]
+            activities_text_with_tts = [act.description for act in activities]
             if len(activities) > 1:
-                activities_textwithtts[-1] = TextWithTTS(" или ").join(
-                    (activities_textwithtts[-2], activities_textwithtts[-1])
-                )
-            message += TextWithTTS(", ").join(activities_textwithtts) + ". "
+                # Construct activity enumerating statement in proper Russian
+                # syntax: objects are seperated by a comma and a whitespace
+                # except for the last two, which have the word "или" inbetween.
+                activities_text_with_tts[-1] = TextWithTTS(" или ").join(
+                    (
+                        activities_text_with_tts[-2],
+                        activities_text_with_tts[-1],
+                    )
+                )  # Glue the last two objects together with the word "или"
+                activities_text_with_tts.pop(-2)  # Get rid of the penultimate
+                #                                   object duplicate
+
+            message += TextWithTTS(", ").join(activities_text_with_tts) + ". "
 
         replica_tail = [
             TextWithTTS("Не желаете-ли получить совет по сну?"),
@@ -302,3 +326,28 @@ class RUMessages(BaseMessages):
             # NOTE:           ^^^^^ Informal
         ]
         return random.choice(replicas)
+
+    def get_wrong_topic_message(self, topic_name: str) -> TextWithTTS:
+        return TextWithTTS(
+            "Пожалуйста, выберите один из вариантов тем для совета: "
+            " дневной сон или ночной сон, или вернитесь в главное меню, сказав"
+            f" {LAQUO}Меню{RAQUO}"
+        )
+        # TODO: Rephrase replica and add variety
+
+    def get_generic_error_message(self) -> TextWithTTS:
+        return TextWithTTS("Что-то пошло не так, вы были возвращены в меню.")
+
+    def get_wrong_time_message(self) -> TextWithTTS:
+        return TextWithTTS(
+            "Пожалуйста, укажите корректное время, или вернитесь в главное "
+            f"меню, сказав {LAQUO}Меню{RAQUO}"
+        )
+    
+    def get_help_message(self) -> TextWithTTS:
+        return TextWithTTS(
+            f"Cкажите {LAQUO}Меню{RAQUO}, чтобы перейти в главное меню\n"
+            f"Скажите {LAQUO}Я хочу спать{RAQUO}, чтобы рассчитать оптимальное время сна\n"
+            f"Скажите {LAQUO}Дай ссовет{RAQUO}, чтобы получить совет по сну\n"
+            f"Скажите {LAQUO}Расскажи о навыке{RAQUO}, чтобы узнать побольше о навыке\n"
+        )
