@@ -67,3 +67,11 @@ class BaseMessages(abc.ABC):
     @abc.abstractmethod
     def get_wrong_topic_message(self, topic_name: str) -> TextWithTTS:
         pass
+
+    @abc.abstractmethod
+    def get_generic_error_message(self) -> TextWithTTS:
+        pass
+
+    @abc.abstractmethod
+    def get_wrong_time_message(self) -> TextWithTTS:
+        pass

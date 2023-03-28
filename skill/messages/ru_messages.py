@@ -332,3 +332,9 @@ class RUMessages(BaseMessages):
 
     def get_generic_error_message(self) -> TextWithTTS:
         return TextWithTTS("Что-то пошло не так, вы были возвращены в меню.")
+
+    def get_wrong_time_message(self) -> TextWithTTS:
+        return TextWithTTS(
+            "Пожалуйста, укажите корректное время, или вернитесь в главное "
+            f"меню, сказав {LAQUO}Меню{RAQUO}"
+        )
