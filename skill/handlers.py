@@ -16,7 +16,7 @@ logging.basicConfig(format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s"
 
 dp = Dispatcher(storage=MemoryStorage())
 
-ICO_ID = "213044/59d97d1ef9d3288d14e5"
+ICO_ID = "1540737/a491c8169a8b2597ba37"
 
 # Key words for:
 # Escaping to main menu
