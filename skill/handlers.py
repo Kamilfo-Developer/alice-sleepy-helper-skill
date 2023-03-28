@@ -30,7 +30,7 @@ ASK_FOR_TIP_REPLICS = [
     "подсказка",
 ]
 # Using main functionality (sleep time calculation)
-MAIN_FUNCTIONALITY_ENTER = ["я хочу спать"]
+MAIN_FUNCTIONALITY_ENTER = ["я хочу спать", "рассчитай сон"]
 # Using main functionality (sleep time calculation) (skip asking the time)
 MAIN_FUNCTIONALITY_ENTER_FAST = ["Во сколько", "Когда", "Через сколько"]
 # Choosing short sleep mode
@@ -328,4 +328,28 @@ async def error_handler(alice_request: AliceRequest, e):
         response_or_text=text_with_tts.text,
         tts=text_with_tts.tts,
         buttons=get_buttons_with_text(RUMessages().MENU_BUTTONS_TEXT),
+    )
+
+
+@dp.request_handler(
+    state=[
+        States.IN_CALCULATOR,
+        States.ASKING_FOR_TIP,
+        States.CALCULATED,
+        States.MAIN_MENU,
+        States.SELECTING_TIME,
+        States.TIME_PROPOSED,
+    ],  # type: ignore
+)
+async def universal_handler(alice_request: AliceRequest):
+    user_id = alice_request.session.user_id
+
+    text_with_tts = RUMessages().get_menu_welcome_message()
+
+    await dp.storage.set_state(user_id, States.MAIN_MENU)
+
+    return alice_request.response(
+        response_or_text=text_with_tts.text,
+        tts=text_with_tts.tts,
+        buttons=get_buttons_with_text(RUMessages.MENU_BUTTONS_TEXT),
     )
