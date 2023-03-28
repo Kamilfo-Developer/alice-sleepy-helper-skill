@@ -49,6 +49,8 @@ WANT_NIGHT_TIP = ["ночной"]
 WANT_DAY_TIP = ["дневной"]
 # User aking help
 HELP_REPLICS = ["помощь", "помогите", "справка"]
+# User wants to stop skill
+QUIT_SKILL_REPLICS = ["выйди", "выход", "закрой навык"]
 
 
 def get_buttons_with_text(texts: list[str] | None) -> list[Button] | None:
@@ -62,15 +64,25 @@ def get_buttons_with_text(texts: list[str] | None) -> list[Button] | None:
     return result
 
 
+def contains_intent(req: AliceRequest, intent_name: str) -> bool:
+    return intent_name in req.request._raw_kwargs["nlu"].get("intents")
+
+
 @dp.request_handler(
-    state=[
-        States.IN_CALCULATOR,
-        States.ASKING_FOR_TIP,
-        States.CALCULATED,
-        States.MAIN_MENU,
-        States.SELECTING_TIME,
-        States.TIME_PROPOSED,
-    ],  # type: ignore
+    state=States.all(),  # type: ignore
+    contains=QUIT_SKILL_REPLICS,
+)
+async def quit_skill(alice_request: AliceRequest):
+    text_with_tts = RUMessages().get_quit_message()
+    return alice_request.response(
+        response_or_text=text_with_tts.text,
+        tts=text_with_tts.tts,
+        end_session=True,
+    )
+
+
+@dp.request_handler(
+    state=States.all(),  # type: ignore
     contains=TO_MENU_REPLICS,
 )
 async def go_to_menu(alice_request: AliceRequest):
@@ -88,15 +100,8 @@ async def go_to_menu(alice_request: AliceRequest):
 
 
 @dp.request_handler(
-    state=[
-        States.IN_CALCULATOR,
-        States.ASKING_FOR_TIP,
-        States.CALCULATED,
-        States.MAIN_MENU,
-        States.SELECTING_TIME,
-        States.TIME_PROPOSED,
-    ],  # type: ignore
-    contains=HELP_REPLICS,
+    state=States.all(),  # type: ignore
+    func=lambda req: contains_intent(req, "YANDEX.HELP"),
 )
 async def ask_help(alice_request: AliceRequest):
     text_with_tts = RUMessages().get_help_message()
@@ -295,7 +300,10 @@ async def enter_calculator_with_no_time(alice_request: AliceRequest):
     )
 
 
-@dp.request_handler(state=States.TIME_PROPOSED, contains=NO_REPLICS)  # type: ignore
+@dp.request_handler(
+    state=States.TIME_PROPOSED,
+    func=lambda req: contains_intent(req, "YANDEX.REJECT"),
+)  # type: ignore
 async def enter_calculator_new_time(alice_request: AliceRequest):
     user_id = alice_request.session.user_id
     text_with_tts = RUMessages().get_ask_wake_up_time_message()
@@ -305,7 +313,10 @@ async def enter_calculator_new_time(alice_request: AliceRequest):
     )
 
 
-@dp.request_handler(state=States.TIME_PROPOSED, contains=YES_REPLICS)  # type: ignore
+@dp.request_handler(
+    state=States.TIME_PROPOSED,
+    func=lambda req: contains_intent(req, "YANDEX.CONFIRM"),
+)  # type: ignore
 async def enter_calculator_proposed_time(alice_request: AliceRequest):
     user_id = alice_request.session.user_id
     user_manager = await UserManager.new_manager(
@@ -325,20 +336,24 @@ async def enter_calculator_proposed_time(alice_request: AliceRequest):
     )
 
 
-@dp.request_handler(state=States.CALCULATED, contains=NO_REPLICS)  # type: ignore
+@dp.request_handler(
+    state=States.CALCULATED,
+    func=lambda req: contains_intent(req, "YANDEX.REJECT"),
+)  # type: ignore
 async def end_skill(alice_request: AliceRequest):
+    user_id = alice_request.session.user_id
+    await dp.storage.set_state(user_id, States.MAIN_MENU)
     text_with_tts = RUMessages().get_good_night_message()
     return alice_request.response(
         response_or_text=text_with_tts.text,
         tts=text_with_tts.tts,
-        end_session=True,
     )
 
 
 dp.register_request_handler(
     send_night_tip,
     state=States.CALCULATED,  # type: ignore
-    contains=YES_REPLICS,
+    func=lambda req: contains_intent(req, "YANDEX.CONFIRM"),
 )
 
 
@@ -377,14 +392,7 @@ async def error_handler(alice_request: AliceRequest, e):
 
 
 @dp.request_handler(
-    state=[
-        States.IN_CALCULATOR,
-        States.ASKING_FOR_TIP,
-        States.CALCULATED,
-        States.MAIN_MENU,
-        States.SELECTING_TIME,
-        States.TIME_PROPOSED,
-    ],  # type: ignore
+    state=States.all(),  # type: ignore
 )
 async def universal_handler(alice_request: AliceRequest):
     user_id = alice_request.session.user_id
