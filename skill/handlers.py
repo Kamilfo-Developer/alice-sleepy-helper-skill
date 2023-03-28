@@ -191,7 +191,7 @@ async def choose_short_duration(alice_request: AliceRequest):
     wake_up_time = (
         datetime.datetime.now(user_timezone)
         .time()
-        .replace(hour=time["hour"], minute=time["minute"], tzinfo=user_timezone)
+        .replace(hour=time["hour"], minute=time.get("minute"), tzinfo=user_timezone)
     )
     user_manager = await UserManager.new_manager(
         user_id=user_id, repo=SARepo(sa_repo_config), messages=RUMessages()
@@ -221,7 +221,7 @@ async def choose_long_duration(alice_request: AliceRequest):
     wake_up_time = (
         datetime.datetime.now(user_timezone)
         .time()
-        .replace(hour=time["hour"], minute=time["minute"], tzinfo=user_timezone)
+        .replace(hour=time["hour"], minute=time.get("minute"), tzinfo=user_timezone)
     )
     user_manager = await UserManager.new_manager(
         user_id=user_id, repo=SARepo(sa_repo_config), messages=RUMessages()
@@ -347,6 +347,7 @@ async def end_skill(alice_request: AliceRequest):
     return alice_request.response(
         response_or_text=text_with_tts.text,
         tts=text_with_tts.tts,
+        buttons=get_buttons_with_text(RUMessages().MENU_BUTTONS_TEXT),
     )
 
 
