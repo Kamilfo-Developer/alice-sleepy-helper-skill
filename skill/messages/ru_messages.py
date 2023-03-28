@@ -16,7 +16,7 @@ class RUMessages(BaseMessages):
         "Дай совет",
         "Рассчитай сон",
         "Расскажи о навыке",
-        "Помощь"
+        "Помощь",
     ]
     TIP_TOPIC_SELECTION_BUTTONS_TEXT = ["Дневной сон", "Ночной сон"]
     SLEEP_TIME_PROPOSAL_BUTTONS_TEXT = ["Да", "Нет"]
@@ -148,7 +148,8 @@ class RUMessages(BaseMessages):
             ),
             TextWithTTS(
                 f"Я {DASH} Сонный Помощник. Моя цель {DASH} помочь"
-                " обеспечить себе правильный здоровый сон тем, кому этого не хватало."
+                " обеспечить себе правильный здоровый сон тем, кому этого не"
+                " хватало."
             ),
             TextWithTTS(
                 f"Я {DASH} Сонный Помощник. Моя цель {DASH} помочь"
@@ -343,11 +344,31 @@ class RUMessages(BaseMessages):
             "Пожалуйста, укажите корректное время, или вернитесь в главное "
             f"меню, сказав {LAQUO}Меню{RAQUO}"
         )
-    
+
     def get_help_message(self) -> TextWithTTS:
         return TextWithTTS(
             f"Cкажите {LAQUO}Меню{RAQUO}, чтобы перейти в главное меню\n"
-            f"Скажите {LAQUO}Я хочу спать{RAQUO}, чтобы рассчитать оптимальное время сна\n"
+            f"Скажите {LAQUO}Я хочу спать{RAQUO}, чтобы рассчитать оптимальное"
+            " время сна\n"
             f"Скажите {LAQUO}Дай ссовет{RAQUO}, чтобы получить совет по сну\n"
-            f"Скажите {LAQUO}Расскажи о навыке{RAQUO}, чтобы узнать побольше о навыке\n"
+            f"Скажите {LAQUO}Расскажи о навыке{RAQUO}, чтобы узнать побольше о"
+            " навыке\n"
         )
+
+    def get_quit_message(self) -> TextWithTTS:
+        replicas = [
+            TextWithTTS(text="Хорошего вам сна)", tts="хар+ошего вам сна!"),
+            TextWithTTS(text="Спокойной ночи!"),
+            TextWithTTS(text="Доброй ночи!"),
+            TextWithTTS(text="Сладких снов!"),
+            TextWithTTS(text="Рад помочь!"),
+            TextWithTTS(text="Хороших вам сноведений!"),
+            TextWithTTS(text="Крепкого сна!"),
+            TextWithTTS(text="Пока-пока!"),
+            TextWithTTS(text="Пишите ещё!"),
+            TextWithTTS(text="Да прибудет с вами сон!"),
+            TextWithTTS(text="Досвидания!"),
+            TextWithTTS(text="Удачи!"),
+            TextWithTTS(text="Пишите почаще!"),
+        ]
+        return random.choice(replicas)
