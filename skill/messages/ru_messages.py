@@ -325,6 +325,7 @@ class RUMessages(BaseMessages):
     def get_wrong_topic_message(self, topic_name: str) -> TextWithTTS:
         return TextWithTTS(
             "Пожалуйста, выберите один из вариантов тем для совета: "
-            " дневной сон или ночной сон"
+            " дневной сон или ночной сон, или вернитесь в главное меню, сказав"
+            f" {LAQUO}Меню{RAQUO}"
         )
         # TODO: Rephrase replica and add variety

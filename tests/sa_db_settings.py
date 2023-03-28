@@ -52,7 +52,7 @@ match DB_PROVIDER:
             os.getenv("TEST_SQLITE_DRIVER_NAME") or "aiosqlite"
         )
 
-        SQLITE_DB_NAME = os.getenv("TEST_SQLITE_DB_NAME") or "test_data.db"
+        SQLITE_DB_NAME = os.getenv("TEST_SQLITE_DB_NAME") or "SAMPLEDATA.db"
 
         ROOT_DIR = Path(__file__).parent.parent.parent.resolve()
 
