@@ -302,3 +302,16 @@ async def welcome_old_user(alice_request: AliceRequest):
         tts=text_with_tts.tts,
         buttons=get_buttons_with_text(RUMessages.MENU_BUTTONS_TEXT),
     )
+
+
+dp.register_request_handler(
+    go_to_menu,
+    state=[
+        States.IN_CALCULATOR,
+        States.ASKING_FOR_TIP,
+        States.CALCULATED,
+        States.MAIN_MENU,
+        States.SELECTING_TIME,
+        States.TIME_PROPOSED,
+    ],
+)
