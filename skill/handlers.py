@@ -8,8 +8,13 @@ from skill.user_manager import UserManager
 from skill.db.repos.sa_repo import SARepo
 from skill.db.sa_db_settings import sa_repo_config
 from skill.states import States
-import datetime
 from pytz import timezone
+import datetime
+import logging
+
+logging.basicConfig(
+    format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s"
+)
 
 dp = Dispatcher(storage=MemoryStorage())
 
@@ -53,31 +58,6 @@ def get_buttons_with_text(texts: list[str] | None) -> list[Button] | None:
         result.append(button)
 
     return result
-
-
-@dp.request_handler(
-    state=[
-        States.IN_CALCULATOR,
-        States.ASKING_FOR_TIP,
-        States.CALCULATED,
-        States.MAIN_MENU,
-        States.SELECTING_TIME,
-        States.TIME_PROPOSED,
-    ],  # type: ignore
-    contains=TO_MENU_REPLICS,
-)
-async def go_to_menu(alice_request: AliceRequest):
-    user_id = alice_request.session.user_id
-
-    text_with_tts = RUMessages().get_menu_welcome_message()
-
-    await dp.storage.set_state(user_id, States.MAIN_MENU)
-
-    return alice_request.response(
-        response_or_text=text_with_tts.text,
-        tts=text_with_tts.tts,
-        buttons=get_buttons_with_text(RUMessages.MENU_BUTTONS_TEXT),
-    )
 
 
 @dp.request_handler(
@@ -308,24 +288,6 @@ dp.register_request_handler(
 )
 
 
-@dp.request_handler(func=lambda areq: areq.session.new)
-async def welcome_user(alice_request: AliceRequest):
-    user_id = alice_request.session.user_id
-    user_manager = await UserManager.new_manager(
-        user_id=user_id, repo=SARepo(sa_repo_config), messages=RUMessages()
-    )
-    response = await user_manager.check_in(
-        now=datetime.datetime.now(timezone(alice_request.meta.timezone))
-    )
-    text_with_tts = response.text_with_tts
-    await dp.storage.set_state(user_id, States.MAIN_MENU)
-    return alice_request.response(
-        response_or_text=text_with_tts.text,
-        tts=text_with_tts.tts,
-        buttons=get_buttons_with_text(response.buttons_text),
-    )
-
-
 @dp.request_handler()
 async def welcome_old_user(alice_request: AliceRequest):
     user_id = alice_request.session.user_id
@@ -344,4 +306,42 @@ async def welcome_old_user(alice_request: AliceRequest):
     )
 
 
-dp.register_errors_handler(go_to_menu)
+@dp.errors_handler()
+async def error_handler(alice_request: AliceRequest, e):
+    user_id = alice_request.session.user_id
+    state = await dp.storage.get_state(user_id)
+    logging.error(str(state))
+    text_with_tts = RUMessages().get_menu_welcome_message()
+
+    await dp.storage.set_state(user_id, States.MAIN_MENU)
+
+    return alice_request.response(
+        response_or_text=text_with_tts.text,
+        tts=text_with_tts.tts,
+        buttons=get_buttons_with_text(response.buttons_text),
+    )
+
+
+@dp.request_handler(
+    state=[
+        States.IN_CALCULATOR,
+        States.ASKING_FOR_TIP,
+        States.CALCULATED,
+        States.MAIN_MENU,
+        States.SELECTING_TIME,
+        States.TIME_PROPOSED,
+    ],
+    # contains=TO_MENU_REPLICS,
+)
+async def go_to_menu(alice_request: AliceRequest):
+    user_id = alice_request.session.user_id
+
+    text_with_tts = RUMessages().get_menu_welcome_message()
+
+    await dp.storage.set_state(user_id, States.MAIN_MENU)
+
+    return alice_request.response(
+        response_or_text=text_with_tts.text,
+        tts=text_with_tts.tts,
+        buttons=get_buttons_with_text(RUMessages.MENU_BUTTONS_TEXT),
+    )
