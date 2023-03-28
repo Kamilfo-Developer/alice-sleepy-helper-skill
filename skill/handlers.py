@@ -63,12 +63,12 @@ async def upload_some_images(pathToPhoto):
     # If tokens were not provided on dp's initialisation
 
     try:
-        img_by_bytes = await dp.upload_image(open('/path/to/photo.png', 'rb'))
+        img_by_bytes = await dp.upload_image(open(pathToPhoto, 'rb'))
     except Exception:
         logging.exception('Oops! Error uploading image by bytes')
     else:
         # origUrl will be `None`
-        return img_by_bytes
+        return img_by_bytes.id
 
     # You have to close session manually
     # if you called any request outside web app
