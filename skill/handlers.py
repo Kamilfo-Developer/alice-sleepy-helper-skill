@@ -221,7 +221,7 @@ async def enter_calculator(alice_request: AliceRequest):
             "slots"
         ]["time"]["value"]
     except KeyError:
-        text_with_tts = RUMessages.get_wrong_time_message()
+        text_with_tts = RUMessages().get_wrong_time_message()
         return alice_request.response(
             response_or_text=text_with_tts.text,
             tts=text_with_tts.tts,
