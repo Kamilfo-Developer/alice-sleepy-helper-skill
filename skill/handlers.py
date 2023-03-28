@@ -45,6 +45,8 @@ NO_REPLICS = ["нет", "отказываюсь", "не хочу"]
 WANT_NIGHT_TIP = ["ночной"]
 # Asking tip abot day slip
 WANT_DAY_TIP = ["дневной"]
+# User aking help
+HELP_REPLICS = ["помощь", "помогите", "справка"]
 
 
 def get_buttons_with_text(texts: list[str] | None) -> list[Button] | None:
@@ -80,6 +82,24 @@ async def go_to_menu(alice_request: AliceRequest):
         response_or_text=text_with_tts.text,
         tts=text_with_tts.tts,
         buttons=get_buttons_with_text(RUMessages.MENU_BUTTONS_TEXT),
+    )
+
+
+@dp.request_handler(
+    state=[
+        States.IN_CALCULATOR,
+        States.ASKING_FOR_TIP,
+        States.CALCULATED,
+        States.MAIN_MENU,
+        States.SELECTING_TIME,
+        States.TIME_PROPOSED,
+    ],  # type: ignore
+    contains=HELP_REPLICS,
+)
+async def ask_help(alice_request: AliceRequest):
+    text_with_tts = RUMessages().get_help_message()
+    return alice_request.response(
+        response_or_text=text_with_tts.text, tts=text_with_tts.tts
     )
 
 
