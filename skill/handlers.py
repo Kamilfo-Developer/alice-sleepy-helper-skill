@@ -8,11 +8,8 @@ from skill.user_manager import UserManager
 from skill.db.repos.sa_repo import SARepo
 from skill.db.sa_db_settings import sa_repo_config
 from skill.states import States
-from pytz import timezone
 import datetime
-import logging
-
-logging.basicConfig(format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
+from pytz import timezone
 
 dp = Dispatcher(storage=MemoryStorage())
 
@@ -50,7 +47,7 @@ def get_buttons_with_text(texts: list[str]) -> list[Button]:
     return result
 
 
-dp.request_handler(
+@dp.request_handler(
     state=[
         States.IN_CALCULATOR,
         States.ASKING_FOR_TIP,
@@ -61,8 +58,6 @@ dp.request_handler(
     ],
     contains=TO_MENU_REPLICS,
 )
-
-
 async def go_to_menu(alice_request: AliceRequest):
     user_id = alice_request.session.user_id
 
@@ -73,6 +68,7 @@ async def go_to_menu(alice_request: AliceRequest):
     return alice_request.response(
         response_or_text=text_with_tts.text,
         tts=text_with_tts.tts,
+        application_state=States.MAIN_MENU,
         buttons=get_buttons_with_text(RUMessages.MENU_BUTTONS_TEXT),
     )
 
@@ -83,6 +79,7 @@ async def give_info(alice_request: AliceRequest):
     return alice_request.response(
         response_or_text=text_with_tts.text,
         tts=text_with_tts.tts,
+        application_state=States.MAIN_MENU,
         buttons=get_buttons_with_text(RUMessages.MENU_BUTTONS_TEXT),
     )
 
@@ -97,7 +94,9 @@ async def send_night_tip(alice_request: AliceRequest):
     await dp.storage.set_state(user_id, response.state)
     text_with_tts = response.text_with_tts
     return alice_request.response(
-        response_or_text=text_with_tts.text, tts=text_with_tts.tts
+        response_or_text=text_with_tts.text,
+        tts=text_with_tts.tts,
+        application_state=response.state,
     )
 
 
@@ -111,7 +110,9 @@ async def send_day_tip(alice_request: AliceRequest):
     await dp.storage.set_state(user_id, response.state)
     text_with_tts = response.text_with_tts
     return alice_request.response(
-        response_or_text=text_with_tts.text, tts=text_with_tts.tts
+        response_or_text=text_with_tts.text,
+        tts=text_with_tts.tts,
+        application_state=response.state,
     )
 
 
@@ -119,7 +120,9 @@ async def send_day_tip(alice_request: AliceRequest):
 async def reask_tip_topic(alice_request: AliceRequest):
     text_with_tts = RUMessages().get_wrong_topic_message("")
     return alice_request.response(
-        response_or_text=text_with_tts.text, tts=text_with_tts.tts
+        response_or_text=text_with_tts.text,
+        tts=text_with_tts.tts,
+        application_state=States.ASKING_FOR_TIP,
     )
 
 
@@ -131,6 +134,7 @@ async def send_tip(alice_request: AliceRequest):
     return alice_request.response(
         response_or_text=text_with_tts.text,
         tts=text_with_tts.tts,
+        application_state=States.ASKING_FOR_TIP,
         buttons=get_buttons_with_text(RUMessages.TIP_TOPIC_SELECTION_BUTTONS_TEXT),
     )
 
@@ -156,7 +160,9 @@ async def choose_short_duration(alice_request: AliceRequest):
     text_with_tts = response.text_with_tts
     await dp.storage.set_state(user_id, States.CALCULATED)
     return alice_request.response(
-        response_or_text=text_with_tts.text, tts=text_with_tts.tts
+        response_or_text=text_with_tts.text,
+        tts=text_with_tts.tts,
+        application_state=States.CALCULATED,
     )
 
 
@@ -183,6 +189,7 @@ async def choose_long_duration(alice_request: AliceRequest):
     return alice_request.response(
         response_or_text=text_with_tts.text,
         tts=text_with_tts.tts,
+        application_state=States.CALCULATED,
         buttons=get_buttons_with_text(RUMessages.POST_SLEEP_CALCULATION_BUTTONS_TEXT),
     )
 
@@ -203,6 +210,7 @@ async def enter_calculator(alice_request: AliceRequest):
     return alice_request.response(
         response_or_text=text_with_tts.text,
         tts=text_with_tts.tts,
+        application_state=States.IN_CALCULATOR,
         buttons=get_buttons_with_text(RUMessages.SLEEP_MODE_SELECTION_BUTTONS_TEXT),
     )
 
@@ -226,6 +234,7 @@ async def enter_calculator_with_no_time(alice_request: AliceRequest):
     return alice_request.response(
         response_or_text=text_with_tts.text,
         tts=text_with_tts.tts,
+        application_state=response.state,
         buttons=get_buttons_with_text(RUMessages.SLEEP_TIME_PROPOSAL_BUTTONS_TEXT),
     )
 
@@ -236,7 +245,9 @@ async def enter_calculator_new_time(alice_request: AliceRequest):
     text_with_tts = RUMessages().get_ask_wake_up_time_message()
     await dp.storage.set_state(user_id, States.SELECTING_TIME)
     return alice_request.response(
-        response_or_text=text_with_tts.text, tts=text_with_tts.tts
+        response_or_text=text_with_tts.text,
+        tts=text_with_tts.tts,
+        application_state=States.SELECTING_TIME,
     )
 
 
@@ -254,7 +265,9 @@ async def enter_calculator_proposed_time(alice_request: AliceRequest):
     text_with_tts = RUMessages().get_ask_sleep_mode_message()
     await dp.storage.set_state(user_id, States.IN_CALCULATOR)
     return alice_request.response(
-        response_or_text=text_with_tts.text, tts=text_with_tts.tts
+        response_or_text=text_with_tts.text,
+        tts=text_with_tts.tts,
+        application_state=States.IN_CALCULATOR,
     )
 
 
@@ -263,7 +276,10 @@ async def end_skill(alice_request: AliceRequest):
     # It must end skill
     text_with_tts = RUMessages().get_good_night_message()
     return alice_request.response(
-        response_or_text=text_with_tts.text, tts=text_with_tts.tts, end_session=True
+        response_or_text=text_with_tts.text,
+        tts=text_with_tts.tts,
+        application_state=States.CALCULATED,
+        end_session=True,
     )
 
 
@@ -273,7 +289,7 @@ dp.register_request_handler(
 
 
 @dp.request_handler()
-async def welcome_old_user(alice_request: AliceRequest):
+async def welcome_user(alice_request: AliceRequest):
     user_id = alice_request.session.user_id
     user_manager = await UserManager.new_manager(
         user_id=user_id, repo=SARepo(sa_repo_config), messages=RUMessages()
@@ -286,6 +302,7 @@ async def welcome_old_user(alice_request: AliceRequest):
     return alice_request.response(
         response_or_text=text_with_tts.text,
         tts=text_with_tts.tts,
+        application_state=States.MAIN_MENU,
         buttons=get_buttons_with_text(RUMessages.MENU_BUTTONS_TEXT),
     )
 
@@ -293,34 +310,9 @@ async def welcome_old_user(alice_request: AliceRequest):
 @dp.errors_handler()
 async def error_handler(alice_request: AliceRequest, e):
     user_id = alice_request.session.user_id
-    state = await dp.storage.get_state(user_id)
-    logging.error(str(state))
-    text_with_tts = RUMessages().get_menu_welcome_message()
-
-    await dp.storage.set_state(user_id, States.MAIN_MENU)
-
-    return alice_request.response(
-        response_or_text=text_with_tts.text,
-        tts=text_with_tts.tts,
-        buttons=get_buttons_with_text(RUMessages.MENU_BUTTONS_TEXT),
-    )
-
-
-@dp.request_handler(
-    state=[
-        States.IN_CALCULATOR,
-        States.ASKING_FOR_TIP,
-        States.CALCULATED,
-        States.MAIN_MENU,
-        States.SELECTING_TIME,
-        States.TIME_PROPOSED,
-    ],
-    # contains=TO_MENU_REPLICS,
-)
-async def go_to_menu(alice_request: AliceRequest):
-    user_id = alice_request.session.user_id
-
-    text_with_tts = RUMessages().get_menu_welcome_message()
+    # state = await dp.storage.get_state(user_id)
+    # logging.error(str(state))
+    text_with_tts = RUMessages().get_generic_error_message()
 
     await dp.storage.set_state(user_id, States.MAIN_MENU)
 
