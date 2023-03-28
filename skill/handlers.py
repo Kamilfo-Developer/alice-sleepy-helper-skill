@@ -318,7 +318,7 @@ async def error_handler(alice_request: AliceRequest, e):
     return alice_request.response(
         response_or_text=text_with_tts.text,
         tts=text_with_tts.tts,
-        buttons=get_buttons_with_text(response.buttons_text),
+        buttons=get_buttons_with_text(RUMessages().MENU_BUTTONS_TEXT),
     )
 
 
@@ -330,7 +330,7 @@ async def error_handler(alice_request: AliceRequest, e):
         States.MAIN_MENU,
         States.SELECTING_TIME,
         States.TIME_PROPOSED,
-    ],
+    ],  # type: ignore
     # contains=TO_MENU_REPLICS,
 )
 async def go_to_menu(alice_request: AliceRequest):
