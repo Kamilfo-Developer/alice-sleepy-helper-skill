@@ -15,6 +15,7 @@ from dataclasses import dataclass
 class SkillResponse:
     text_with_tts: TextWithTTS
     state: str | None
+    buttons_text: list[str] | None
 
 
 class UserManager:
@@ -36,7 +37,7 @@ class UserManager:
         repo: BaseRepo,
         messages: BaseMessages,
         create_user_if_not_found: bool = True,
-    ) -> UserManager | None:
+    ) -> UserManager:
         """Sets up UserManager with given user repo and messages.
         If user_id is not found in the DB and create_user_if_not_found
         is True, creates a new user.
@@ -62,8 +63,8 @@ class UserManager:
         """
 
         user = await repo.get_user_by_id(user_id)
-        if not user and not create_user_if_not_found:
-            return None
+        # if not user and not create_user_if_not_found:
+        #    return None
 
         if not user:
             user = User(
@@ -150,7 +151,9 @@ class UserManager:
 
         if new_user:
             return SkillResponse(
-                self.messages.get_start_message_intro(now), States.MAIN_MENU
+                self.messages.get_start_message_intro(now),
+                States.MAIN_MENU,
+                self.messages.MENU_BUTTON_TEXT,
             )
         streak = self.user._streak
 
@@ -160,6 +163,7 @@ class UserManager:
                 time=now, streak=streak, scoreboard=scoreboard
             ),
             States.MAIN_MENU,
+            self.messages.MENU_BUTTON_TEXT,
         )
 
     async def ask_tip(self, topic_name: str) -> SkillResponse:
@@ -179,6 +183,7 @@ class UserManager:
             return SkillResponse(
                 self.messages.get_wrong_topic_message(topic_name),
                 States.ASKING_FOR_TIP,
+                self.messages.TIP_TOPIC_SELECTION_BUTTON_TEXT,
             )
         tips = await self.repo.get_topic_tips(topic_id=topic._id)
         heard_tips = self.user._heard_tips
@@ -196,7 +201,9 @@ class UserManager:
 
         await self.repo.update_user(self.user)
         return SkillResponse(
-            self.messages.get_tip_message(tip), States.MAIN_MENU
+            self.messages.get_tip_message(tip),
+            States.MAIN_MENU,
+            self.messages.MENU_BUTTON_TEXT,
         )
 
     async def get_ask_sleep_time_message(self) -> SkillResponse:
@@ -211,9 +218,12 @@ class UserManager:
                     last_wake_up_time
                 ),
                 States.TIME_PROPOSED,
+                self.messages.SLEEP_TIME_PROPOSAL_BUTTON_TEXT,
             )
         return SkillResponse(
-            self.messages.get_ask_wake_up_time_message(), States.SELECTING_TIME
+            self.messages.get_ask_wake_up_time_message(),
+            States.SELECTING_TIME,
+            None,
         )
 
     async def ask_sleep_time(
@@ -278,4 +288,5 @@ class UserManager:
                 bed_time.time(), activities
             ),
             States.CALCULATED,
+            self.messages.POST_SLEEP_CALCULATION_BUTTON_TEXT,
         )

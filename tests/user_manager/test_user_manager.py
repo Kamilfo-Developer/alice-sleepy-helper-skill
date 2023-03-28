@@ -20,7 +20,71 @@ def generate_random_string_id() -> str:
 
 
 @pytest.mark.asyncio
+async def test_me():
+    repo = SARepo(sa_repo_config)
+    now = datetime.datetime.now(tz=pytz.utc)
+    tips_topic = TipsTopic(
+        id=uuid4(),
+        name=TextWithTTS("Ночной сон"),
+        topic_description=TextWithTTS("вот как"),
+        created_date=now,
+        repo=repo,
+    )
+
+    await repo.insert_tips_topic(tips_topic)
+
+    await tips_topic.add_tip(
+        short_description=TextWithTTS("святая вода"),
+        tip_content=TextWithTTS("[1] мойте руки святой водой кншн"),
+        tips_topic=tips_topic,
+        created_date=now,
+    )
+    await tips_topic.add_tip(
+        short_description=TextWithTTS("зачем"),
+        tip_content=TextWithTTS("[2] не мойте руки вообще никак вы что дурак"),
+        tips_topic=tips_topic,
+        created_date=now,
+    )
+    await tips_topic.add_tip(
+        short_description=TextWithTTS("оближи"),
+        tip_content=TextWithTTS("[3] всё что нам нужно у нас в руках"),
+        tips_topic=tips_topic,
+        created_date=now,
+    )
+
+    tips_topic = TipsTopic(
+        id=uuid4(),
+        name=TextWithTTS("Дневной сон"),
+        topic_description=TextWithTTS("вот как"),
+        created_date=now,
+        repo=repo,
+    )
+
+    await repo.insert_tips_topic(tips_topic)
+
+    await tips_topic.add_tip(
+        short_description=TextWithTTS("святая вода"),
+        tip_content=TextWithTTS("[1] мойте руки святой водой кншн"),
+        tips_topic=tips_topic,
+        created_date=now,
+    )
+    await tips_topic.add_tip(
+        short_description=TextWithTTS("зачем"),
+        tip_content=TextWithTTS("[2] не мойте руки вообще никак вы что дурак"),
+        tips_topic=tips_topic,
+        created_date=now,
+    )
+    await tips_topic.add_tip(
+        short_description=TextWithTTS("оближи"),
+        tip_content=TextWithTTS("[3] всё что нам нужно у нас в руках"),
+        tips_topic=tips_topic,
+        created_date=now,
+    )
+
+
+@pytest.mark.asyncio
 async def test_check_in():
+    assert False
     repo = SARepo(sa_repo_config)
     messages = RUMessages()
     now = datetime.datetime.now(tz=pytz.utc)
@@ -34,9 +98,7 @@ async def test_check_in():
         id=generate_random_string_id(),
         streak=0,
         last_skill_use=(now - datetime.timedelta(days=1)),
-        last_wake_up_time=datetime.time(
-            hour=4, minute=20, tzinfo=pytz.utc
-        ),
+        last_wake_up_time=datetime.time(hour=4, minute=20, tzinfo=pytz.utc),
         heard_tips=[],
         join_date=datetime.datetime(
             year=2022, month=1, day=1, tzinfo=pytz.utc
@@ -48,9 +110,7 @@ async def test_check_in():
         id=test_user_id,
         streak=4,
         last_skill_use=(now - datetime.timedelta(days=1)),
-        last_wake_up_time=datetime.time(
-            hour=4, minute=20, tzinfo=pytz.utc
-        ),
+        last_wake_up_time=datetime.time(hour=4, minute=20, tzinfo=pytz.utc),
         heard_tips=[],
         join_date=datetime.datetime(
             year=2022, month=1, day=1, tzinfo=pytz.utc
@@ -98,6 +158,7 @@ async def test_check_in():
 
 @pytest.mark.asyncio
 async def test_sleep_calc():
+    assert False
     repo = SARepo(sa_repo_config)
     messages = RUMessages()
 
@@ -114,18 +175,10 @@ async def test_sleep_calc():
     assert "как в прошлый раз" not in message1.text
 
     now = datetime.datetime(
-        year=1420,
-        month=1,
-        day=1,
-        hour=1,
-        minute=0,
-        second=0,
-        tzinfo=pytz.utc
+        year=1420, month=1, day=1, hour=1, minute=0, second=0, tzinfo=pytz.utc
     )
 
-    wake_up_time = datetime.time(
-        hour=14, minute=0, second=0, tzinfo=pytz.utc
-    )
+    wake_up_time = datetime.time(hour=14, minute=0, second=0, tzinfo=pytz.utc)
 
     message2 = await user_manager.ask_sleep_time(
         now, wake_up_time, SleepMode.LONG
@@ -148,6 +201,7 @@ async def test_sleep_calc():
 
 @pytest.mark.asyncio
 async def test_activities_proposal():
+    assert False
     repo = SARepo(sa_repo_config)
     messages = RUMessages()
 
@@ -194,9 +248,7 @@ async def test_activities_proposal():
 
     await repo.insert_activities((activity1, activity2, activity3))
 
-    wake_up_time = datetime.time(
-        hour=14, minute=0, second=0, tzinfo=pytz.utc
-    )
+    wake_up_time = datetime.time(hour=14, minute=0, second=0, tzinfo=pytz.utc)
 
     message1 = await user_manager.ask_sleep_time(
         now, wake_up_time, SleepMode.SHORT
@@ -213,7 +265,7 @@ async def test_activities_proposal():
         hour=12,
         minute=30,
         second=0,
-        tzinfo=pytz.utc
+        tzinfo=pytz.utc,
     )
 
     message2 = await user_manager.ask_sleep_time(
@@ -227,6 +279,7 @@ async def test_activities_proposal():
 
 @pytest.mark.asyncio
 async def test_tips():
+    assert False
     repo = SARepo(sa_repo_config)
     messages = RUMessages()
 
