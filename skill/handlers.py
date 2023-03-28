@@ -8,8 +8,11 @@ from skill.user_manager import UserManager
 from skill.db.repos.sa_repo import SARepo
 from skill.db.sa_db_settings import sa_repo_config
 from skill.states import States
-import datetime
 from pytz import timezone
+import datetime
+import logging
+
+logging.basicConfig(format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
 
 dp = Dispatcher(storage=MemoryStorage())
 
@@ -303,4 +306,17 @@ async def welcome_old_user(alice_request: AliceRequest):
     )
 
 
-dp.register_errors_handler(go_to_menu)
+@dp.errors_handler()
+async def error_handler(alice_request: AliceRequest, e):
+    user_id = alice_request.session.user_id
+    state = await dp.storage.get_state(user_id)
+    logging.error(str(state))
+    text_with_tts = RUMessages().get_menu_welcome_message()
+
+    await dp.storage.set_state(user_id, States.MAIN_MENU)
+
+    return alice_request.response(
+        response_or_text=text_with_tts.text,
+        tts=text_with_tts.tts,
+        buttons=get_buttons_with_text(RUMessages.MENU_BUTTONS_TEXT),
+    )
