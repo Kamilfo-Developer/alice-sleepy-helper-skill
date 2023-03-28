@@ -251,6 +251,14 @@ async def enter_calculator(alice_request: AliceRequest):
             response_or_text=text_with_tts.text,
             tts=text_with_tts.tts,
         )
+    if "hour" not in value.keys():
+        text_with_tts = RUMessages().get_wrong_time_message()
+        return alice_request.response(
+            response_or_text=text_with_tts.text,
+            tts=text_with_tts.tts,
+        )
+    if "minute" not in value.keys():
+        value["minutes"] = 0
     # save time sleep time
     await dp.storage.set_data(user_id, value)
     text_with_tts = RUMessages().get_ask_sleep_mode_message()
