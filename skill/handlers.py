@@ -22,7 +22,9 @@ ICO_ID = "1540737/a491c8169a8b2597ba37"
 # Escaping to main menu
 TO_MENU_REPLICS = ["выйди", "меню", "Меню"]
 # Asking info
-GIVE_INFO_REPLICS = ["расскажи о навыке", "что ты делаешь", "что ты умеешь"]
+GIVE_INFO_REPLICS = ["расскажи о навыке", "расскажи о себе"]
+# What can you do
+GIVE_WHAT_CAN_YOU_DO_REPLICS = ["что ты делаешь", "что ты умеешь"]
 # Asking tip
 ASK_FOR_TIP_REPLICS = [
     "посоветуй",
@@ -118,6 +120,16 @@ async def give_info(alice_request: AliceRequest):
         image_id=ICO_ID,
         title="О навыке",
         description=text_with_tts.text,
+        tts=text_with_tts.tts,
+        buttons=get_buttons_with_text(RUMessages.MENU_BUTTONS_TEXT),
+    )
+
+
+@dp.request_handler(state=States.MAIN_MENU, contains=GIVE_WHAT_CAN_YOU_DO_REPLICS)  # type: ignore
+async def give_info(alice_request: AliceRequest):
+    text_with_tts = RUMessages().get_what_can_you_do_message()
+    return alice_request.response(
+        response_or_text=text_with_tts.text,
         tts=text_with_tts.tts,
         buttons=get_buttons_with_text(RUMessages.MENU_BUTTONS_TEXT),
     )
