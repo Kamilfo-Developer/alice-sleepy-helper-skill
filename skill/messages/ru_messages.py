@@ -259,7 +259,7 @@ class RUMessages(BaseMessages):
         return TextWithTTS(text="Во сколько вы хотите завтра проснуться?")
 
     def get_ask_sleep_mode_message(self) -> TextWithTTS:
-        replicas = [
+        replicas_a = [
             TextWithTTS(
                 "Как много вы хотите спать? Выберите "
                 "один из режимов сна: короткий или длинный сон"
@@ -269,7 +269,36 @@ class RUMessages(BaseMessages):
                 "Какой режим сна вы бы предпочли, длинный или короткий?"
             ),
         ]
-        return random.choice(replicas)
+        replicas_b = [
+            TextWithTTS(
+                f"Режим {LAQUO}Короткого сна{RAQUO} подберёт вам самое позднее"
+                " время сна, при котором вы сможете чувствовать себя хорошо"
+                " после пробуждения."
+            ),
+            TextWithTTS(
+                f"В режиме {LAQUO}Короткий сон{RAQUO} вам будет подобрано"
+                " время, при котором длительность сна будет меньше, но вы всё"
+                " равно сможете выспаться."
+            ),
+            TextWithTTS(
+                f"{LAQUO}Короткий сон{RAQUO} {DASH} обеспечит вам больше"
+                " времени бодровствования, так, чтобы вы не чувствовали"
+                " недостаток сна, когда проснётесь."
+            ),
+        ]
+        replicas_с = [
+            TextWithTTS(
+                f"Режим {LAQUO}Длинного сна{RAQUO} подберёт вам самое раннее"
+                " время сна, при котором вы сможете чувствовать себя хорошо"
+                " после пробуждения."
+            ),
+            TextWithTTS(
+                f"В режиме {LAQUO}Длинный сон{RAQUO} вам будет подобрано"
+                " время, при котором длительность сна будет больше, но вы всё"
+                " равно сможете встать вовремя."
+            ),
+        ]
+        return construct_random_message(replicas_a, replicas_b, replicas_с)
 
     def get_sleep_calc_time_message(
         self, bed_time: datetime.time, activities: List[Activity]
