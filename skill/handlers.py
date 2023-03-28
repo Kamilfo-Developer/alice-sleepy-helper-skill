@@ -101,6 +101,7 @@ async def send_day_tip(alice_request: AliceRequest):
     response = await user_manager.ask_tip("Дневной сон")
     await dp.storage.set_state(user_id, response.state)
     text_with_tts = response.text_with_tts
+    if response.state == States.ASKING_FOR_TIP
     return alice_request.response(
         response_or_text=text_with_tts.text,
         tts=text_with_tts.tts,
@@ -305,7 +306,7 @@ async def welcome_old_user(alice_request: AliceRequest):
         buttons=get_buttons_with_text(response.buttons_text),
     )
 
-
+'''
 @dp.errors_handler()
 async def error_handler(alice_request: AliceRequest, e):
     user_id = alice_request.session.user_id
@@ -320,7 +321,7 @@ async def error_handler(alice_request: AliceRequest, e):
         tts=text_with_tts.tts,
         buttons=get_buttons_with_text(response.buttons_text),
     )
-
+'''
 
 @dp.request_handler(
     state=[
