@@ -68,7 +68,6 @@ async def go_to_menu(alice_request: AliceRequest):
     return alice_request.response(
         response_or_text=text_with_tts.text,
         tts=text_with_tts.tts,
-        application_state=States.MAIN_MENU,
         buttons=get_buttons_with_text(RUMessages.MENU_BUTTONS_TEXT),
     )
 
@@ -260,9 +259,7 @@ async def end_skill(alice_request: AliceRequest):
     # It must end skill
     text_with_tts = RUMessages().get_good_night_message()
     return alice_request.response(
-        response_or_text=text_with_tts.text,
-        tts=text_with_tts.tts,
-        end_session=True,
+        response_or_text=text_with_tts.text, tts=text_with_tts.tts, end_session=True
     )
 
 
