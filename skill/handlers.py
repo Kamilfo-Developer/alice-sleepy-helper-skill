@@ -319,7 +319,7 @@ async def welcome_user(alice_request: AliceRequest):
 async def error_handler(alice_request: AliceRequest, e):
     user_id = alice_request.session.user_id
     state = await dp.storage.get_state(user_id)
-    logging.error(str(state))
+    logging.error(str(state), exc_info=e)
     text_with_tts = RUMessages().get_generic_error_message()
 
     await dp.storage.set_state(user_id, States.MAIN_MENU)
