@@ -329,3 +329,6 @@ class RUMessages(BaseMessages):
             f" {LAQUO}Меню{RAQUO}"
         )
         # TODO: Rephrase replica and add variety
+
+    def get_generic_error_message(self) -> TextWithTTS:
+        return TextWithTTS("Что-то пошло не так, вы были возвращены в меню.")
