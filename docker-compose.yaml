@@ -2,6 +2,8 @@ version: "3.8"
 services:
   skill:
     image: sleepy-helper-skill
+    volumes:
+      - ./content/:/app/content/
     restart: always
     env_file:
       - .env
@@ -13,7 +15,7 @@ services:
       - migration
     networks:
       - skill_network
-    ports: 
+    ports:
       - '5555:5555'
 
   migration:
@@ -21,7 +23,7 @@ services:
     image: sleepy-helper-skill
     env_file:
       - .env
-    depends_on: 
+    depends_on:
       - database
     command: bash -c "cd /app/skill/db/migrations && alembic upgrade head && cd /app"
     networks:
@@ -45,4 +47,5 @@ networks:
 
 volumes:
   skill-database-data:
+
 

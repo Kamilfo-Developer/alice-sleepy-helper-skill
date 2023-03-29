@@ -31,7 +31,7 @@ match DB_PROVIDER:
 
         POSTGRES_HOST = os.getenv("TEST_POSTGRES_HOST") or "localhost"
 
-        POSTGRES_DB_PORT = os.getenv("TEST_POSTGRES_DB_PORT") or "5432"
+        POSTGRES_DB_PORT = os.getenv("TEST_POSTGRES_PORT") or "5432"
 
         POSTGRES_PASSWORD = os.getenv("TEST_POSTGRES_PASSWORD") or "postgres"
 
