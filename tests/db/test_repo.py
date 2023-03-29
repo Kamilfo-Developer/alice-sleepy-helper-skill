@@ -267,11 +267,11 @@ async def test_tips(repo: BaseRepo, insert_values):
     tip = Tip(
         uuid4(),
         short_description=TextWithTTS(
-            "Ну тупо какой-то дневной совет, а почему бы и нет",
+            "Ну тупо очередной какой-то дневной совет, а почему бы и нет",
             "Ну т+упо как+ой-то дневн+ой сов+ет, а почем+у бы и нет",
         ),
         tip_content=TextWithTTS(
-            "Ну тупо какой-то дневной совет, а почему бы и нет",
+            "Ну тупо очередной какой-то дневной совет, а почему бы и нет",
             "Ну т+упо как+ой-то дневн+ой сов+ет, а почем+у бы и нет",
         ),
         tips_topic=(await repo.get_tips_topics(1))[0],
@@ -483,3 +483,43 @@ async def test_users_stats(repo: BaseRepo, insert_values):
     assert await repo.count_users_with_streak(100, condition=">") == 0
 
     assert await repo.count_users_with_streak(100, condition="==") == 1
+
+
+@pytest.mark.parametrize("repo", repos_to_test)
+@pytest.mark.asyncio
+async def test_deleting_all_users(repo: BaseRepo, insert_values):
+    await repo.delete_all_users()
+
+    assert await repo.get_users() == []
+
+    await repo.delete_all_tips_topics()
+
+
+@pytest.mark.parametrize("repo", repos_to_test)
+@pytest.mark.asyncio
+async def test_deleting_all_activities(repo: BaseRepo, insert_values):
+    await repo.delete_all_activities()
+
+    assert await repo.get_activities() == []
+
+
+@pytest.mark.parametrize("repo", repos_to_test)
+@pytest.mark.asyncio
+async def test_deleting_all_tips_topics(repo: BaseRepo, insert_values):
+    await repo.delete_all_tips_topics()
+
+    assert await repo.get_tips_topics() == []
+
+    assert await repo.get_tips() == []
+
+
+@pytest.mark.parametrize("repo", repos_to_test)
+@pytest.mark.asyncio
+async def test_deleting_all_tips(repo: BaseRepo, insert_values):
+    await repo.delete_all_tips_topics()
+
+    topics_before_deleting = await repo.get_tips_topics()
+
+    assert await repo.get_tips() == []
+
+    assert await repo.get_tips_topics() == topics_before_deleting
