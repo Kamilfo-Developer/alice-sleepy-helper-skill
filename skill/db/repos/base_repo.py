@@ -65,6 +65,26 @@ class BaseRepo(abc.ABC):
         pass
 
     @abc.abstractmethod
+    async def delete_all_users(self) -> None:
+        """Deletes ALL users entities from the db"""
+        pass
+
+    @abc.abstractmethod
+    async def delete_all_activities(self) -> None:
+        """Deletes ALL activities entities from the db"""
+        pass
+
+    @abc.abstractmethod
+    async def delete_all_tips_topics(self) -> None:
+        """Deletes ALL tips topics entities from the db"""
+        pass
+
+    @abc.abstractmethod
+    async def delete_all_tips(self) -> None:
+        """Deletes ALL tips entities from the db"""
+        pass
+
+    @abc.abstractmethod
     async def delete_user(self, user: User) -> User:
         """Deletes the passed user entity from the db
 

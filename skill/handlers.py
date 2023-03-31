@@ -18,11 +18,15 @@ logging.basicConfig(
 
 dp = Dispatcher(storage=MemoryStorage())
 
+ICO_ID = "1540737/a491c8169a8b2597ba37"
+
 # Key words for:
 # Escaping to main menu
 TO_MENU_REPLICS = ["выйди", "меню", "Меню"]
 # Asking info
-GIVE_INFO_REPLICS = ["расскажи о навыке", "что ты делаешь", "что ты умеешь"]
+GIVE_INFO_REPLICS = ["расскажи о навыке", "расскажи о себе"]
+# What can you do
+GIVE_WHAT_CAN_YOU_DO_REPLICS = ["что ты делаешь", "что ты умеешь"]
 # Asking tip
 ASK_FOR_TIP_REPLICS = [
     "посоветуй",
@@ -51,10 +55,12 @@ YES_REPLICS = ["да", "конечно", "естественно", "хочу"]
 NO_REPLICS = ["нет", "отказываюсь", "не хочу"]
 # Asking tip about night sleep
 WANT_NIGHT_TIP = ["ночной"]
-# Asking tip abot day slip
+# Asking tip abot day sleep
 WANT_DAY_TIP = ["дневной"]
 # User aking help
 HELP_REPLICS = ["помощь", "помогите", "справка"]
+# User wants to stop skill
+QUIT_SKILL_REPLICS = ["выйди", "выход", "закрой навык"]
 
 
 def get_buttons_with_text(texts: list[str] | None) -> list[Button] | None:
@@ -68,15 +74,25 @@ def get_buttons_with_text(texts: list[str] | None) -> list[Button] | None:
     return result
 
 
+def contains_intent(req: AliceRequest, intent_name: str) -> bool:
+    return intent_name in req.request._raw_kwargs["nlu"].get("intents")
+
+
 @dp.request_handler(
-    state=[
-        States.IN_CALCULATOR,
-        States.ASKING_FOR_TIP,
-        States.CALCULATED,
-        States.MAIN_MENU,
-        States.SELECTING_TIME,
-        States.TIME_PROPOSED,
-    ],  # type: ignore
+    state=States.all(),  # type: ignore
+    contains=QUIT_SKILL_REPLICS,
+)
+async def quit_skill(alice_request: AliceRequest):
+    text_with_tts = RUMessages().get_quit_message()
+    return alice_request.response(
+        response_or_text=text_with_tts.text,
+        tts=text_with_tts.tts,
+        end_session=True,
+    )
+
+
+@dp.request_handler(
+    state=States.all(),  # type: ignore
     contains=TO_MENU_REPLICS,
 )
 async def go_to_menu(alice_request: AliceRequest):
@@ -94,15 +110,8 @@ async def go_to_menu(alice_request: AliceRequest):
 
 
 @dp.request_handler(
-    state=[
-        States.IN_CALCULATOR,
-        States.ASKING_FOR_TIP,
-        States.CALCULATED,
-        States.MAIN_MENU,
-        States.SELECTING_TIME,
-        States.TIME_PROPOSED,
-    ],  # type: ignore
-    contains=HELP_REPLICS,
+    state=States.all(),  # type: ignore
+    func=lambda req: contains_intent(req, "YANDEX.HELP"),
 )
 async def ask_help(alice_request: AliceRequest):
     text_with_tts = RUMessages().get_help_message()
@@ -114,6 +123,19 @@ async def ask_help(alice_request: AliceRequest):
 @dp.request_handler(state=States.MAIN_MENU, contains=GIVE_INFO_REPLICS)  # type: ignore
 async def give_info(alice_request: AliceRequest):
     text_with_tts = RUMessages().get_info_message()
+    return alice_request.response_big_image(
+        text=text_with_tts.text,
+        image_id=ICO_ID,
+        title="О навыке",
+        description=text_with_tts.text,
+        tts=text_with_tts.tts,
+        buttons=get_buttons_with_text(RUMessages.MENU_BUTTONS_TEXT),
+    )
+
+
+@dp.request_handler(state=States.MAIN_MENU, contains=GIVE_WHAT_CAN_YOU_DO_REPLICS)  # type: ignore
+async def give_info(alice_request: AliceRequest):
+    text_with_tts = RUMessages().get_what_can_you_do_message()
     return alice_request.response(
         response_or_text=text_with_tts.text,
         tts=text_with_tts.tts,
@@ -129,7 +151,7 @@ async def send_night_tip(alice_request: AliceRequest):
     user_manager = await UserManager.new_manager(
         user_id=user_id, repo=SARepo(sa_repo_config), messages=RUMessages()
     )
-    response = await user_manager.ask_tip("Ночной сон")
+    response = await user_manager.ask_tip("ночной")
     await dp.storage.set_state(user_id, response.state)
     text_with_tts = response.text_with_tts
     return alice_request.response(
@@ -145,7 +167,7 @@ async def send_day_tip(alice_request: AliceRequest):
     user_manager = await UserManager.new_manager(
         user_id=user_id, repo=SARepo(sa_repo_config), messages=RUMessages()
     )
-    response = await user_manager.ask_tip("Дневной сон")
+    response = await user_manager.ask_tip("дневной")
     await dp.storage.set_state(user_id, response.state)
     text_with_tts = response.text_with_tts
     return alice_request.response(
@@ -187,13 +209,14 @@ async def choose_short_duration(alice_request: AliceRequest):
     # time when user wants to get up, saved from previous dialogues
     time = await dp.storage.get_data(user_id)
     user_timezone = timezone(alice_request.meta.timezone)
-
+    hour = time["hour"]
+    minute = time.get("minute")
+    if minute is None:
+        minute = 0
     wake_up_time = (
         datetime.datetime.now(user_timezone)
         .time()
-        .replace(
-            hour=time["hour"], minute=time["minute"], tzinfo=user_timezone
-        )
+        .replace(hour=hour, minute=minute, tzinfo=user_timezone)
     )
     user_manager = await UserManager.new_manager(
         user_id=user_id, repo=SARepo(sa_repo_config), messages=RUMessages()
@@ -220,12 +243,14 @@ async def choose_long_duration(alice_request: AliceRequest):
     # time when user wants to get up, saved from previous dialogues
     time = await dp.storage.get_data(user_id)
     user_timezone = timezone(alice_request.meta.timezone)
+    hour = time["hour"]
+    minute = time.get("minute")
+    if minute is None:
+        minute = 0
     wake_up_time = (
         datetime.datetime.now(user_timezone)
         .time()
-        .replace(
-            hour=time["hour"], minute=time["minute"], tzinfo=user_timezone
-        )
+        .replace(hour=hour, minute=minute, tzinfo=user_timezone)
     )
     user_manager = await UserManager.new_manager(
         user_id=user_id, repo=SARepo(sa_repo_config), messages=RUMessages()
@@ -260,6 +285,14 @@ async def enter_calculator(alice_request: AliceRequest):
             response_or_text=text_with_tts.text,
             tts=text_with_tts.tts,
         )
+    if "hour" not in value.keys():
+        text_with_tts = RUMessages().get_wrong_time_message()
+        return alice_request.response(
+            response_or_text=text_with_tts.text,
+            tts=text_with_tts.tts,
+        )
+    if "minute" not in value.keys():
+        value["minutes"] = 0
     # save time sleep time
     await dp.storage.set_data(user_id, value)
     text_with_tts = RUMessages().get_ask_sleep_mode_message()
@@ -298,7 +331,10 @@ async def enter_calculator_with_no_time(alice_request: AliceRequest):
     )
 
 
-@dp.request_handler(state=States.TIME_PROPOSED, contains=NO_REPLICS)  # type: ignore
+@dp.request_handler(
+    state=States.TIME_PROPOSED,
+    func=lambda req: contains_intent(req, "YANDEX.REJECT"),
+)  # type: ignore
 async def enter_calculator_new_time(alice_request: AliceRequest):
     user_id = alice_request.session.user_id
     text_with_tts = RUMessages().get_ask_wake_up_time_message()
@@ -308,7 +344,10 @@ async def enter_calculator_new_time(alice_request: AliceRequest):
     )
 
 
-@dp.request_handler(state=States.TIME_PROPOSED, contains=YES_REPLICS)  # type: ignore
+@dp.request_handler(
+    state=States.TIME_PROPOSED,
+    func=lambda req: contains_intent(req, "YANDEX.CONFIRM"),
+)  # type: ignore
 async def enter_calculator_proposed_time(alice_request: AliceRequest):
     user_id = alice_request.session.user_id
     user_manager = await UserManager.new_manager(
@@ -330,20 +369,25 @@ async def enter_calculator_proposed_time(alice_request: AliceRequest):
     )
 
 
-@dp.request_handler(state=States.CALCULATED, contains=NO_REPLICS)  # type: ignore
+@dp.request_handler(
+    state=States.CALCULATED,
+    func=lambda req: contains_intent(req, "YANDEX.REJECT"),
+)  # type: ignore
 async def end_skill(alice_request: AliceRequest):
+    user_id = alice_request.session.user_id
+    await dp.storage.set_state(user_id, States.MAIN_MENU)
     text_with_tts = RUMessages().get_good_night_message()
     return alice_request.response(
         response_or_text=text_with_tts.text,
         tts=text_with_tts.tts,
-        end_session=True,
+        buttons=get_buttons_with_text(RUMessages().MENU_BUTTONS_TEXT),
     )
 
 
 dp.register_request_handler(
     send_night_tip,
     state=States.CALCULATED,  # type: ignore
-    contains=YES_REPLICS,
+    func=lambda req: contains_intent(req, "YANDEX.CONFIRM"),
 )
 
 
@@ -382,14 +426,7 @@ async def error_handler(alice_request: AliceRequest, e):
 
 
 @dp.request_handler(
-    state=[
-        States.IN_CALCULATOR,
-        States.ASKING_FOR_TIP,
-        States.CALCULATED,
-        States.MAIN_MENU,
-        States.SELECTING_TIME,
-        States.TIME_PROPOSED,
-    ],  # type: ignore
+    state=States.all(),  # type: ignore
 )
 async def universal_handler(alice_request: AliceRequest):
     user_id = alice_request.session.user_id

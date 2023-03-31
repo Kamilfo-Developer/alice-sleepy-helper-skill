@@ -2,6 +2,7 @@ from __future__ import annotations
 import datetime
 import random
 import pytz
+import logging
 from skill.entities import User
 from skill.exceptions import InvalidInputError
 from skill.db.repos.base_repo import BaseRepo
@@ -255,6 +256,7 @@ class UserManager:
         Returns:
             TextWithTTS: a response message in a form of TextWithTTS.
         """
+        logging.debug(wake_up_time)
         if remember_time:
             self.user.last_wake_up_time = wake_up_time
             await self.repo.update_user(self.user)

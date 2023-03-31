@@ -1,5 +1,5 @@
 from typing import Callable, Iterable, Literal
-from sqlalchemy import select, func
+from sqlalchemy import delete, select, func
 from skill.db.models.sa_models import (
     ActivityModel,
     TipModel,
@@ -131,6 +131,42 @@ class SARepo(BaseRepo):
                     *[self.get_tip_by_id(model.id) for model in models]
                 )
             ]
+
+    async def delete_all_users(self) -> None:
+        """Deletes ALL users entities from the db"""
+        async with self.__config.connection_provider() as session:
+            q = delete(UserModel)
+
+            await session.execute(q)
+
+            await session.commit()
+
+    async def delete_all_activities(self) -> None:
+        """Deletes ALL activities entities from the db"""
+        async with self.__config.connection_provider() as session:
+            q = delete(ActivityModel)
+
+            await session.execute(q)
+
+            await session.commit()
+
+    async def delete_all_tips_topics(self) -> None:
+        """Deletes ALL tips AND ALL related tips from the db"""
+        async with self.__config.connection_provider() as session:
+            q = delete(TipsTopicModel)
+
+            await session.execute(q)
+
+            await session.commit()
+
+    async def delete_all_tips(self) -> None:
+        """Deletes ALL tips entities from the db"""
+        async with self.__config.connection_provider() as session:
+            q = delete(TipModel)
+
+            await session.execute(q)
+
+            await session.commit()
 
     async def delete_user(self, user: User) -> User:
         """Deletes the passed user entity from the db
