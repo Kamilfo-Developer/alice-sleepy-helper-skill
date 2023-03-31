@@ -12,7 +12,9 @@ from pytz import timezone
 import datetime
 import logging
 
-logging.basicConfig(format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
+logging.basicConfig(
+    format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s"
+)
 
 dp = Dispatcher(storage=MemoryStorage())
 
@@ -47,7 +49,7 @@ YES_REPLICS = ["да", "конечно", "естественно", "хочу"]
 NO_REPLICS = ["нет", "отказываюсь", "не хочу"]
 # Asking tip about night sleep
 WANT_NIGHT_TIP = ["ночной"]
-# Asking tip abot day slip
+# Asking tip abot day sleep
 WANT_DAY_TIP = ["дневной"]
 # User aking help
 HELP_REPLICS = ["помощь", "помогите", "справка"]
@@ -143,7 +145,7 @@ async def send_night_tip(alice_request: AliceRequest):
     user_manager = await UserManager.new_manager(
         user_id=user_id, repo=SARepo(sa_repo_config), messages=RUMessages()
     )
-    response = await user_manager.ask_tip("Ночной сон")
+    response = await user_manager.ask_tip("ночной")
     await dp.storage.set_state(user_id, response.state)
     text_with_tts = response.text_with_tts
     return alice_request.response(
@@ -159,7 +161,7 @@ async def send_day_tip(alice_request: AliceRequest):
     user_manager = await UserManager.new_manager(
         user_id=user_id, repo=SARepo(sa_repo_config), messages=RUMessages()
     )
-    response = await user_manager.ask_tip("Дневной сон")
+    response = await user_manager.ask_tip("Дневной")
     await dp.storage.set_state(user_id, response.state)
     text_with_tts = response.text_with_tts
     return alice_request.response(
@@ -187,7 +189,9 @@ async def send_tip(alice_request: AliceRequest):
     return alice_request.response(
         response_or_text=text_with_tts.text,
         tts=text_with_tts.tts,
-        buttons=get_buttons_with_text(RUMessages.TIP_TOPIC_SELECTION_BUTTONS_TEXT),
+        buttons=get_buttons_with_text(
+            RUMessages.TIP_TOPIC_SELECTION_BUTTONS_TEXT
+        ),
     )
 
 
@@ -266,9 +270,9 @@ async def enter_calculator(alice_request: AliceRequest):
         response = RUMessages().get_ask_wake_up_time_message().text
         return response
     try:
-        value = alice_request.request._raw_kwargs["nlu"]["intents"]["sleep_calc"][
-            "slots"
-        ]["time"]["value"]
+        value = alice_request.request._raw_kwargs["nlu"]["intents"][
+            "sleep_calc"
+        ]["slots"]["time"]["value"]
     except KeyError:
         text_with_tts = RUMessages().get_wrong_time_message()
         return alice_request.response(
@@ -290,7 +294,9 @@ async def enter_calculator(alice_request: AliceRequest):
     return alice_request.response(
         response_or_text=text_with_tts.text,
         tts=text_with_tts.tts,
-        buttons=get_buttons_with_text(RUMessages.SLEEP_MODE_SELECTION_BUTTONS_TEXT),
+        buttons=get_buttons_with_text(
+            RUMessages.SLEEP_MODE_SELECTION_BUTTONS_TEXT
+        ),
     )
 
 
@@ -351,7 +357,9 @@ async def enter_calculator_proposed_time(alice_request: AliceRequest):
     return alice_request.response(
         response_or_text=text_with_tts.text,
         tts=text_with_tts.tts,
-        buttons=get_buttons_with_text(RUMessages.SLEEP_MODE_SELECTION_BUTTONS_TEXT),
+        buttons=get_buttons_with_text(
+            RUMessages.SLEEP_MODE_SELECTION_BUTTONS_TEXT
+        ),
     )
 
 
