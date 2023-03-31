@@ -74,20 +74,32 @@ class SleepCalculator:
 
         if origin_time is None:
             origin_time = datetime.datetime.now(wake_up_time.tzinfo)
+            # Adds time to prepare for sleep
+            origin_time += datetime.timedelta(minutes=20) 
 
         if wake_up_time <= origin_time:
             raise InvalidInputError(
                 "Wake up time is earlier than current time"
             )
 
-        step = datetime.timedelta(hours=1, minutes=30)
-
         if mode == SleepMode.SHORT:
-            return wake_up_time - step
-
-        if mode == SleepMode.LONG:
+            step = datetime.timedelta(minutes=15)
             delta = wake_up_time - origin_time
             delta_steps = delta // step
-            return wake_up_time - ((delta_steps) * step)
+            sleep_time = delta_steps * step
+            # Sets the maximum possible sleep time to be 4:30
+            max_time = datetime.timedelta(hours=4, minutes=30)
+            sleep_time = min(sleep_time, max_time)
+            return wake_up_time - sleep_time
+
+        if mode == SleepMode.LONG:
+            step = datetime.timedelta(hours=1, minutes=30)
+            delta = wake_up_time - origin_time
+            delta_steps = delta // step
+            sleep_time = delta_steps * step
+            # Sets the maximum possible sleep time to be 9:00
+            max_time = datetime.timedelta(hours=9, minutes=0)
+            sleep_time = min(sleep_time, max_time)
+            return wake_up_time - sleep_time
 
         raise InvalidInputError(f"Invalid sleep mode given: {mode}")
