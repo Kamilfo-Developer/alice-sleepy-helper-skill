@@ -12,7 +12,9 @@ from pytz import timezone
 import datetime
 import logging
 
-logging.basicConfig(format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
+logging.basicConfig(
+    format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s"
+)
 
 dp = Dispatcher(storage=MemoryStorage())
 
@@ -33,10 +35,16 @@ ASK_FOR_TIP_REPLICS = [
 MAIN_FUNCTIONALITY_ENTER = ["я хочу спать", "рассчитай сон"]
 # Using main functionality (sleep time calculation) (skip asking the time)
 MAIN_FUNCTIONALITY_ENTER_FAST = ["Во сколько", "Когда", "Через сколько"]
+# Choosing very short sleep mode
+VERY_SHORT_SLEEP_KEYWORDS = [
+    RUMessages.SLEEP_MODES_NOMINATIVE[SleepMode.VERY_SHORT]
+]
 # Choosing short sleep mode
-SHORT_SLEEP_KEYWORDS = ["маленький", "короткий", "недолгий", "небольшой"]
+SHORT_SLEEP_KEYWORDS = [RUMessages.SLEEP_MODES_NOMINATIVE[SleepMode.SHORT]]
+# Choosing medium sleep mode
+MEDIUM_SLEEP_KEYWORDS = [RUMessages.SLEEP_MODES_NOMINATIVE[SleepMode.MEDIUM]]
 # Choosing long sleep mode
-LONG_SLEEP_KEYWORDS = ["большой", "длинный", "долгий"]
+LONG_SLEEP_KEYWORDS = [RUMessages.SLEEP_MODES_NOMINATIVE[SleepMode.LONG]]
 # Yes answer
 YES_REPLICS = ["да", "конечно", "естественно", "хочу"]
 # No answer
@@ -165,7 +173,9 @@ async def send_tip(alice_request: AliceRequest):
     return alice_request.response(
         response_or_text=text_with_tts.text,
         tts=text_with_tts.tts,
-        buttons=get_buttons_with_text(RUMessages.TIP_TOPIC_SELECTION_BUTTONS_TEXT),
+        buttons=get_buttons_with_text(
+            RUMessages.TIP_TOPIC_SELECTION_BUTTONS_TEXT
+        ),
     )
 
 
@@ -181,7 +191,9 @@ async def choose_short_duration(alice_request: AliceRequest):
     wake_up_time = (
         datetime.datetime.now(user_timezone)
         .time()
-        .replace(hour=time["hour"], minute=time["minute"], tzinfo=user_timezone)
+        .replace(
+            hour=time["hour"], minute=time["minute"], tzinfo=user_timezone
+        )
     )
     user_manager = await UserManager.new_manager(
         user_id=user_id, repo=SARepo(sa_repo_config), messages=RUMessages()
@@ -211,7 +223,9 @@ async def choose_long_duration(alice_request: AliceRequest):
     wake_up_time = (
         datetime.datetime.now(user_timezone)
         .time()
-        .replace(hour=time["hour"], minute=time["minute"], tzinfo=user_timezone)
+        .replace(
+            hour=time["hour"], minute=time["minute"], tzinfo=user_timezone
+        )
     )
     user_manager = await UserManager.new_manager(
         user_id=user_id, repo=SARepo(sa_repo_config), messages=RUMessages()
@@ -237,9 +251,9 @@ async def enter_calculator(alice_request: AliceRequest):
         response = RUMessages().get_ask_wake_up_time_message().text
         return response
     try:
-        value = alice_request.request._raw_kwargs["nlu"]["intents"]["sleep_calc"][
-            "slots"
-        ]["time"]["value"]
+        value = alice_request.request._raw_kwargs["nlu"]["intents"][
+            "sleep_calc"
+        ]["slots"]["time"]["value"]
     except KeyError:
         text_with_tts = RUMessages().get_wrong_time_message()
         return alice_request.response(
@@ -253,7 +267,9 @@ async def enter_calculator(alice_request: AliceRequest):
     return alice_request.response(
         response_or_text=text_with_tts.text,
         tts=text_with_tts.tts,
-        buttons=get_buttons_with_text(RUMessages.SLEEP_MODE_SELECTION_BUTTONS_TEXT),
+        buttons=get_buttons_with_text(
+            RUMessages.SLEEP_MODE_SELECTION_BUTTONS_TEXT
+        ),
     )
 
 
@@ -308,7 +324,9 @@ async def enter_calculator_proposed_time(alice_request: AliceRequest):
     return alice_request.response(
         response_or_text=text_with_tts.text,
         tts=text_with_tts.tts,
-        buttons=get_buttons_with_text(RUMessages.SLEEP_MODE_SELECTION_BUTTONS_TEXT),
+        buttons=get_buttons_with_text(
+            RUMessages.SLEEP_MODE_SELECTION_BUTTONS_TEXT
+        ),
     )
 
 

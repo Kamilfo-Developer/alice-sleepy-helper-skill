@@ -6,6 +6,7 @@ from skill.utils import TextWithTTS, Daytime, gentle_capitalize
 from skill.utils import construct_random_message
 from skill.messages.unicode_literals import DASH, LAQUO, RAQUO
 from skill.messages.base_messages import BaseMessages
+from skill.sleep_calculator import SleepMode, SleepCalculatorResult
 
 if TYPE_CHECKING:
     from skill.entities import Tip, Activity
@@ -16,12 +17,25 @@ class RUMessages(BaseMessages):
         "Дай совет",
         "Рассчитай сон",
         "Расскажи о навыке",
-        "Помощь"
+        "Помощь",
     ]
     TIP_TOPIC_SELECTION_BUTTONS_TEXT = ["Дневной сон", "Ночной сон"]
     SLEEP_TIME_PROPOSAL_BUTTONS_TEXT = ["Да", "Нет"]
     SLEEP_MODE_SELECTION_BUTTONS_TEXT = ["Короткий", "Длинный"]
     POST_SLEEP_CALCULATION_BUTTONS_TEXT = ["Да", "Нет"]
+
+    SLEEP_MODES_NOMINATIVE = {
+        SleepMode.VERY_SHORT: "Лёгкий",
+        SleepMode.SHORT: "Короткий",
+        SleepMode.MEDIUM: "Стандартный",
+        SleepMode.LONG: "Длинный",
+    }
+    SLEEP_MODES_INSTRUMENTAL = {
+        SleepMode.VERY_SHORT: "Лёгким",
+        SleepMode.SHORT: "Коротким",
+        SleepMode.MEDIUM: "Стандартным",
+        SleepMode.LONG: "Длинным",
+    }
 
     def __init__(self):
         pass
@@ -271,13 +285,34 @@ class RUMessages(BaseMessages):
         return random.choice(replicas)
 
     def get_sleep_calc_time_message(
-        self, bed_time: datetime.time, activities: List[Activity]
+        self,
+        sleep_calc_result: SleepCalculatorResult,
+        activities: List[Activity],
     ) -> TextWithTTS:
 
-        message = TextWithTTS(
-            "Хорошо, рекомендую вам лечь в "
-            f"{bed_time.isoformat(timespec='minutes')}. "
-        )
+        if sleep_calc_result.changed_mode:
+            selected_mode = sleep_calc_result.selected_mode
+            changed_mode = sleep_calc_result.changed_mode
+            bed_time = sleep_calc_result.bed_time
+            message = TextWithTTS(
+                "К сожалению, за этот промежуток времени вы не успеваете "
+                "поспать "
+                f"{self.SLEEP_MODES_INSTRUMENTAL[selected_mode].lower()} "
+                "сном. Вместо этого, предлагаю вам попробовать "
+                f"{self.SLEEP_MODES_NOMINATIVE[changed_mode].lower()} "
+                "сон и лечь в "
+                f"{bed_time.hour:02d}:{bed_time.minute:02d}. "
+                f"Вы проспите {sleep_calc_result.sleep_time.seconds // 60} "
+                "минут. "
+            )
+        else:
+            bed_time = sleep_calc_result.bed_time
+            message = TextWithTTS(
+                "Хорошо, рекомендую вам лечь в "
+                f"{bed_time.hour:02d}:{bed_time.minute:02d}. "
+                f"Вы проспите {sleep_calc_result.sleep_time.seconds // 60} "
+                "минут. "
+            )
         if activities:
             message += TextWithTTS(
                 "За этот вечер вы можете успеть, например, "
@@ -343,7 +378,7 @@ class RUMessages(BaseMessages):
             "Пожалуйста, укажите корректное время, или вернитесь в главное "
             f"меню, сказав {LAQUO}Меню{RAQUO}"
         )
-    
+
     def get_help_message(self) -> TextWithTTS:
         return TextWithTTS(
             f"Cкажите {LAQUO}Меню{RAQUO}, чтобы перейти в главное меню\n"

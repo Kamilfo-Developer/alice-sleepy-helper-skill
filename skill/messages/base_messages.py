@@ -2,6 +2,7 @@ import abc
 import datetime
 from skill.utils import TextWithTTS
 from typing import Any, List
+from skill.sleep_calculator import SleepCalculatorResult
 
 
 class BaseMessages(abc.ABC):
@@ -56,7 +57,7 @@ class BaseMessages(abc.ABC):
 
     @abc.abstractmethod
     def get_sleep_calc_time_message(
-        self, bed_time: datetime.time, activities: List[Any]
+        self, sleep_calc_result: SleepCalculatorResult, activities: List[Any]
     ) -> TextWithTTS:
         pass
 

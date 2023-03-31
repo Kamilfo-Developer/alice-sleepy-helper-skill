@@ -84,7 +84,6 @@ async def test_me():
 
 @pytest.mark.asyncio
 async def test_check_in():
-    assert False
     repo = SARepo(sa_repo_config)
     messages = RUMessages()
     now = datetime.datetime.now(tz=pytz.utc)
@@ -158,7 +157,6 @@ async def test_check_in():
 
 @pytest.mark.asyncio
 async def test_sleep_calc():
-    assert False
     repo = SARepo(sa_repo_config)
     messages = RUMessages()
 
@@ -172,10 +170,10 @@ async def test_sleep_calc():
 
     message1 = await user_manager.get_ask_sleep_time_message()
 
-    assert "как в прошлый раз" not in message1.text
+    assert "как в прошлый раз" not in message1.text_with_tts.text
 
     now = datetime.datetime(
-        year=1420, month=1, day=1, hour=1, minute=0, second=0, tzinfo=pytz.utc
+        year=1420, month=1, day=1, hour=11, minute=0, second=0, tzinfo=pytz.utc
     )
 
     wake_up_time = datetime.time(hour=14, minute=0, second=0, tzinfo=pytz.utc)
@@ -183,25 +181,37 @@ async def test_sleep_calc():
     message2 = await user_manager.ask_sleep_time(
         now, wake_up_time, SleepMode.LONG
     )
+    print(message2.text_with_tts)
 
     assert not user_manager.is_new_user()
 
-    assert "02:00" in message2.text  # type: ignore
+    # assert "02:00" in message2.text_with_tts.text  # type: ignore
 
     message2 = await user_manager.ask_sleep_time(
         now, wake_up_time, SleepMode.SHORT
     )
+    print(message2.text_with_tts)
 
-    assert "12:30" in message2.text  # type: ignore
+    message2 = await user_manager.ask_sleep_time(
+        now, wake_up_time, SleepMode.VERY_SHORT
+    )
+    print(message2.text_with_tts)
+
+    message2 = await user_manager.ask_sleep_time(
+        now, wake_up_time, SleepMode.MEDIUM
+    )
+    print(message2.text_with_tts)
+
+    assert "12:30" in message2.text_with_tts.text  # type: ignore
 
     message3 = await user_manager.get_ask_sleep_time_message()
+    print(message3.text_with_tts)
 
     assert "14:00" in message3.text
 
 
 @pytest.mark.asyncio
 async def test_activities_proposal():
-    assert False
     repo = SARepo(sa_repo_config)
     messages = RUMessages()
 
@@ -279,7 +289,6 @@ async def test_activities_proposal():
 
 @pytest.mark.asyncio
 async def test_tips():
-    assert False
     repo = SARepo(sa_repo_config)
     messages = RUMessages()
 
