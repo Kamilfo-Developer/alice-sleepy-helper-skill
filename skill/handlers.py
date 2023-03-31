@@ -161,7 +161,7 @@ async def send_day_tip(alice_request: AliceRequest):
     user_manager = await UserManager.new_manager(
         user_id=user_id, repo=SARepo(sa_repo_config), messages=RUMessages()
     )
-    response = await user_manager.ask_tip("Дневной")
+    response = await user_manager.ask_tip("дневной")
     await dp.storage.set_state(user_id, response.state)
     text_with_tts = response.text_with_tts
     return alice_request.response(
