@@ -8,6 +8,8 @@ from skill.entities import Activity
 class SleepMode(enum.Enum):
     LONG = enum.auto()
     SHORT = enum.auto()
+    VERY_LONG = enum.auto()
+    VERY_SHORT = enum.auto()
 
 
 class SleepCalculator:
@@ -66,7 +68,7 @@ class SleepCalculator:
             result with the timezone of wake_up_time.
             Defaults to None
 
-            mode (SleepMode.SHORT | Sleepmode.LONG): user's desired sleep mode
+            mode (SleepMode.SHORT | Sleepmode.LONG | Sleepmode.VERY_SHORT | Sleepmode.VERY_LONG): user's desired sleep mode
 
         Returns:
             datetime.datetime: the time at which the user should go to bed
@@ -81,7 +83,7 @@ class SleepCalculator:
             raise InvalidInputError(
                 "Wake up time is earlier than current time"
             )
-
+        
         if mode == SleepMode.SHORT:
             step = datetime.timedelta(minutes=15)
             delta = wake_up_time - origin_time
