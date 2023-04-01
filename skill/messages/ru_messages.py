@@ -33,13 +33,13 @@ class RUMessages(BaseMessages):
     SLEEP_MODES_NOMINATIVE = {
         SleepMode.VERY_SHORT: "Лёгкий",
         SleepMode.SHORT: "Короткий",
-        SleepMode.MEDIUM: "Стандартный",
+        SleepMode.MEDIUM: "Средний",
         SleepMode.LONG: "Длинный",
     }
     SLEEP_MODES_INSTRUMENTAL = {
         SleepMode.VERY_SHORT: "Лёгким",
         SleepMode.SHORT: "Коротким",
-        SleepMode.MEDIUM: "Стандартным",
+        SleepMode.MEDIUM: "Средним",
         SleepMode.LONG: "Длинным",
     }
 
@@ -75,8 +75,7 @@ class RUMessages(BaseMessages):
         replicas_tail = [
             TextWithTTS("Чем я могу помочь?"),
             TextWithTTS("Чем могу помочь?"),
-            TextWithTTS("Чем могу быть полезен?"),
-            # TODO:                         ^^ Assure gender consistency
+            TextWithTTS("Чем могу быть полезна?"),
             TextWithTTS("Я к вашим услугам."),
         ]
 
@@ -137,8 +136,7 @@ class RUMessages(BaseMessages):
         replicas_tail = [
             TextWithTTS("Чем я могу помочь?"),
             TextWithTTS("Чем могу помочь?"),
-            TextWithTTS("Чем могу быть полезен?"),
-            # TODO:                         ^^ Assure gender consistency
+            TextWithTTS("Чем могу быть полезна?"),
             TextWithTTS("Я к вашим услугам."),
         ]
 
@@ -155,16 +153,21 @@ class RUMessages(BaseMessages):
         ]
 
         replicas_b = [
-            TextWithTTS("Здесь вам доступны все функции навыка."),
+            TextWithTTS(
+                f"Скажите {LAQUO}Помощь{RAQUO}, чтобы узнать о "
+                "функциях навыка."
+            )
+        ]
+
+        replicas_c = [
             TextWithTTS("Чем я могу помочь?"),
-            TextWithTTS("Чем могу быть полезен?"),
-            # TODO:                         ^^ Assure gender consistency
+            TextWithTTS("Чем могу быть полезна?"),
             TextWithTTS("Я к вашим услугам."),
             TextWithTTS("Что угодно, лишь бы вы спали хорошо."),
             # NOTE:      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Informal
         ]
 
-        message = construct_random_message(replicas_a, replicas_b)
+        message = construct_random_message(replicas_a, replicas_b, replicas_c)
 
         return message
 
