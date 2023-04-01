@@ -1,5 +1,5 @@
-import enum
 import datetime
+
 from skill.exceptions import InvalidInputError
 from typing import Iterable, Callable
 from skill.entities import Activity
@@ -8,6 +8,12 @@ from dataclasses import dataclass
 
 class SleepModeDoesntFitError(Exception):
     pass
+
+import enum
+from typing import Iterable
+
+from skill.entities import Activity
+from skill.exceptions import InvalidInputError
 
 
 class SleepMode(enum.Enum):

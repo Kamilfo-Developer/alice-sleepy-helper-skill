@@ -1,16 +1,16 @@
+import random
 from datetime import UTC, datetime, time, timedelta, timezone
 from uuid import uuid4
 
+import pytest
 import pytest_asyncio
+
+from skill.db.repos.base_repo import BaseRepo
+from skill.db.repos.sa_repo import SARepo
+from skill.entities import Activity, Tip, TipsTopic, User
 from skill.exceptions import NoSuchEntityInDB
 from skill.utils import TextWithTTS
 from tests.sa_db_settings import sa_repo_config
-from skill.db.repos.sa_repo import SARepo
-from skill.db.repos.base_repo import BaseRepo
-from skill.entities import Activity, Tip, TipsTopic, User
-import pytest
-import random
-
 
 repos_to_test = (SARepo(sa_repo_config),)
 

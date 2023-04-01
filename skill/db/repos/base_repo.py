@@ -1,14 +1,9 @@
 from __future__ import annotations
+
 import abc
+from typing import (TYPE_CHECKING, Any, AsyncContextManager, Callable,
+                    Iterable, Literal)
 from uuid import UUID
-from typing import (
-    Any,
-    AsyncContextManager,
-    Callable,
-    TYPE_CHECKING,
-    Iterable,
-    Literal,
-)
 
 if TYPE_CHECKING:
     from skill.entities import Activity, Tip, TipsTopic, User

@@ -1,9 +1,10 @@
 from __future__ import annotations
-import enum
+
 import datetime
-import random
+import enum
 import itertools
-from typing import Union, Any, Iterable, List, Callable
+import random
+from typing import Any, Callable, Iterable, List, Union
 
 
 class Daytime(enum.Enum):

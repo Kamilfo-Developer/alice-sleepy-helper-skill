@@ -1,5 +1,5 @@
-import sys
 import os
+import sys
 from pathlib import Path
 
 # FIXME: CHANGE THIS TO GETTING PATH
@@ -8,14 +8,16 @@ ROOT_DIR = str(Path(os.path.abspath(__file__)).parent.parent)
 
 sys.path.append(ROOT_DIR)
 
-from skill.entities import Activity, TipsTopic, Tip
-from skill.db.repos.get_repo import get_repo
-from datetime import UTC, datetime, timedelta
-from skill.utils import TextWithTTS
-from argparse import ArgumentParser
-from uuid import uuid4
-import pandas as pd
 import asyncio
+from argparse import ArgumentParser
+from datetime import UTC, datetime, timedelta
+from uuid import uuid4
+
+import pandas as pd
+
+from skill.db.repos.get_repo import get_repo
+from skill.entities import Activity, Tip, TipsTopic
+from skill.utils import TextWithTTS
 
 
 def prep(s: str) -> str:
@@ -50,7 +52,9 @@ async def extract_tips_topics(
         tips_topics_to_insert.append(
             TipsTopic(
                 uuid4(),
-                TextWithTTS(prep(row.iloc[0]).lower(), prep(row.iloc[1])),
+                TextWithTTS(
+                    prep(row.iloc[0]).lower().strip(), prep(row.iloc[1])
+                ),
                 TextWithTTS(prep(row.iloc[2]), prep(row.iloc[3])),
                 created_date=datetime.utcnow().astimezone(UTC),
                 repo=repo,
