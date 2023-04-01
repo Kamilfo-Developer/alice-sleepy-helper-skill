@@ -1,7 +1,8 @@
-from skill.config import WEBHOOK_URL_PATH, WEBAPP_HOST, WEBAPP_PORT
-from skill.handlers import dp
 from aioalice import get_new_configured_app
 from aiohttp import web
+
+from skill.config import WEBAPP_HOST, WEBAPP_PORT, WEBHOOK_URL_PATH
+from skill.handlers import dp
 
 if __name__ == "__main__":
     app = get_new_configured_app(dispatcher=dp, path=WEBHOOK_URL_PATH)

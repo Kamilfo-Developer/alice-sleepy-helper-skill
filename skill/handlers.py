@@ -1,16 +1,18 @@
-from aioalice import Dispatcher
-from aioalice.dispatcher import MemoryStorage
-from aioalice.types.alice_request import AliceRequest
-from aioalice.types import Button
-from skill.messages.ru_messages import RUMessages
-from skill.sleep_calculator import SleepMode
-from skill.user_manager import UserManager
-from skill.db.repos.sa_repo import SARepo
-from skill.db.sa_db_settings import sa_repo_config
-from skill.states import States
-from pytz import timezone
 import datetime
 import logging
+
+from aioalice import Dispatcher
+from aioalice.dispatcher import MemoryStorage
+from aioalice.types import Button
+from aioalice.types.alice_request import AliceRequest
+from pytz import timezone
+
+from skill.db.repos.sa_repo import SARepo
+from skill.db.sa_db_settings import sa_repo_config
+from skill.messages.ru_messages import RUMessages
+from skill.sleep_calculator import SleepMode
+from skill.states import States
+from skill.user_manager import UserManager
 
 logging.basicConfig(
     format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s"
@@ -19,48 +21,6 @@ logging.basicConfig(
 dp = Dispatcher(storage=MemoryStorage())
 
 ICO_ID = "1540737/a491c8169a8b2597ba37"
-
-# Key words for:
-# Escaping to main menu
-TO_MENU_REPLICS = ["выйди", "меню", "Меню"]
-# Asking info
-GIVE_INFO_REPLICS = ["расскажи о навыке", "расскажи о себе"]
-# What can you do
-GIVE_WHAT_CAN_YOU_DO_REPLICS = ["что ты делаешь", "что ты умеешь"]
-# Asking tip
-ASK_FOR_TIP_REPLICS = [
-    "посоветуй",
-    "совет",
-    "лайфхак",
-    "подскажи",
-    "подсказка",
-]
-# Using main functionality (sleep time calculation)
-MAIN_FUNCTIONALITY_ENTER = ["я хочу спать", "рассчитай сон"]
-# Using main functionality (sleep time calculation) (skip asking the time)
-MAIN_FUNCTIONALITY_ENTER_FAST = ["Во сколько", "Когда", "Через сколько"]
-# Choosing very short sleep mode
-VERY_SHORT_SLEEP_KEYWORDS = [
-    RUMessages.SLEEP_MODES_NOMINATIVE[SleepMode.VERY_SHORT]
-]
-# Choosing short sleep mode
-SHORT_SLEEP_KEYWORDS = [RUMessages.SLEEP_MODES_NOMINATIVE[SleepMode.SHORT]]
-# Choosing medium sleep mode
-MEDIUM_SLEEP_KEYWORDS = [RUMessages.SLEEP_MODES_NOMINATIVE[SleepMode.MEDIUM]]
-# Choosing long sleep mode
-LONG_SLEEP_KEYWORDS = [RUMessages.SLEEP_MODES_NOMINATIVE[SleepMode.LONG]]
-# Yes answer
-YES_REPLICS = ["да", "конечно", "естественно", "хочу"]
-# No answer
-NO_REPLICS = ["нет", "отказываюсь", "не хочу"]
-# Asking tip about night sleep
-WANT_NIGHT_TIP = ["ночной"]
-# Asking tip abot day sleep
-WANT_DAY_TIP = ["дневной"]
-# User aking help
-HELP_REPLICS = ["помощь", "помогите", "справка"]
-# User wants to stop skill
-QUIT_SKILL_REPLICS = ["выйди", "выход", "закрой навык"]
 
 
 def get_buttons_with_text(texts: list[str] | None) -> list[Button] | None:
@@ -80,7 +40,7 @@ def contains_intent(req: AliceRequest, intent_name: str) -> bool:
 
 @dp.request_handler(
     state=States.all(),  # type: ignore
-    contains=QUIT_SKILL_REPLICS,
+    func=lambda req: contains_intent(req, "QUIT_SKILL"),
 )
 async def quit_skill(alice_request: AliceRequest):
     text_with_tts = RUMessages().get_quit_message()
@@ -93,7 +53,7 @@ async def quit_skill(alice_request: AliceRequest):
 
 @dp.request_handler(
     state=States.all(),  # type: ignore
-    contains=TO_MENU_REPLICS,
+    func=lambda req: contains_intent(req, "TO_MENU"),
 )
 async def go_to_menu(alice_request: AliceRequest):
     user_id = alice_request.session.user_id
@@ -120,7 +80,10 @@ async def ask_help(alice_request: AliceRequest):
     )
 
 
-@dp.request_handler(state=States.MAIN_MENU, contains=GIVE_INFO_REPLICS)  # type: ignore
+@dp.request_handler(
+    state=States.MAIN_MENU,
+    func=lambda req: contains_intent(req, "GIVE_INFO"),
+)  # type: ignore
 async def give_info(alice_request: AliceRequest):
     text_with_tts = RUMessages().get_info_message()
     return alice_request.response_big_image(
@@ -133,7 +96,10 @@ async def give_info(alice_request: AliceRequest):
     )
 
 
-@dp.request_handler(state=States.MAIN_MENU, contains=GIVE_WHAT_CAN_YOU_DO_REPLICS)  # type: ignore
+@dp.request_handler(
+    state=States.MAIN_MENU,
+    func=lambda req: contains_intent(req, "GIVE_WHAT_CAN_YOU_DO"),
+)  # type: ignore
 async def give_info(alice_request: AliceRequest):
     text_with_tts = RUMessages().get_what_can_you_do_message()
     return alice_request.response(
@@ -144,7 +110,8 @@ async def give_info(alice_request: AliceRequest):
 
 
 @dp.request_handler(
-    state=States.ASKING_FOR_TIP, contains=WANT_NIGHT_TIP  # type: ignore
+    state=States.ASKING_FOR_TIP,
+    func=lambda req: contains_intent(req, "WANT_NIGHT_TIP"),  # type: ignore
 )
 async def send_night_tip(alice_request: AliceRequest):
     user_id = alice_request.session.user_id
@@ -161,7 +128,10 @@ async def send_night_tip(alice_request: AliceRequest):
     )
 
 
-@dp.request_handler(state=States.ASKING_FOR_TIP, contains=WANT_DAY_TIP)  # type: ignore
+@dp.request_handler(
+    state=States.ASKING_FOR_TIP,
+    func=lambda req: contains_intent(req, "WANT_DAY_TIP"),
+)  # type: ignore
 async def send_day_tip(alice_request: AliceRequest):
     user_id = alice_request.session.user_id
     user_manager = await UserManager.new_manager(
@@ -186,7 +156,7 @@ async def reask_tip_topic(alice_request: AliceRequest):
 
 
 @dp.request_handler(
-    state=States.MAIN_MENU, contains=ASK_FOR_TIP_REPLICS  # type: ignore
+    func=lambda req: contains_intent(req, "ASK_FOR_TIP"),  # type: ignore
 )
 async def send_tip(alice_request: AliceRequest):
     user_id = alice_request.session.user_id
@@ -202,7 +172,8 @@ async def send_tip(alice_request: AliceRequest):
 
 
 @dp.request_handler(
-    state=States.IN_CALCULATOR, contains=SHORT_SLEEP_KEYWORDS  # type: ignore
+    state=States.IN_CALCULATOR,
+    func=lambda req: contains_intent(req, "SHORT_SLEEP"),  # type: ignore
 )
 async def choose_short_duration(alice_request: AliceRequest):
     user_id = alice_request.session.user_id
@@ -236,7 +207,8 @@ async def choose_short_duration(alice_request: AliceRequest):
 
 
 @dp.request_handler(
-    state=States.IN_CALCULATOR, contains=LONG_SLEEP_KEYWORDS  # type: ignore
+    state=States.IN_CALCULATOR,
+    func=lambda req: contains_intent(req, "LONG_SLEEP"),  # type: ignore
 )
 async def choose_long_duration(alice_request: AliceRequest):
     user_id = alice_request.session.user_id
@@ -309,12 +281,13 @@ async def enter_calculator(alice_request: AliceRequest):
 dp.register_request_handler(
     enter_calculator,
     state=States.MAIN_MENU,  # type: ignore
-    contains=MAIN_FUNCTIONALITY_ENTER_FAST,
+    func=lambda req: contains_intent(req, "MAIN_FUNCTIONALITY_ENTER_FAST"),
 )
 
 
 @dp.request_handler(
-    state=States.MAIN_MENU, contains=MAIN_FUNCTIONALITY_ENTER  # type: ignore
+    state=States.MAIN_MENU,
+    func=lambda req: contains_intent(req, "MAIN_FUNCTIONALITY_ENTER"),  # type: ignore
 )
 async def enter_calculator_with_no_time(alice_request: AliceRequest):
     user_id = alice_request.session.user_id

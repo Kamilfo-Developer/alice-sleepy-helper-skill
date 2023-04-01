@@ -1,17 +1,14 @@
-from typing import Callable, Iterable, Literal
-from sqlalchemy import delete, select, func
-from skill.db.models.sa_models import (
-    ActivityModel,
-    TipModel,
-    TipsTopicModel,
-    UserModel,
-)
-from skill.db.repos.base_repo import BaseRepo, RepoConfig
-from sqlalchemy.ext.asyncio import AsyncSession
-from skill.entities import Activity, Tip, TipsTopic, User
-from uuid import UUID
 import asyncio
+from typing import Callable, Iterable, Literal
+from uuid import UUID
 
+from sqlalchemy import delete, func, select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from skill.db.models.sa_models import (ActivityModel, TipModel, TipsTopicModel,
+                                       UserModel)
+from skill.db.repos.base_repo import BaseRepo, RepoConfig
+from skill.entities import Activity, Tip, TipsTopic, User
 from skill.exceptions import IncorrectConditionError, NoSuchEntityInDB
 
 

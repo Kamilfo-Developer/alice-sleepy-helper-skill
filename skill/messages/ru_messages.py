@@ -1,15 +1,22 @@
 from __future__ import annotations
-from typing import List, TYPE_CHECKING
+
 import datetime
 import random
-from skill.utils import TextWithTTS, Daytime, gentle_capitalize
-from skill.utils import construct_random_message
-from skill.messages.unicode_literals import DASH, LAQUO, RAQUO
+from typing import TYPE_CHECKING, List
+
 from skill.messages.base_messages import BaseMessages
 from skill.sleep_calculator import SleepMode, SleepCalculation
+from skill.messages.unicode_literals import DASH, LAQUO, RAQUO
+from skill.utils import (
+    Daytime,
+    TextWithTTS,
+    construct_random_message,
+    gentle_capitalize,
+)
+
 
 if TYPE_CHECKING:
-    from skill.entities import Tip, Activity
+    from skill.entities import Activity, Tip
 
 
 class RUMessages(BaseMessages):
