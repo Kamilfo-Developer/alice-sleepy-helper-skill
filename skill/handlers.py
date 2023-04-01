@@ -119,7 +119,9 @@ async def go_to_menu(alice_request: AliceRequest):
 async def ask_help(alice_request: AliceRequest):
     text_with_tts = RUMessages().get_help_message()
     return alice_request.response(
-        response_or_text=text_with_tts.text, tts=text_with_tts.tts
+        response_or_text=text_with_tts.text,
+        tts=text_with_tts.tts,
+        buttons=get_buttons_with_text(RUMessages().HELP_BUTTONS_TEXT),
     )
 
 
