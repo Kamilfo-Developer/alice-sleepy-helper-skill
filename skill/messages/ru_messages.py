@@ -5,6 +5,7 @@ import random
 from typing import TYPE_CHECKING, List
 
 from skill.messages.base_messages import BaseMessages
+from skill.sleep_calculator import SleepMode, SleepCalculation
 from skill.messages.unicode_literals import DASH, LAQUO, RAQUO
 from skill.utils import (Daytime, TextWithTTS, construct_random_message,
                          gentle_capitalize)
@@ -24,6 +25,19 @@ class RUMessages(BaseMessages):
     SLEEP_TIME_PROPOSAL_BUTTONS_TEXT = ["Да", "Нет"]
     SLEEP_MODE_SELECTION_BUTTONS_TEXT = ["Короткий", "Длинный"]
     POST_SLEEP_CALCULATION_BUTTONS_TEXT = ["Да", "Нет"]
+
+    SLEEP_MODES_NOMINATIVE = {
+        SleepMode.VERY_SHORT: "Лёгкий",
+        SleepMode.SHORT: "Короткий",
+        SleepMode.MEDIUM: "Стандартный",
+        SleepMode.LONG: "Длинный",
+    }
+    SLEEP_MODES_INSTRUMENTAL = {
+        SleepMode.VERY_SHORT: "Лёгким",
+        SleepMode.SHORT: "Коротким",
+        SleepMode.MEDIUM: "Стандартным",
+        SleepMode.LONG: "Длинным",
+    }
 
     def __init__(self):
         pass
@@ -50,7 +64,8 @@ class RUMessages(BaseMessages):
             "вас время сна, за которое вы можете выспаться. "
             f"Для этого скажите {LAQUO}Я хочу спать{RAQUO}. "
             "А ещё вы можете попросить меня дать вам пару "
-            "советов по тому, как лучше высыпаться. Чтобы выйти из навка, скажите «Выход». "
+            "советов по тому, как лучше высыпаться. Чтобы выйти из навка,"
+            " скажите «Выход». "
         )
 
         replicas_tail = [
@@ -109,7 +124,8 @@ class RUMessages(BaseMessages):
             "вас время сна, за которое вы можете выспаться. "
             f"Для этого скажите {LAQUO}Я хочу спать{RAQUO}. "
             "А ещё вы можете попросить меня дать вам пару "
-            "советов по тому, как лучше высыпаться. Чтобы выйти из навыка, скажите «Выход». "
+            "советов по тому, как лучше высыпаться. Чтобы выйти из навыка,"
+            " скажите «Выход». "
         )
 
         message += man
@@ -271,55 +287,77 @@ class RUMessages(BaseMessages):
         return TextWithTTS(text="Во сколько вы хотите завтра проснуться?")
 
     def get_ask_sleep_mode_message(self) -> TextWithTTS:
-        replicas_a = [
-            TextWithTTS(
-                "Как много вы хотите спать? Выберите "
-                "один из режимов сна: короткий или длинный сон."
-            ),
-            TextWithTTS("Вас интересует длинный или короткий сон?"),
-            TextWithTTS(
-                "Какой режим сна вы бы предпочли, длинный или короткий?"
-            ),
-        ]
-        replicas_b = [
-            TextWithTTS(
-                f"Режим {LAQUO}Короткого сна{RAQUO} подберёт вам самое позднее"
-                " время сна, при котором вы сможете чувствовать себя хорошо"
-                " после пробуждения."
-            ),
-            TextWithTTS(
-                f"В режиме {LAQUO}Короткий сон{RAQUO} вам будет подобрано"
-                " время, при котором длительность сна будет меньше, но вы всё"
-                " равно сможете выспаться."
-            ),
-            TextWithTTS(
-                f"{LAQUO}Короткий сон{RAQUO} {DASH} обеспечит вам больше"
-                " времени бодровствования, так, чтобы вы не чувствовали"
-                " недостаток сна, когда проснётесь."
-            ),
-        ]
-        replicas_с = [
-            TextWithTTS(
-                f"Режим {LAQUO}Длинного сна{RAQUO} подберёт вам самое продолжительное"
-                " время сна, при котором вы сможете чувствовать себя хорошо"
-                " после пробуждения."
-            ),
-            TextWithTTS(
-                f"В режиме {LAQUO}Длинный сон{RAQUO} вам будет подобрано"
-                " время, при котором длительность сна будет больше, но вы всё"
-                " равно сможете встать вовремя."
-            ),
-        ]
-        return construct_random_message(replicas_a, replicas_b, replicas_с)
+        message = TextWithTTS(
+            "Выберите один из режимов сна:\n",
+            "Выберите один из режимов сна.\n",
+        )
+        message += TextWithTTS(
+            f"Режим {LAQUO}{self.SLEEP_MODES_NOMINATIVE[SleepMode.LONG]} "
+            f"сон {RAQUO} обеспечит вам продолжительный сон длиной от"
+            " 9 до 12 часов. Отличная опция после долгой бессонной недели.\n",
+            f"Режим {LAQUO}{self.SLEEP_MODES_NOMINATIVE[SleepMode.LONG]} "
+            f"сон{RAQUO} обеспечит вам продолжительный сон длиной от"
+            " девяти до двенадцати часов. Отличная опция после долгой"
+            " бессонной недели!\n",
+        )
+        message += TextWithTTS(
+            f"Режим {LAQUO}{self.SLEEP_MODES_NOMINATIVE[SleepMode.MEDIUM]} "
+            f"сон{RAQUO} предложит вам классический сон длиной от"
+            " 6 до 9 часов.\n",
+            f"Режим {LAQUO}{self.SLEEP_MODES_NOMINATIVE[SleepMode.MEDIUM]} "
+            f"сон{RAQUO} предложит вам классический сон длиной от"
+            " шести до девяти часов.\n",
+        )
+        message += TextWithTTS(
+            "Если у вас ещё много дел на вечер, или вы не хотите много спать,"
+            " вам подойдёт режим "
+            f"{LAQUO}{self.SLEEP_MODES_NOMINATIVE[SleepMode.SHORT]} "
+            f"сон{RAQUO}. Вы проспите от 3 до 6 часов.\n",
+            "Если у вас ещё много дел на вечер, или вы не хотите много спать,"
+            " вам подойдёт режим "
+            f"{LAQUO}{self.SLEEP_MODES_NOMINATIVE[SleepMode.SHORT]} "
+            f"сон{RAQUO}. Вы проспите от трёх до шести часов.\n",
+        )
+        message += TextWithTTS(
+            "Для небольшого дневного отдыха выберите режим "
+            f"{LAQUO}{self.SLEEP_MODES_NOMINATIVE[SleepMode.VERY_SHORT]} "
+            f"сон{RAQUO}. Он подберёт вам перерыв от 15 минут до 3 часов.\n",
+            "Для небольшого дневного отдыха выберите режим "
+            f"{LAQUO}{self.SLEEP_MODES_NOMINATIVE[SleepMode.VERY_SHORT]} "
+            f"сон{RAQUO}. Он подберёт вам перерыв от пятнадцати минут до"
+            " трёх часов.\n",
+        )
+        return message
 
     def get_sleep_calc_time_message(
-        self, bed_time: datetime.time, activities: List[Activity]
+        self,
+        sleep_calc_result: SleepCalculation,
+        activities: List[Activity],
     ) -> TextWithTTS:
 
-        message = TextWithTTS(
-            "Хорошо, рекомендую вам лечь в "
-            f"{bed_time.isoformat(timespec='minutes')}. "
-        )
+        if sleep_calc_result.changed_mode:
+            selected_mode = sleep_calc_result.selected_mode
+            changed_mode = sleep_calc_result.changed_mode
+            bed_time = sleep_calc_result.bed_time
+            message = TextWithTTS(
+                "К сожалению, за этот промежуток времени вы не успеваете "
+                "поспать "
+                f"{self.SLEEP_MODES_INSTRUMENTAL[selected_mode].lower()} "
+                "сном. Вместо этого, предлагаю вам попробовать "
+                f"{self.SLEEP_MODES_NOMINATIVE[changed_mode].lower()} "
+                "сон и лечь в "
+                f"{bed_time.hour:02d}:{bed_time.minute:02d}. "
+                f"Вы проспите {sleep_calc_result.sleep_time.seconds // 60} "
+                "минут. "
+            )
+        else:
+            bed_time = sleep_calc_result.bed_time
+            message = TextWithTTS(
+                "Хорошо, рекомендую вам лечь в "
+                f"{bed_time.hour:02d}:{bed_time.minute:02d}. "
+                f"Вы проспите {sleep_calc_result.sleep_time.seconds // 60} "
+                "минут. "
+            )
         if activities:
             message += TextWithTTS(
                 "За этот вечер вы можете успеть, например, "

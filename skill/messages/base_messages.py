@@ -1,8 +1,13 @@
 import abc
 import datetime
-from typing import Any, List
 
 from skill.utils import TextWithTTS
+from typing import List
+from skill.sleep_calculator import SleepCalculation
+from skill.entities import Tip, Activity
+
+from typing import Any, List
+
 
 
 class BaseMessages(abc.ABC):
@@ -52,12 +57,14 @@ class BaseMessages(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_tip_message(self, tip: Any) -> TextWithTTS:
+    def get_tip_message(self, tip: Tip) -> TextWithTTS:
         pass
 
     @abc.abstractmethod
     def get_sleep_calc_time_message(
-        self, bed_time: datetime.time, activities: List[Any]
+        self,
+        sleep_calc_result: SleepCalculation,
+        activities: List[Activity],
     ) -> TextWithTTS:
         pass
 

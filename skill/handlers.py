@@ -22,6 +22,49 @@ dp = Dispatcher(storage=MemoryStorage())
 
 ICO_ID = "1540737/a491c8169a8b2597ba37"
 
+# Key words for:
+# Escaping to main menu
+TO_MENU_REPLICS = ["выйди", "меню", "Меню"]
+# Asking info
+GIVE_INFO_REPLICS = ["расскажи о навыке", "расскажи о себе"]
+# What can you do
+GIVE_WHAT_CAN_YOU_DO_REPLICS = ["что ты делаешь", "что ты умеешь"]
+# Asking tip
+ASK_FOR_TIP_REPLICS = [
+    "посоветуй",
+    "совет",
+    "лайфхак",
+    "подскажи",
+    "подсказка",
+]
+# Using main functionality (sleep time calculation)
+MAIN_FUNCTIONALITY_ENTER = ["я хочу спать", "рассчитай сон"]
+# Using main functionality (sleep time calculation) (skip asking the time)
+MAIN_FUNCTIONALITY_ENTER_FAST = ["Во сколько", "Когда", "Через сколько"]
+# Choosing very short sleep mode
+VERY_SHORT_SLEEP_KEYWORDS = [
+    RUMessages.SLEEP_MODES_NOMINATIVE[SleepMode.VERY_SHORT]
+]
+# Choosing short sleep mode
+SHORT_SLEEP_KEYWORDS = [RUMessages.SLEEP_MODES_NOMINATIVE[SleepMode.SHORT]]
+# Choosing medium sleep mode
+MEDIUM_SLEEP_KEYWORDS = [RUMessages.SLEEP_MODES_NOMINATIVE[SleepMode.MEDIUM]]
+# Choosing long sleep mode
+LONG_SLEEP_KEYWORDS = [RUMessages.SLEEP_MODES_NOMINATIVE[SleepMode.LONG]]
+# Yes answer
+YES_REPLICS = ["да", "конечно", "естественно", "хочу"]
+# No answer
+NO_REPLICS = ["нет", "отказываюсь", "не хочу"]
+# Asking tip about night sleep
+WANT_NIGHT_TIP = ["ночной"]
+# Asking tip abot day sleep
+WANT_DAY_TIP = ["дневной"]
+# User aking help
+HELP_REPLICS = ["помощь", "помогите", "справка"]
+# User wants to stop skill
+QUIT_SKILL_REPLICS = ["выйди", "выход", "закрой навык"]
+
+
 def get_buttons_with_text(texts: list[str] | None) -> list[Button] | None:
     if texts is None:
         return None

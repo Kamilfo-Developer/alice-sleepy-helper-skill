@@ -7,6 +7,10 @@ from dataclasses import dataclass
 
 import pytz
 
+import logging
+from skill.entities import User
+from skill.exceptions import InvalidInputError
+
 from skill.db.repos.base_repo import BaseRepo
 from skill.entities import User
 from skill.messages.base_messages import BaseMessages
@@ -27,7 +31,9 @@ class UserManager:
     repo: BaseRepo
     messages: BaseMessages
 
-    def __init__(self, user: User, repo: BaseRepo, messages: BaseMessages) -> None:
+    def __init__(
+        self, user: User, repo: BaseRepo, messages: BaseMessages
+    ) -> None:
         self.user = user
         self.repo = repo
         self.messages = messages
@@ -108,7 +114,9 @@ class UserManager:
         percentage = round(score / total * 100)
         return percentage
 
-    async def check_in(self, now: datetime.datetime | None = None) -> SkillResponse:
+    async def check_in(
+        self, now: datetime.datetime | None = None
+    ) -> SkillResponse:
         """Perform all needed processes when a user starts the skill.
         To be more precise, this method:
         - Drops user's streak if the streak is lost
@@ -259,33 +267,32 @@ class UserManager:
             self.user.last_wake_up_time = wake_up_time
             await self.repo.update_user(self.user)
 
-        now_time = datetime.time(
-            hour=now.hour,
-            minute=now.minute,
-            second=now.second,
-            microsecond=now.microsecond,
-            tzinfo=now.tzinfo,
-        )
-
-        wake_up_datetime = datetime.datetime.combine(
-            date=(
-                (now + datetime.timedelta(days=1)).date()
-                if wake_up_time < now_time
-                else now.date()
-            ),
-            time=wake_up_time,
-            tzinfo=now.tzinfo,
-        )
-
-        bed_time = SleepCalculator.calc(
-            wake_up_time=wake_up_datetime, origin_time=now, mode=mode
-        )
+        try:
+            wake_up_datetime = datetime.datetime.combine(
+                date=now.date(),
+                time=wake_up_time,
+                tzinfo=now.tzinfo,
+            )
+            sleep_calc_result = SleepCalculator.calc(
+                wake_up_time=wake_up_datetime, origin_time=now, mode=mode
+            )
+        except InvalidInputError:
+            wake_up_datetime = datetime.datetime.combine(
+                date=(now + datetime.timedelta(days=1)).date(),
+                time=wake_up_time,
+                tzinfo=now.tzinfo,
+            )
+            sleep_calc_result = SleepCalculator.calc(
+                wake_up_time=wake_up_datetime, origin_time=now, mode=mode
+            )
         all_activities = await self.repo.get_activities()
         activities = SleepCalculator.activities_compilation(
-            now, bed_time, all_activities
+            now, sleep_calc_result.bed_time, all_activities
         )
         return SkillResponse(
-            self.messages.get_sleep_calc_time_message(bed_time.time(), activities),
+            self.messages.get_sleep_calc_time_message(
+                sleep_calc_result, activities
+            ),
             States.CALCULATED,
             self.messages.POST_SLEEP_CALCULATION_BUTTONS_TEXT,
         )
