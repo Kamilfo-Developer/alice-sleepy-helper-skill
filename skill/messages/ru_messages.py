@@ -42,6 +42,13 @@ class RUMessages(BaseMessages):
     SLEEP_TIME_PROPOSAL_BUTTONS_TEXT = ["Да", "Нет"]
     POST_SLEEP_CALCULATION_BUTTONS_TEXT = ["Да", "Нет"]
     SLEEP_MODE_SELECTION_BUTTONS_TEXT = list(SLEEP_MODES_NOMINATIVE.values())
+    HELP_BUTTONS_TEXT = [
+        "Меню",
+        "Я хочу спать",
+        "Дай совет",
+        "Расскажи о навыке",
+        "Выход",
+    ]
 
     def __init__(self):
         pass
