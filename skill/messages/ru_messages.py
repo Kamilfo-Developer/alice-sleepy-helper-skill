@@ -7,8 +7,12 @@ from typing import TYPE_CHECKING, List
 from skill.messages.base_messages import BaseMessages
 from skill.sleep_calculator import SleepMode, SleepCalculation
 from skill.messages.unicode_literals import DASH, LAQUO, RAQUO
-from skill.utils import (Daytime, TextWithTTS, construct_random_message,
-                         gentle_capitalize)
+from skill.utils import (
+    Daytime,
+    TextWithTTS,
+    construct_random_message,
+    gentle_capitalize,
+)
 
 if TYPE_CHECKING:
     from skill.entities import Activity, Tip

@@ -4,15 +4,10 @@ import datetime
 import logging
 import random
 from dataclasses import dataclass
-
 import pytz
-
-import logging
 from skill.entities import User
 from skill.exceptions import InvalidInputError
-
 from skill.db.repos.base_repo import BaseRepo
-from skill.entities import User
 from skill.messages.base_messages import BaseMessages
 from skill.sleep_calculator import SleepCalculator, SleepMode
 from skill.states import States

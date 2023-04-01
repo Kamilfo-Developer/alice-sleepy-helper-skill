@@ -1,13 +1,9 @@
 import abc
 import datetime
-
 from skill.utils import TextWithTTS
 from typing import List
 from skill.sleep_calculator import SleepCalculation
 from skill.entities import Tip, Activity
-
-from typing import Any, List
-
 
 
 class BaseMessages(abc.ABC):
