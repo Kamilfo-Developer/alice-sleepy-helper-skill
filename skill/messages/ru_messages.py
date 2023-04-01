@@ -433,9 +433,15 @@ class RUMessages(BaseMessages):
         return TextWithTTS("Что-то пошло не так, вы были возвращены в меню.")
 
     def get_wrong_time_message(self) -> TextWithTTS:
+        hour = random.randint(0, 23)
+        minute = random.randint(0, 59)
         return TextWithTTS(
-            "Пожалуйста, укажите корректное время, или вернитесь в главное "
-            f"меню, сказав {LAQUO}Меню{RAQUO}"
+            text="Пожалуйста, укажите время в формате ЧЧ:ММ, "
+            f"например, {hour}:{minute:02d}, "
+            f"или вернитесь  в главное меню, сказав {LAQUO}Меню{RAQUO}",
+            tts="Пожалуйста, укажите время в формате час минута, "
+            f"например, {hour} часов {minute} минут, "
+            f"или вернитесь в главное меню, сказав {LAQUO}Меню{RAQUO}.",
         )
 
     def get_help_message(self) -> TextWithTTS:
