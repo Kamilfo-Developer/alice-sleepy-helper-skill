@@ -1,6 +1,8 @@
 from __future__ import annotations
+
 from datetime import datetime, time, timedelta
 from uuid import UUID, uuid4
+
 from skill.db.repos.base_repo import BaseRepo
 from skill.utils import IdComparable, TextWithTTS
 

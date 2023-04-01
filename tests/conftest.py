@@ -1,8 +1,10 @@
+import asyncio
+
+import pytest
+import pytest_asyncio
+
 from skill.db.models.sa_models import BaseModel
 from tests.sa_db_settings import engine
-import pytest_asyncio
-import asyncio
-import pytest
 
 
 @pytest.fixture(scope="session")

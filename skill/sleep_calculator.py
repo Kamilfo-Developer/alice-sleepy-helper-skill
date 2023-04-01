@@ -1,8 +1,9 @@
-import enum
 import datetime
-from skill.exceptions import InvalidInputError
+import enum
 from typing import Iterable
+
 from skill.entities import Activity
+from skill.exceptions import InvalidInputError
 
 
 class SleepMode(enum.Enum):

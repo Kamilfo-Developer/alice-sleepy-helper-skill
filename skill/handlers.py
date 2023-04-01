@@ -1,16 +1,18 @@
-from aioalice import Dispatcher
-from aioalice.dispatcher import MemoryStorage
-from aioalice.types.alice_request import AliceRequest
-from aioalice.types import Button
-from skill.messages.ru_messages import RUMessages
-from skill.sleep_calculator import SleepMode
-from skill.user_manager import UserManager
-from skill.db.repos.sa_repo import SARepo
-from skill.db.sa_db_settings import sa_repo_config
-from skill.states import States
-from pytz import timezone
 import datetime
 import logging
+
+from aioalice import Dispatcher
+from aioalice.dispatcher import MemoryStorage
+from aioalice.types import Button
+from aioalice.types.alice_request import AliceRequest
+from pytz import timezone
+
+from skill.db.repos.sa_repo import SARepo
+from skill.db.sa_db_settings import sa_repo_config
+from skill.messages.ru_messages import RUMessages
+from skill.sleep_calculator import SleepMode
+from skill.states import States
+from skill.user_manager import UserManager
 
 logging.basicConfig(format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
 
