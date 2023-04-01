@@ -6,7 +6,7 @@ from skill.utils import TextWithTTS, Daytime, gentle_capitalize
 from skill.utils import construct_random_message
 from skill.messages.unicode_literals import DASH, LAQUO, RAQUO
 from skill.messages.base_messages import BaseMessages
-from skill.sleep_calculator import SleepMode, SleepCalculatorResult
+from skill.sleep_calculator import SleepMode, SleepCalculation
 
 if TYPE_CHECKING:
     from skill.entities import Tip, Activity
@@ -283,50 +283,51 @@ class RUMessages(BaseMessages):
         return TextWithTTS(text="Во сколько вы хотите завтра проснуться?")
 
     def get_ask_sleep_mode_message(self) -> TextWithTTS:
-        replicas_a = [
-            TextWithTTS(
-                "Как много вы хотите спать? Выберите "
-                "один из режимов сна: короткий или длинный сон."
-            ),
-            TextWithTTS("Вас интересует длинный или короткий сон?"),
-            TextWithTTS(
-                "Какой режим сна вы бы предпочли, длинный или короткий?"
-            ),
-        ]
-        replicas_b = [
-            TextWithTTS(
-                f"Режим {LAQUO}Короткого сна{RAQUO} подберёт вам самое позднее"
-                " время сна, при котором вы сможете чувствовать себя хорошо"
-                " после пробуждения."
-            ),
-            TextWithTTS(
-                f"В режиме {LAQUO}Короткий сон{RAQUO} вам будет подобрано"
-                " время, при котором длительность сна будет меньше, но вы всё"
-                " равно сможете выспаться."
-            ),
-            TextWithTTS(
-                f"{LAQUO}Короткий сон{RAQUO} {DASH} обеспечит вам больше"
-                " времени бодровствования, так, чтобы вы не чувствовали"
-                " недостаток сна, когда проснётесь."
-            ),
-        ]
-        replicas_с = [
-            TextWithTTS(
-                f"Режим {LAQUO}Длинного сна{RAQUO} подберёт вам самое продолжительное"
-                " время сна, при котором вы сможете чувствовать себя хорошо"
-                " после пробуждения."
-            ),
-            TextWithTTS(
-                f"В режиме {LAQUO}Длинный сон{RAQUO} вам будет подобрано"
-                " время, при котором длительность сна будет больше, но вы всё"
-                " равно сможете встать вовремя."
-            ),
-        ]
-        return construct_random_message(replicas_a, replicas_b, replicas_с)
+        message = TextWithTTS(
+            "Выберите один из режимов сна:\n",
+            "Выберите один из режимов сна.\n",
+        )
+        message += TextWithTTS(
+            f"Режим {LAQUO}{self.SLEEP_MODES_NOMINATIVE[SleepMode.LONG]} "
+            f"сон {RAQUO} обеспечит вам продолжительный сон длиной от"
+            " 9 до 12 часов. Отличная опция после долгой бессонной недели.\n",
+            f"Режим {LAQUO}{self.SLEEP_MODES_NOMINATIVE[SleepMode.LONG]} "
+            f"сон{RAQUO} обеспечит вам продолжительный сон длиной от"
+            " девяти до двенадцати часов. Отличная опция после долгой"
+            " бессонной недели!\n",
+        )
+        message += TextWithTTS(
+            f"Режим {LAQUO}{self.SLEEP_MODES_NOMINATIVE[SleepMode.MEDIUM]} "
+            f"сон{RAQUO} предложит вам классический сон длиной от"
+            " 6 до 9 часов.\n",
+            f"Режим {LAQUO}{self.SLEEP_MODES_NOMINATIVE[SleepMode.MEDIUM]} "
+            f"сон{RAQUO} предложит вам классический сон длиной от"
+            " шести до девяти часов.\n",
+        )
+        message += TextWithTTS(
+            "Если у вас ещё много дел на вечер, или вы не хотите много спать,"
+            " вам подойдёт режим "
+            f"{LAQUO}{self.SLEEP_MODES_NOMINATIVE[SleepMode.SHORT]} "
+            f"сон{RAQUO}. Вы проспите от 3 до 6 часов.\n",
+            "Если у вас ещё много дел на вечер, или вы не хотите много спать,"
+            " вам подойдёт режим "
+            f"{LAQUO}{self.SLEEP_MODES_NOMINATIVE[SleepMode.SHORT]} "
+            f"сон{RAQUO}. Вы проспите от трёх до шести часов.\n",
+        )
+        message += TextWithTTS(
+            "Для небольшого дневного отдыха выберите режим "
+            f"{LAQUO}{self.SLEEP_MODES_NOMINATIVE[SleepMode.VERY_SHORT]} "
+            f"сон{RAQUO}. Он подберёт вам перерыв от 15 минут до 3 часов.\n",
+            "Для небольшого дневного отдыха выберите режим "
+            f"{LAQUO}{self.SLEEP_MODES_NOMINATIVE[SleepMode.VERY_SHORT]} "
+            f"сон{RAQUO}. Он подберёт вам перерыв от пятнадцати минут до"
+            " трёх часов.\n",
+        )
+        return message
 
     def get_sleep_calc_time_message(
         self,
-        sleep_calc_result: SleepCalculatorResult,
+        sleep_calc_result: SleepCalculation,
         activities: List[Activity],
     ) -> TextWithTTS:
 

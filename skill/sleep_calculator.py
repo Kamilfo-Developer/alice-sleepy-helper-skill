@@ -18,7 +18,7 @@ class SleepMode(enum.Enum):
 
 
 @dataclass
-class SleepCalculatorResult:
+class SleepCalculation:
     bed_time: datetime.datetime = datetime.datetime(datetime.MINYEAR, 1, 1)
     selected_mode: SleepMode = SleepMode.LONG
     sleep_time: datetime.timedelta = datetime.timedelta(0)
@@ -96,7 +96,7 @@ class SleepCalculator:
         wake_up_time: datetime.datetime,
         origin_time: datetime.datetime | None = None,
         mode: SleepMode = SleepMode.LONG,
-    ) -> SleepCalculatorResult:
+    ) -> SleepCalculation:
         """Returns the time at which the user need to go to bed according to
         their request.
 
@@ -124,7 +124,7 @@ class SleepCalculator:
                 "Wake up time is earlier than current time"
             )
 
-        result = SleepCalculatorResult()
+        result = SleepCalculation()
         result.selected_mode = mode
 
         # Initial calculation for the desired mode
