@@ -1,20 +1,14 @@
 from __future__ import annotations
-from uuid import UUID
-from sqlalchemy import (
-    Integer,
-    Table,
-    Time,
-    Uuid,
-    ForeignKey,
-    DateTime,
-    String,
-    Interval,
-    Column,
-)
-from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, relationship
-from skill.db.repos.base_repo import BaseRepo
-from skill.entities import User, Activity, Tip, TipsTopic
+
 from datetime import datetime, time, timedelta
+from uuid import UUID
+
+from sqlalchemy import (Column, DateTime, ForeignKey, Integer, Interval,
+                        String, Table, Time, Uuid)
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+
+from skill.db.repos.base_repo import BaseRepo
+from skill.entities import Activity, Tip, TipsTopic, User
 from skill.utils import TextWithTTS
 
 

@@ -1,15 +1,17 @@
-from tests.sa_db_settings import sa_repo_config
-from skill.db.repos.sa_repo import SARepo
-from skill.entities import User, Activity, TipsTopic
-from skill.user_manager import UserManager
-from skill.messages.ru_messages import RUMessages
-from skill.sleep_calculator import SleepMode
-from skill.utils import TextWithTTS
-import pytest
 import datetime
 import random
 from uuid import uuid4
+
+import pytest
 import pytz
+
+from skill.db.repos.sa_repo import SARepo
+from skill.entities import Activity, TipsTopic, User
+from skill.messages.ru_messages import RUMessages
+from skill.sleep_calculator import SleepMode
+from skill.user_manager import UserManager
+from skill.utils import TextWithTTS
+from tests.sa_db_settings import sa_repo_config
 
 
 def generate_random_string_id() -> str:

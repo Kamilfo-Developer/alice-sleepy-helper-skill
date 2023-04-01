@@ -1,5 +1,6 @@
-from skill.dataconvert.ya_converter import YaDataConverter
 import datetime
+
+from skill.dataconvert.ya_converter import YaDataConverter
 
 
 def test_data_convert():

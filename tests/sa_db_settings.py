@@ -1,14 +1,13 @@
-from pathlib import Path
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.engine import Engine
-from sqlalchemy import event
-from dotenv import load_dotenv
-
 import os
+from pathlib import Path
+
+from dotenv import load_dotenv
+from sqlalchemy import event
+from sqlalchemy.engine import Engine
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import sessionmaker
 
 from skill.db.repos.sa_repo import SARepoConfig
-
 
 load_dotenv()
 

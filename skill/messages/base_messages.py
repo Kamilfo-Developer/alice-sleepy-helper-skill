@@ -1,7 +1,8 @@
 import abc
 import datetime
-from skill.utils import TextWithTTS
 from typing import Any, List
+
+from skill.utils import TextWithTTS
 
 
 class BaseMessages(abc.ABC):
