@@ -14,7 +14,6 @@ from skill.utils import (
     gentle_capitalize,
 )
 
-
 if TYPE_CHECKING:
     from skill.entities import Activity, Tip
 
