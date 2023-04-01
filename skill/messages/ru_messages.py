@@ -19,17 +19,6 @@ if TYPE_CHECKING:
 
 
 class RUMessages(BaseMessages):
-    MENU_BUTTONS_TEXT = [
-        "Дай совет",
-        "Рассчитай сон",
-        "Расскажи о навыке",
-        "Помощь",
-    ]
-    TIP_TOPIC_SELECTION_BUTTONS_TEXT = ["Дневной сон", "Ночной сон"]
-    SLEEP_TIME_PROPOSAL_BUTTONS_TEXT = ["Да", "Нет"]
-    SLEEP_MODE_SELECTION_BUTTONS_TEXT = ["Короткий", "Длинный"]
-    POST_SLEEP_CALCULATION_BUTTONS_TEXT = ["Да", "Нет"]
-
     SLEEP_MODES_NOMINATIVE = {
         SleepMode.VERY_SHORT: "Лёгкий",
         SleepMode.SHORT: "Короткий",
@@ -42,6 +31,17 @@ class RUMessages(BaseMessages):
         SleepMode.MEDIUM: "Средним",
         SleepMode.LONG: "Длинным",
     }
+
+    MENU_BUTTONS_TEXT = [
+        "Дай совет",
+        "Рассчитай сон",
+        "Расскажи о навыке",
+        "Помощь",
+    ]
+    TIP_TOPIC_SELECTION_BUTTONS_TEXT = ["Дневной сон", "Ночной сон"]
+    SLEEP_TIME_PROPOSAL_BUTTONS_TEXT = ["Да", "Нет"]
+    POST_SLEEP_CALCULATION_BUTTONS_TEXT = ["Да", "Нет"]
+    SLEEP_MODE_SELECTION_BUTTONS_TEXT = list(SLEEP_MODES_NOMINATIVE.values())
 
     def __init__(self):
         pass
