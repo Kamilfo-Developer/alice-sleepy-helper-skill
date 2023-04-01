@@ -173,6 +173,41 @@ async def send_tip(alice_request: AliceRequest):
 
 @dp.request_handler(
     state=States.IN_CALCULATOR,
+    func=lambda req: contains_intent(req, "VERY_SHORT_SLEEP"),  # type: ignore
+)
+async def choose_very_short_duration(alice_request: AliceRequest):
+    user_id = alice_request.session.user_id
+    # time when user wants to get up, saved from previous dialogues
+    time = await dp.storage.get_data(user_id)
+    user_timezone = timezone(alice_request.meta.timezone)
+    hour = time["hour"]
+    minute = time.get("minute")
+    if minute is None:
+        minute = 0
+    wake_up_time = (
+        datetime.datetime.now(user_timezone)
+        .time()
+        .replace(hour=hour, minute=minute, tzinfo=user_timezone)
+    )
+    user_manager = await UserManager.new_manager(
+        user_id=user_id, repo=SARepo(sa_repo_config), messages=RUMessages()
+    )
+    response = await user_manager.ask_sleep_time(
+        now=datetime.datetime.now(timezone(alice_request.meta.timezone)),
+        wake_up_time=wake_up_time,
+        mode=SleepMode.VERY_SHORT,
+    )
+    text_with_tts = response.text_with_tts
+    await dp.storage.set_state(user_id, States.CALCULATED)
+    return alice_request.response(
+        response_or_text=text_with_tts.text,
+        tts=text_with_tts.tts,
+        buttons=get_buttons_with_text(response.buttons_text),
+    )
+
+
+@dp.request_handler(
+    state=States.IN_CALCULATOR,
     func=lambda req: contains_intent(req, "SHORT_SLEEP"),  # type: ignore
 )
 async def choose_short_duration(alice_request: AliceRequest):
@@ -196,6 +231,41 @@ async def choose_short_duration(alice_request: AliceRequest):
         now=datetime.datetime.now(timezone(alice_request.meta.timezone)),
         wake_up_time=wake_up_time,
         mode=SleepMode.SHORT,
+    )
+    text_with_tts = response.text_with_tts
+    await dp.storage.set_state(user_id, States.CALCULATED)
+    return alice_request.response(
+        response_or_text=text_with_tts.text,
+        tts=text_with_tts.tts,
+        buttons=get_buttons_with_text(response.buttons_text),
+    )
+
+
+@dp.request_handler(
+    state=States.IN_CALCULATOR,
+    func=lambda req: contains_intent(req, "MEDIUM_SLEEP"),  # type: ignore
+)
+async def choose_medium_duration(alice_request: AliceRequest):
+    user_id = alice_request.session.user_id
+    # time when user wants to get up, saved from previous dialogues
+    time = await dp.storage.get_data(user_id)
+    user_timezone = timezone(alice_request.meta.timezone)
+    hour = time["hour"]
+    minute = time.get("minute")
+    if minute is None:
+        minute = 0
+    wake_up_time = (
+        datetime.datetime.now(user_timezone)
+        .time()
+        .replace(hour=hour, minute=minute, tzinfo=user_timezone)
+    )
+    user_manager = await UserManager.new_manager(
+        user_id=user_id, repo=SARepo(sa_repo_config), messages=RUMessages()
+    )
+    response = await user_manager.ask_sleep_time(
+        now=datetime.datetime.now(timezone(alice_request.meta.timezone)),
+        wake_up_time=wake_up_time,
+        mode=SleepMode.MEDIUM,
     )
     text_with_tts = response.text_with_tts
     await dp.storage.set_state(user_id, States.CALCULATED)
