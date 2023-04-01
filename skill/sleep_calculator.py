@@ -155,6 +155,10 @@ class SleepCalculator:
         return result
 
 
+# TODO: Change the sleep mode definition architecture to be more
+# developer-friendly (Issue #87)
+
+
 @SleepCalculator.mode_calculator(SleepMode.VERY_SHORT, 3)
 def vert_short_sleep(
     origin_time: datetime.datetime, wake_up_time: datetime.datetime
