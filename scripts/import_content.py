@@ -50,7 +50,9 @@ async def extract_tips_topics(
         tips_topics_to_insert.append(
             TipsTopic(
                 uuid4(),
-                TextWithTTS(prep(row.iloc[0]).lower(), prep(row.iloc[1])),
+                TextWithTTS(
+                    prep(row.iloc[0]).lower().strip(), prep(row.iloc[1])
+                ),
                 TextWithTTS(prep(row.iloc[2]), prep(row.iloc[3])),
                 created_date=datetime.utcnow().astimezone(UTC),
                 repo=repo,
