@@ -75,6 +75,17 @@ def contains_intent(req: AliceRequest, intent_name: str) -> bool:
 
 
 @dp.request_handler(
+    state=States.SELECTING_TIME, func=lambda req: contains_intent(req, "YANDEX.HELP")
+)
+async def time_form_info(alice_request: AliceRequest):
+    text_with_tts = RUMessages().get_sleep_form_message()
+    return alice_request.response(
+        response_or_text=text_with_tts.text,
+        tts=text_with_tts.tts,
+    )
+
+
+@dp.request_handler(
     state=States.all(),  # type: ignore
     func=lambda req: contains_intent(req, "QUIT_SKILL"),
 )
