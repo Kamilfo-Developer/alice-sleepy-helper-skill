@@ -55,7 +55,7 @@ class RUMessages(BaseMessages):
 
     def get_sleep_form_message(self) -> TextWithTTS:
         return TextWithTTS(
-            f"Скажите во сколько вы хотте лечь по форме {LAQUO}В 12:12{LAQUO}"
+            f"Скажите во сколько вы хотите лечь по форме {LAQUO}В 12:12{RAQUO}"
         )
 
     def get_start_message_intro(self, time: datetime.datetime) -> TextWithTTS:
