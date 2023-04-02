@@ -53,6 +53,11 @@ class RUMessages(BaseMessages):
     def __init__(self):
         pass
 
+    def get_sleep_form_message(self) -> TextWithTTS:
+        return TextWithTTS(
+            f"Скажите во сколько вы хотте лечь по форме {LAQUO}В 12:12{LAQUO}"
+        )
+
     def get_start_message_intro(self, time: datetime.datetime) -> TextWithTTS:
         daytime = Daytime.from_time(time)
         greeting = TextWithTTS("Здравствуйте!")
@@ -111,8 +116,7 @@ class RUMessages(BaseMessages):
 
         if streak > 1:
             praise = TextWithTTS(
-                f"Сегодня вы пользуетесь Сонным Помощником {streak}"
-                " день подряд. "
+                f"Сегодня вы пользуетесь Сонным Помощником {streak}" " день подряд. "
             )
             replicas_insert = [
                 TextWithTTS("Так держать!"),
@@ -123,9 +127,7 @@ class RUMessages(BaseMessages):
                 TextWithTTS("Продолжайте в том же духе!"),
             ]
             praise += random.choice(replicas_insert)
-            praise += TextWithTTS(
-                f" Вы спите лучше, чем {scoreboard}% пользователей! "
-            )
+            praise += TextWithTTS(f" Вы спите лучше, чем {scoreboard}% пользователей! ")
 
             message += praise
 
@@ -161,8 +163,7 @@ class RUMessages(BaseMessages):
 
         replicas_b = [
             TextWithTTS(
-                f"Скажите {LAQUO}Помощь{RAQUO}, чтобы узнать о "
-                "функциях навыка."
+                f"Скажите {LAQUO}Помощь{RAQUO}, чтобы узнать о " "функциях навыка."
             )
         ]
 
@@ -230,19 +231,16 @@ class RUMessages(BaseMessages):
         replicas_c = [
             TextWithTTS(f"Для этого скажите {LAQUO}Я хочу спать{RAQUO}."),
             TextWithTTS(
-                "Чтобы вызвать эту функцию, скажитe "
-                f"{LAQUO}Я хочу спать{RAQUO}."
+                "Чтобы вызвать эту функцию, скажитe " f"{LAQUO}Я хочу спать{RAQUO}."
             ),
         ]
 
         replicas_d = [
             TextWithTTS(
-                "А ещё вы можете попросить у меня совет по тому, "
-                "как лучше спать."
+                "А ещё вы можете попросить у меня совет по тому, " "как лучше спать."
             ),
             TextWithTTS(
-                "Или вы можете попросить у меня совет по тому, "
-                "как лучше спать."
+                "Или вы можете попросить у меня совет по тому, " "как лучше спать."
             ),
             TextWithTTS("А ещё я могу поделиться советом по здоровому сну."),
             TextWithTTS(
@@ -250,12 +248,10 @@ class RUMessages(BaseMessages):
                 "интересующему вас виду сна."
             ),
             TextWithTTS(
-                "Ещё я могу дать вам пару советов по улучшению "
-                "качества вашего сна."
+                "Ещё я могу дать вам пару советов по улучшению " "качества вашего сна."
             ),
             TextWithTTS(
-                "А ещё я могу дать вам пару советов по тому, "
-                "как высыпаться."
+                "А ещё я могу дать вам пару советов по тому, " "как высыпаться."
             ),
         ]
 
@@ -269,16 +265,13 @@ class RUMessages(BaseMessages):
         replicas = [
             TextWithTTS("Вас интересует совет по дневному или ночному сну?"),
             TextWithTTS(
-                "По какому сну вы хотите получить совет, дневному, "
-                "или ночному? "
+                "По какому сну вы хотите получить совет, дневному, " "или ночному? "
             ),
             TextWithTTS(
                 "Я могу дать вам совет по дневному или ночному сну. "
                 "Какой сон вас интересует?"
             ),
-            TextWithTTS(
-                "С каким сном вам нужна помощь? С дневным или ночным?"
-            ),
+            TextWithTTS("С каким сном вам нужна помощь? С дневным или ночным?"),
             TextWithTTS("Вам нужна помощь по дневному или ночному сну?"),
         ]
         # NOTE: Tip topic options are currently hardcoded.
@@ -373,9 +366,7 @@ class RUMessages(BaseMessages):
                 "минут. "
             )
         if activities:
-            message += TextWithTTS(
-                "За этот вечер вы можете успеть, например, "
-            )
+            message += TextWithTTS("За этот вечер вы можете успеть, например, ")
 
             activities_text_with_tts = [act.description for act in activities]
             if len(activities) > 1:
